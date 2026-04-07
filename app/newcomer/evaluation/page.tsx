@@ -1,22 +1,24 @@
 "use client";
 import { useState } from "react";
 import { NavBar, PageShell, Card, SectionLabel } from "@/components/ui";
-import { evalQuestions } from "@/lib/mock";
+import { EVAL_QUESTIONS } from "@/lib/framework";
+import { InterviewChat } from "@/components/InterviewChat";
 
-const bucketKeys = ["job", "org", "people"] as const;
-const bucketLabels = { job: "My Job", org: "My Organization", people: "My People" };
+const bucketKeys = ["fit", "ace", "tie"] as const;
+const bucketLabels = { fit: "FIT · Role Clarity", ace: "ACE · Task Mastery", tie: "TIE · Social Acceptance" };
 
 const labels = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"];
 
 export default function EvaluationPage() {
   const [scores, setScores] = useState<Record<string, number[]>>({
-    job: [0, 0, 0, 0, 0],
-    org: [0, 0, 0, 0, 0],
-    people: [0, 0, 0, 0, 0],
+    fit: [0, 0, 0, 0, 0],
+    ace: [0, 0, 0, 0, 0],
+    tie: [0, 0, 0, 0, 0],
   });
-  const [qualitative, setQualitative] = useState({ surprise: "", unclear: "" });
   const [submitted, setSubmitted] = useState(false);
-  const [activeBucket, setActiveBucket] = useState<"job" | "org" | "people">("job");
+  const [activeBucket, setActiveBucket] = useState<"fit" | "ace" | "tie">("fit");
+  const [checkinId, setCheckinId] = useState<string | null>(null);
+  const [interviewDone, setInterviewDone] = useState(false);
 
   const setScore = (bucket: string, idx: number, val: number) => {
     setScores(prev => ({
@@ -26,7 +28,8 @@ export default function EvaluationPage() {
   };
 
   const bucketComplete = (b: string) => scores[b].every(s => s > 0);
-  const allComplete = bucketKeys.every(bucketComplete) && qualitative.surprise && qualitative.unclear;
+  const allLikertComplete = bucketKeys.every(bucketComplete);
+  const allComplete = allLikertComplete;
 
   if (submitted) {
     return (
@@ -67,7 +70,7 @@ export default function EvaluationPage() {
       <Card>
         <SectionLabel>{bucketLabels[activeBucket]}</SectionLabel>
         <div className="space-y-5">
-          {evalQuestions[activeBucket].map((q, i) => (
+          {EVAL_QUESTIONS[activeBucket].map((q, i) => (
             <div key={i}>
               <p className="text-sm font-medium text-[#0A0A0A] mb-2.5 leading-relaxed">{q}</p>
               <div className="flex gap-1.5">
@@ -90,43 +93,60 @@ export default function EvaluationPage() {
         </div>
       </Card>
 
-      {/* Open questions */}
-      <Card>
-        <SectionLabel>In your own words</SectionLabel>
-        <div className="space-y-4">
-          <div>
-            <label className="text-sm font-medium text-[#0A0A0A] block mb-2">
-              What has surprised you most so far?
-            </label>
-            <textarea
-              value={qualitative.surprise}
-              onChange={e => setQualitative(p => ({ ...p, surprise: e.target.value }))}
-              className="w-full border border-[#E2E0DA] rounded-lg p-3 text-sm text-[#0A0A0A] resize-none focus:outline-none focus:border-[#0A0A0A] transition-colors bg-white"
-              rows={3} placeholder="Share anything that surprised you..."
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium text-[#0A0A0A] block mb-2">
-              What feels most unclear right now?
-            </label>
-            <textarea
-              value={qualitative.unclear}
-              onChange={e => setQualitative(p => ({ ...p, unclear: e.target.value }))}
-              className="w-full border border-[#E2E0DA] rounded-lg p-3 text-sm text-[#0A0A0A] resize-none focus:outline-none focus:border-[#0A0A0A] transition-colors bg-white"
-              rows={3} placeholder="Be honest — this helps your manager support you better..."
-            />
-          </div>
+      {/* Qualitative AI interview — appears after Likert scores are submitted */}
+      {checkinId && (
+        <div>
+          <SectionLabel>Part 2 — Qualitative Interview</SectionLabel>
+          <InterviewChat
+            checkinId={checkinId}
+            onComplete={() => setInterviewDone(true)}
+          />
         </div>
-      </Card>
+      )}
+
+      {!checkinId && allLikertComplete && (
+        <Card style={{ background: "#EEEEF5", border: "1px solid #1A1A2E" }}>
+          <p className="text-xs font-semibold text-[#1A1A2E] mb-1">Next: Qualitative interview</p>
+          <p className="text-sm text-[#1A1A2E]">
+            After submitting your ratings, an AI-guided interview will explore your experience in more depth.
+          </p>
+        </Card>
+      )}
 
       <button
-        onClick={() => allComplete && setSubmitted(true)}
+        onClick={async () => {
+          if (!allComplete) return;
+          if (checkinId) {
+            // Likert already submitted — just mark done
+            setSubmitted(true);
+            return;
+          }
+          try {
+            const res = await fetch("/api/newcomer/checkin", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                scores_fit: scores.fit,
+                scores_ace: scores.ace,
+                scores_tie: scores.tie,
+                month_number: new Date().getMonth() + 1,
+              }),
+            });
+            if (res.ok) {
+              const data = await res.json();
+              setCheckinId(data.id); // Triggers interview to appear
+              return; // Don't mark submitted yet — interview first
+            }
+          } catch { /* API may not be available in dev */ }
+          // Fallback: if API unavailable, just show submitted
+          setSubmitted(true);
+        }}
         className={`w-full py-4 rounded-xl font-semibold text-sm transition-colors ${
           allComplete
             ? "bg-[#0A0A0A] text-white hover:bg-[#1A1A2E]"
             : "bg-[#E2E0DA] text-[#AEABA3] cursor-not-allowed"
         }`}>
-        Submit check-in
+        {checkinId ? (interviewDone ? "Complete check-in" : "Interview in progress...") : "Submit ratings & start interview"}
       </button>
     </PageShell>
   );

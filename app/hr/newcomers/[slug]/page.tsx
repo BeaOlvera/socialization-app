@@ -5,107 +5,107 @@ import { notFound } from "next/navigation";
 const profiles: Record<string, {
   name: string; role: string; dept: string; day: number; phase: string;
   status: "green" | "yellow" | "red"; manager: string; avatar: string;
-  scores: { job: number; org: number; people: number };
+  scores: { fit: number; ace: number; tie: number };
   selfScore: number; managerScore: number;
   alerts: string[]; strengths: string[];
-  checkins: { date: string; job: number; org: number; people: number }[];
+  checkins: { date: string; fit: number; ace: number; tie: number }[];
 }> = {
   sofia: {
     name: "Sofia Martínez", role: "Marketing Specialist", dept: "Marketing",
     day: 18, phase: "Arrival", status: "yellow",
     manager: "Claire Bennett", avatar: "SM",
-    scores: { job: 62, org: 48, people: 35 },
+    scores: { fit: 62, ace: 48, tie: 35 },
     selfScore: 48, managerScore: 65,
-    alerts: ["Self vs manager divergence — 17 pts gap", "My People score below 40 — social integration at risk"],
+    alerts: ["Self vs manager divergence — 17 pts gap", "TIE score below 40 — social integration at risk"],
     strengths: ["Fast learner in role tasks", "Proactive communication with manager"],
     checkins: [
-      { date: "Mar W1", job: 30, org: 20, people: 15 },
-      { date: "Mar W3", job: 62, org: 48, people: 35 },
+      { date: "Mar W1", fit: 30, ace: 20, tie: 15 },
+      { date: "Mar W3", fit: 62, ace: 48, tie: 35 },
     ],
   },
   daniel: {
     name: "Daniel Cruz", role: "Data Analyst", dept: "Analytics",
     day: 54, phase: "Integration", status: "green",
     manager: "Ravi Sharma", avatar: "DC",
-    scores: { job: 78, org: 72, people: 68 },
+    scores: { fit: 78, ace: 72, tie: 68 },
     selfScore: 72, managerScore: 74,
     alerts: [],
     strengths: ["Strong cross-functional relationships", "Exceeds expectations in role clarity"],
     checkins: [
-      { date: "Feb W1", job: 40, org: 30, people: 22 },
-      { date: "Feb W3", job: 60, org: 52, people: 48 },
-      { date: "Mar W3", job: 78, org: 72, people: 68 },
+      { date: "Feb W1", fit: 40, ace: 30, tie: 22 },
+      { date: "Feb W3", fit: 60, ace: 52, tie: 48 },
+      { date: "Mar W3", fit: 78, ace: 72, tie: 68 },
     ],
   },
   yuki: {
     name: "Yuki Tanaka", role: "Product Designer", dept: "Product",
     day: 91, phase: "Adjustment", status: "red",
     manager: "Claire Bennett", avatar: "YT",
-    scores: { job: 55, org: 40, people: 28 },
+    scores: { fit: 55, ace: 40, tie: 28 },
     selfScore: 38, managerScore: 60,
-    alerts: ["Social isolation — My People critically low (28%)", "Large divergence gap — 22 pts", "No informal connections reported in 3 weeks"],
+    alerts: ["Social isolation — TIE critically low (28%)", "Large divergence gap — 22 pts", "No informal connections reported in 3 weeks"],
     strengths: ["Strong design output quality"],
     checkins: [
-      { date: "Jan", job: 35, org: 25, people: 20 },
-      { date: "Feb", job: 48, org: 35, people: 24 },
-      { date: "Mar", job: 55, org: 40, people: 28 },
+      { date: "Jan", fit: 35, ace: 25, tie: 20 },
+      { date: "Feb", fit: 48, ace: 35, tie: 24 },
+      { date: "Mar", fit: 55, ace: 40, tie: 28 },
     ],
   },
   marcus: {
     name: "Marcus Webb", role: "Account Executive", dept: "Sales",
     day: 134, phase: "Stabilization", status: "green",
     manager: "Lee Park", avatar: "MW",
-    scores: { job: 82, org: 75, people: 79 },
+    scores: { fit: 82, ace: 75, tie: 79 },
     selfScore: 78, managerScore: 80,
     alerts: [],
     strengths: ["Excellent relationship building", "Leading informal team rituals"],
     checkins: [
-      { date: "Nov", job: 55, org: 48, people: 50 },
-      { date: "Dec", job: 68, org: 60, people: 65 },
-      { date: "Jan", job: 75, org: 68, people: 72 },
-      { date: "Mar", job: 82, org: 75, people: 79 },
+      { date: "Nov", fit: 55, ace: 48, tie: 50 },
+      { date: "Dec", fit: 68, ace: 60, tie: 65 },
+      { date: "Jan", fit: 75, ace: 68, tie: 72 },
+      { date: "Mar", fit: 82, ace: 75, tie: 79 },
     ],
   },
   fatima: {
     name: "Fatima Al-Hassan", role: "Legal Counsel", dept: "Legal",
     day: 201, phase: "Embedding", status: "green",
     manager: "Susan Cole", avatar: "FA",
-    scores: { job: 88, org: 84, people: 86 },
+    scores: { fit: 88, ace: 84, tie: 86 },
     selfScore: 85, managerScore: 87,
     alerts: [],
     strengths: ["Fully embedded", "Acts as informal mentor to newer hires", "Strong influence across departments"],
     checkins: [
-      { date: "Sep", job: 72, org: 65, people: 68 },
-      { date: "Nov", job: 80, org: 76, people: 78 },
-      { date: "Mar", job: 88, org: 84, people: 86 },
+      { date: "Sep", fit: 72, ace: 65, tie: 68 },
+      { date: "Nov", fit: 80, ace: 76, tie: 78 },
+      { date: "Mar", fit: 88, ace: 84, tie: 86 },
     ],
   },
   ben: {
     name: "Ben Kowalski", role: "Software Engineer", dept: "Engineering",
     day: 12, phase: "Arrival", status: "green",
     manager: "Ravi Sharma", avatar: "BK",
-    scores: { job: 42, org: 28, people: 22 },
+    scores: { fit: 42, ace: 28, tie: 22 },
     selfScore: 35, managerScore: 40,
     alerts: ["Very early stage — monitoring only"],
     strengths: ["Strong technical onboarding progress"],
     checkins: [
-      { date: "Mar W1", job: 25, org: 18, people: 12 },
-      { date: "Mar W3", job: 42, org: 28, people: 22 },
+      { date: "Mar W1", fit: 25, ace: 18, tie: 12 },
+      { date: "Mar W3", fit: 42, ace: 28, tie: 22 },
     ],
   },
 };
 
 const bucketConfig = {
-  job:    { label: "My Job",    color: "#1A1A2E", bg: "#EEEEF5", num: "01" },
-  org:    { label: "My Org",    color: "#2D6A4F", bg: "#EAF4EF", num: "02" },
-  people: { label: "My People", color: "#9B2335", bg: "#FBEAEC", num: "03" },
+  fit: { label: "FIT",  color: "#1A1A2E", bg: "#EEEEF5", num: "01" },
+  ace: { label: "ACE",  color: "#2D6A4F", bg: "#EAF4EF", num: "02" },
+  tie: { label: "TIE",  color: "#9B2335", bg: "#FBEAEC", num: "03" },
 };
 
 export default function HRNewcomerDetail({ params }: { params: { slug: string } }) {
   const profile = profiles[params.slug];
   if (!profile) notFound();
 
-  const avg = Math.round((profile.scores.job + profile.scores.org + profile.scores.people) / 3);
+  const avg = Math.round((profile.scores.fit + profile.scores.ace + profile.scores.tie) / 3);
   const gap = profile.managerScore - profile.selfScore;
 
   return (
@@ -137,9 +137,9 @@ export default function HRNewcomerDetail({ params }: { params: { slug: string } 
         {/* Left column */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
-          {/* Bucket scores */}
+          {/* Dimension scores */}
           <Card>
-            <SectionLabel>Three-bucket scores</SectionLabel>
+            <SectionLabel>FIT · ACE · TIE scores</SectionLabel>
             <div style={{ display: "flex", gap: 16, justifyContent: "space-around", marginBottom: 16 }}>
               {(Object.entries(profile.scores) as [keyof typeof bucketConfig, number][]).map(([key, score]) => {
                 const bc = bucketConfig[key];
@@ -177,7 +177,7 @@ export default function HRNewcomerDetail({ params }: { params: { slug: string } 
                 <div key={i} style={{ background: "#F5F4F0", borderRadius: 10, padding: "10px 12px" }}>
                   <p style={{ fontSize: 11, fontWeight: 600, color: "#6B6B6B", marginBottom: 6 }}>{c.date}</p>
                   <div style={{ display: "flex", gap: 8 }}>
-                    {(["job", "org", "people"] as const).map(k => {
+                    {(["fit", "ace", "tie"] as const).map(k => {
                       const bc = bucketConfig[k];
                       return (
                         <div key={k} style={{ flex: 1, background: bc.bg, borderRadius: 7, padding: "5px 8px", textAlign: "center" }}>

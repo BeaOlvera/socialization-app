@@ -12,13 +12,13 @@ const notifications: Record<Role, {
 }[]> = {
   newcomer: [
     { id: "n1", type: "reminder", title: "Monthly check-in due", body: "Your March self-evaluation is due in 3 days. It takes about 5 minutes.", time: "Today", href: "/newcomer/evaluation", read: false },
-    { id: "n2", type: "alert", title: "My People score needs attention", body: "Your social integration score (35%) is below the target. Consider reaching out to 2 new colleagues this week.", time: "2 days ago", href: "/newcomer/buckets", read: false },
+    { id: "n2", type: "alert", title: "TIE score needs attention", body: "Your social integration score (35%) is below the target. Consider reaching out to 2 new colleagues this week.", time: "2 days ago", href: "/newcomer/buckets", read: false },
     { id: "n3", type: "info", title: "Manager check-in scheduled", body: "Claire Bennett has scheduled a 1:1 for Thursday March 26 at 10:00 AM.", time: "3 days ago", read: false },
-    { id: "n4", type: "reminder", title: "Task pending: Watch strategy video", body: "You have an uncompleted task in My Organization. It's quick — 5 minutes.", time: "5 days ago", href: "/newcomer/timeline", read: true },
+    { id: "n4", type: "reminder", title: "Task pending: Complete HubSpot module", body: "You have an uncompleted task in ACE · Task Mastery. It's quick — 5 minutes.", time: "5 days ago", href: "/newcomer/timeline", read: true },
     { id: "n5", type: "info", title: "Welcome to Arrival phase", body: "You're on Day 18 of 30 in your Arrival phase. Keep going!", time: "18 days ago", read: true },
   ],
   manager: [
-    { id: "m1", type: "alert", title: "Yuki Tanaka — flight risk", body: "Yuki's My People score dropped to 28%. Social isolation detected. Immediate check-in recommended.", time: "Today", href: "/manager/newcomer/sofia", read: false },
+    { id: "m1", type: "alert", title: "Yuki Tanaka — flight risk", body: "Yuki's TIE score dropped to 28%. Social isolation detected. Immediate check-in recommended.", time: "Today", href: "/manager/newcomer/sofia", read: false },
     { id: "m2", type: "alert", title: "Divergence alert — Sofia Martínez", body: "17-point gap between manager and self scores. Schedule a check-in to align perceptions.", time: "Yesterday", href: "/manager/checkin/sofia", read: false },
     { id: "m3", type: "reminder", title: "March evaluations pending", body: "2 of your 3 newcomers are awaiting your monthly evaluation. Due by March 31.", time: "2 days ago", href: "/manager/checkin/sofia", read: false },
     { id: "m4", type: "info", title: "Daniel Cruz — Integration phase", body: "Daniel moved into Integration phase today (Day 31). New milestones are now active.", time: "5 days ago", read: true },
@@ -27,9 +27,9 @@ const notifications: Record<Role, {
   hr: [
     { id: "h1", type: "alert", title: "2 newcomers at high risk", body: "Yuki Tanaka and one other show critical adjustment risk. Review immediately.", time: "Today", href: "/hr/newcomers/yuki", read: false },
     { id: "h2", type: "reminder", title: "March check-ins: 4 overdue", body: "4 newcomers have not completed their March self-evaluation. Send reminders.", time: "Yesterday", href: "/hr/newcomers", read: false },
-    { id: "h3", type: "alert", title: "Average My People score declining", body: "Company-wide average dropped 3 pts this month. Review cohort strategy.", time: "3 days ago", href: "/hr", read: false },
+    { id: "h3", type: "alert", title: "Average TIE score declining", body: "Company-wide social acceptance average dropped 3 pts this month. Review cohort strategy.", time: "3 days ago", href: "/hr", read: false },
     { id: "h4", type: "info", title: "Ben Kowalski joined the program", body: "New newcomer added: Ben Kowalski (Engineering, Day 12). Assigned to Ravi Sharma.", time: "12 days ago", read: true },
-    { id: "h5", type: "info", title: "Marcus Webb — Stabilization phase", body: "Marcus advanced to Stabilization phase (Day 134). On track across all buckets.", time: "4 days ago", read: true },
+    { id: "h5", type: "info", title: "Marcus Webb — Stabilization phase", body: "Marcus advanced to Stabilization phase (Day 134). On track across FIT · ACE · TIE.", time: "4 days ago", read: true },
   ],
 };
 

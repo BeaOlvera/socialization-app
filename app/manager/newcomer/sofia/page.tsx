@@ -6,7 +6,7 @@ const sofia = managerNewcomers[0];
 
 const nudges = [
   { text: "Review 90-day goals together in your next 1:1 — she may need more clarity on KPIs." },
-  { text: "Introduce Sofia to 1–2 people outside Marketing this week — her people score is the lowest." },
+  { text: "Introduce Sofia to 1–2 people outside Marketing this week — her TIE score is the lowest." },
 ];
 
 const qualQuotes = [
@@ -57,8 +57,8 @@ export default function SofiaPage() {
         </div>
       </div>
       <div className="space-y-3">
-        {(["job", "org", "people"] as const).map(b => {
-          const labels = { job: "My Job", org: "My Organization", people: "My People" };
+        {(["fit", "ace", "tie"] as const).map(b => {
+          const labels = { fit: "FIT · Role Clarity", ace: "ACE · Task Mastery", tie: "TIE · Social Acceptance" };
           return (
             <div key={b}>
               <div className="flex justify-between mb-1">

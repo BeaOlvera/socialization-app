@@ -12,7 +12,7 @@ export default function ManagerHome() {
 
     <Card style={{ background: "#FBEAEC", border: "1px solid #9B2335" }}>
       <p className="text-xs font-semibold text-[#9B2335] uppercase tracking-widest mb-1">Action needed</p>
-      <p className="text-sm text-[#9B2335]">Yuki Tanaka shows signs of social isolation — low Bucket 3 score for 3 consecutive weeks.</p>
+      <p className="text-sm text-[#9B2335]">Yuki Tanaka shows signs of social isolation — low TIE score for 3 consecutive weeks.</p>
     </Card>
 
     <div>
@@ -34,7 +34,7 @@ export default function ManagerHome() {
       <SectionLabel>Active newcomers ({managerNewcomers.length})</SectionLabel>
       <div className="space-y-2">
         {managerNewcomers.map((n, i) => (
-          <Link key={i} href={i === 0 ? "/manager/newcomer/sofia" : "#"}>
+          <Link key={i} href={`/manager/newcomer/${n.name.toLowerCase().split(" ")[0]}`}>
             <Card className="hover:border-[#0A0A0A] transition-colors cursor-pointer">
               <div className="flex items-start gap-3">
                 <Avatar initials={n.name.split(" ").map(w => w[0]).join("")} size={40} />
@@ -45,9 +45,9 @@ export default function ManagerHome() {
                   </div>
                   <p className="text-xs text-[#6B6B6B]">{n.role} · Day {n.day}</p>
                   <div className="mt-2.5 space-y-1.5">
-                    {(["job", "org", "people"] as const).map(b => (
+                    {(["fit", "ace", "tie"] as const).map(b => (
                       <div key={b} className="flex items-center gap-2">
-                        <span className="text-[10px] text-[#AEABA3] w-12 flex-shrink-0 capitalize">{b}</span>
+                        <span className="text-[10px] text-[#AEABA3] w-12 flex-shrink-0 uppercase">{b}</span>
                         <div className="flex-1 h-1.5 bg-[#F5F4F0] rounded-full overflow-hidden">
                           <div className="h-full rounded-full"
                             style={{

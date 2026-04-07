@@ -1,0 +1,11 @@
+{
+  "regions": ["cdg1"],
+  "functions": {
+    "app/api/newcomer/interview/*/chat/route.ts": {
+      "maxDuration": 120
+    },
+    "app/api/hr/newcomers/*/erase/route.ts": {
+      "maxDuration": 60
+    }
+  }
+}

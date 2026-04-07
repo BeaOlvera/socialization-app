@@ -11,9 +11,9 @@ import { currentData, monthlyData } from "@/components/Charts";
 export default function ProgressPage() {
   const latest = currentData[currentData.length - 1];
   const first = currentData[0];
-  const jobGrowth = latest.job - first.job;
-  const orgGrowth = latest.org - first.org;
-  const peopleGrowth = latest.people - first.people;
+  const fitGrowth = latest.fit - first.fit;
+  const aceGrowth = latest.ace - first.ace;
+  const tieGrowth = latest.tie - first.tie;
 
   const left = <>
     <div>
@@ -21,15 +21,15 @@ export default function ProgressPage() {
       <p style={{ fontSize: 13, color: "#6B6B6B" }}>Sofia Martínez · Day 18 · Arrival phase</p>
     </div>
 
-    {/* Three bucket trend */}
+    {/* Three dimension trend */}
     <Card>
-      <SectionLabel>Three-bucket scores — Month 1</SectionLabel>
+      <SectionLabel>FIT · ACE · TIE scores — Month 1</SectionLabel>
       <BucketLineChart />
       <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
         {[
-          { label: "My Job", growth: jobGrowth, color: "#1A1A2E", bg: "#EEEEF5" },
-          { label: "My Org", growth: orgGrowth, color: "#2D6A4F", bg: "#EAF4EF" },
-          { label: "My People", growth: peopleGrowth, color: "#9B2335", bg: "#FBEAEC" },
+          { label: "FIT", growth: fitGrowth, color: "#1A1A2E", bg: "#EEEEF5" },
+          { label: "ACE", growth: aceGrowth, color: "#2D6A4F", bg: "#EAF4EF" },
+          { label: "TIE", growth: tieGrowth, color: "#9B2335", bg: "#FBEAEC" },
         ].map(b => (
           <div key={b.label} style={{ flex: 1, background: b.bg, borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
             <p style={{ fontSize: 18, fontWeight: 700, color: b.color }}>+{b.growth}%</p>
@@ -71,9 +71,9 @@ export default function ProgressPage() {
       <SectionLabel>This week vs. last week</SectionLabel>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {[
-          { label: "My Job", current: latest.job, prev: currentData[currentData.length - 2]?.job || 0, color: "#1A1A2E", bg: "#EEEEF5" },
-          { label: "My Organization", current: latest.org, prev: currentData[currentData.length - 2]?.org || 0, color: "#2D6A4F", bg: "#EAF4EF" },
-          { label: "My People", current: latest.people, prev: currentData[currentData.length - 2]?.people || 0, color: "#9B2335", bg: "#FBEAEC" },
+          { label: "FIT · Role Clarity", current: latest.fit, prev: currentData[currentData.length - 2]?.fit || 0, color: "#1A1A2E", bg: "#EEEEF5" },
+          { label: "ACE · Task Mastery", current: latest.ace, prev: currentData[currentData.length - 2]?.ace || 0, color: "#2D6A4F", bg: "#EAF4EF" },
+          { label: "TIE · Social Acceptance", current: latest.tie, prev: currentData[currentData.length - 2]?.tie || 0, color: "#9B2335", bg: "#FBEAEC" },
         ].map(b => {
           const delta = b.current - b.prev;
           return (
@@ -100,7 +100,7 @@ export default function ProgressPage() {
     <Card style={{ background: "#ECECEA", border: "1px solid #DDDBD5" }}>
       <p style={{ fontSize: 11, fontWeight: 700, color: "#AEABA3", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>Insight</p>
       <p style={{ fontSize: 14, color: "#0A0A0A", lineHeight: 1.7 }}>
-        Your <strong>My Job</strong> track is progressing fastest. Focus energy on <strong>My People</strong> — social integration at this stage has a strong long-term effect on overall adjustment.
+        Your <strong>FIT</strong> track is progressing fastest. Focus energy on <strong>TIE</strong> — social integration at this stage has a strong long-term effect on overall adjustment.
       </p>
     </Card>
   </>;

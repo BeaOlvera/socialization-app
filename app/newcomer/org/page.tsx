@@ -3,101 +3,42 @@ import { useState } from "react";
 import { NavBar, PageShell, Card, SectionLabel } from "@/components/ui";
 
 type Person = {
-  id: string;
-  name: string;
-  role: string;
-  dept: string;
-  avatar: string;
-  tag?: string;
-  tagColor?: string;
-  tagBg?: string;
-  children?: Person[];
+  id: string; name: string; role: string; dept: string; avatar: string;
+  tag?: string; tagColor?: string; tagBg?: string; children?: Person[];
 };
 
 const org: Person = {
-  id: "ceo",
-  name: "Sarah Chen",
-  role: "Chief Executive Officer",
-  dept: "Executive",
-  avatar: "SC",
+  id: "ceo", name: "Sarah Chen", role: "CEO", dept: "Executive", avatar: "SC",
   children: [
     {
-      id: "claire",
-      name: "Claire Bennett",
-      role: "VP Marketing",
-      dept: "Marketing",
-      avatar: "CB",
-      tag: "Your manager",
-      tagColor: "#2D6A4F",
-      tagBg: "#EAF4EF",
+      id: "claire", name: "Claire Bennett", role: "VP Marketing", dept: "Marketing", avatar: "CB",
+      tag: "Your manager", tagColor: "#2D6A4F", tagBg: "#EAF4EF",
       children: [
-        {
-          id: "sofia",
-          name: "Sofia Martínez",
-          role: "Marketing Specialist",
-          dept: "Marketing",
-          avatar: "SM",
-          tag: "You · Day 18",
-          tagColor: "#1A1A2E",
-          tagBg: "#EEEEF5",
-        },
-        {
-          id: "james",
-          name: "James Okafor",
-          role: "Senior Marketing Manager",
-          dept: "Marketing",
-          avatar: "JO",
-          tag: "Your buddy",
-          tagColor: "#B7791F",
-          tagBg: "#FEF3E2",
-        },
-        {
-          id: "maya",
-          name: "Maya Torres",
-          role: "Content Lead",
-          dept: "Marketing",
-          avatar: "MT",
-        },
-        {
-          id: "raj",
-          name: "Raj Patel",
-          role: "Brand Designer",
-          dept: "Marketing",
-          avatar: "RP",
-        },
+        { id: "sofia", name: "Sofia Martínez", role: "Mkt. Specialist", dept: "Marketing", avatar: "SM", tag: "You", tagColor: "#1A1A2E", tagBg: "#EEEEF5" },
+        { id: "james", name: "James Okafor", role: "Sr. Mkt. Manager", dept: "Marketing", avatar: "JO", tag: "Buddy", tagColor: "#B7791F", tagBg: "#FEF3E2" },
+        { id: "maya", name: "Maya Torres", role: "Content Lead", dept: "Marketing", avatar: "MT" },
+        { id: "raj", name: "Raj Patel", role: "Brand Designer", dept: "Marketing", avatar: "RP" },
       ],
     },
     {
-      id: "jp",
-      name: "James Park",
-      role: "VP Product",
-      dept: "Product",
-      avatar: "JP",
+      id: "jp", name: "James Park", role: "VP Product", dept: "Product", avatar: "JP",
       children: [
         { id: "lc", name: "Lisa Chen", role: "Product Manager", dept: "Product", avatar: "LC" },
         { id: "ar", name: "Alex Rivera", role: "UX Lead", dept: "Product", avatar: "AR" },
       ],
     },
     {
-      id: "al",
-      name: "Ana Lima",
-      role: "VP Sales",
-      dept: "Sales",
-      avatar: "AL",
+      id: "al", name: "Ana Lima", role: "VP Sales", dept: "Sales", avatar: "AL",
       children: [
-        { id: "bm", name: "Ben Morris", role: "Account Executive", dept: "Sales", avatar: "BM" },
+        { id: "bm", name: "Ben Morris", role: "Account Exec", dept: "Sales", avatar: "BM" },
         { id: "ps", name: "Priya Shah", role: "Sales Manager", dept: "Sales", avatar: "PS" },
-        { id: "tn", name: "Tom Nielsen", role: "Account Executive", dept: "Sales", avatar: "TN" },
+        { id: "tn", name: "Tom Nielsen", role: "Account Exec", dept: "Sales", avatar: "TN" },
       ],
     },
     {
-      id: "dr",
-      name: "David Ross",
-      role: "CFO",
-      dept: "Finance",
-      avatar: "DR",
+      id: "dr", name: "David Ross", role: "CFO", dept: "Finance", avatar: "DR",
       children: [
-        { id: "km", name: "Kate Murphy", role: "Finance Manager", dept: "Finance", avatar: "KM" },
+        { id: "km", name: "Kate Murphy", role: "Finance Mgr", dept: "Finance", avatar: "KM" },
       ],
     },
   ],
@@ -105,148 +46,157 @@ const org: Person = {
 
 const deptColors: Record<string, { color: string; bg: string }> = {
   Executive: { color: "#1A1A2E", bg: "#EEEEF5" },
-  Marketing:  { color: "#9B2335", bg: "#FBEAEC" },
-  Product:    { color: "#2D6A4F", bg: "#EAF4EF" },
-  Sales:      { color: "#B7791F", bg: "#FEF3E2" },
-  Finance:    { color: "#6B6B6B", bg: "#F5F4F0" },
+  Marketing: { color: "#9B2335", bg: "#FBEAEC" },
+  Product:   { color: "#2D6A4F", bg: "#EAF4EF" },
+  Sales:     { color: "#B7791F", bg: "#FEF3E2" },
+  Finance:   { color: "#6B6B6B", bg: "#F5F4F0" },
 };
+
+const CW = 80;  // card width
+const GAP = 4;   // gap between cards
+const COL_GAP = 10; // gap between VP columns
+const CH = 82;  // card height (fixed for alignment)
 
 function NodeCard({ person, selected, onSelect }: { person: Person; selected: string | null; onSelect: (p: Person) => void }) {
   const dc = deptColors[person.dept] || deptColors.Finance;
   const isSelected = selected === person.id;
   const isMe = person.id === "sofia";
-
   return (
-    <button
-      onClick={() => onSelect(person)}
-      style={{
-        background: isMe ? "#0A0A0A" : "#FFFFFF",
-        border: isSelected ? `2px solid ${dc.color}` : isMe ? "2px solid #0A0A0A" : "1px solid #E2E0DA",
-        borderRadius: 12,
-        padding: "10px 12px",
-        cursor: "pointer",
-        textAlign: "left",
-        width: 148,
-        flexShrink: 0,
-        transition: "all 0.15s",
-        boxShadow: isSelected ? `0 0 0 3px ${dc.bg}` : "none",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 6 }}>
-        <div style={{
-          width: 28, height: 28, borderRadius: 99,
-          background: isMe ? "#FFFFFF22" : dc.bg,
-          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-        }}>
-          <span style={{ fontSize: 9, fontWeight: 800, color: isMe ? "#FFFFFF" : dc.color }}>{person.avatar}</span>
-        </div>
-        <div style={{ minWidth: 0 }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: isMe ? "#FFFFFF" : "#0A0A0A", lineHeight: 1.2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-            {person.name}
-          </p>
-          <p style={{ fontSize: 9, color: isMe ? "#AAAAAA" : "#AEABA3", lineHeight: 1.3 }}>{person.dept}</p>
-        </div>
-      </div>
-      <p style={{ fontSize: 10, color: isMe ? "#CCCCCC" : "#6B6B6B", lineHeight: 1.3, marginBottom: person.tag ? 6 : 0 }}>
-        {person.role}
-      </p>
+    <button onClick={() => onSelect(person)} style={{
+      background: isMe ? "#0A0A0A" : "#FFFFFF",
+      border: isSelected ? `2px solid ${dc.color}` : isMe ? "2px solid #0A0A0A" : "1px solid #E2E0DA",
+      borderRadius: 10, padding: "6px 4px", cursor: "pointer", textAlign: "center",
+      width: CW, minWidth: CW, height: CH, flexShrink: 0, transition: "all 0.15s",
+      boxShadow: isSelected ? `0 0 0 3px ${dc.bg}` : "none",
+      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+      position: "relative",
+    }}>
+      {/* Tag dot indicator */}
       {person.tag && (
-        <span style={{
-          fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 99,
-          background: isMe ? "#FFFFFF22" : person.tagBg,
-          color: isMe ? "#FFFFFF" : person.tagColor,
-        }}>
-          {person.tag}
-        </span>
+        <div style={{ position: "absolute", top: 4, right: 4, width: 8, height: 8, borderRadius: 99, background: isMe ? "#FFF" : person.tagColor, border: isMe ? "none" : `2px solid ${person.tagBg}` }} />
       )}
+      <div style={{ width: 24, height: 24, borderRadius: 99, marginBottom: 3, background: isMe ? "#FFFFFF22" : dc.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <span style={{ fontSize: 8, fontWeight: 800, color: isMe ? "#FFF" : dc.color }}>{person.avatar}</span>
+      </div>
+      <p style={{ fontSize: 9, fontWeight: 700, color: isMe ? "#FFF" : "#0A0A0A", lineHeight: 1.15, marginBottom: 1, overflow: "hidden", textOverflow: "ellipsis", width: "100%", padding: "0 2px" }}>{person.name}</p>
+      <p style={{ fontSize: 7, color: isMe ? "#AAA" : "#6B6B6B", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", width: "100%", padding: "0 2px" }}>{person.role}</p>
     </button>
   );
 }
 
-// Draws a connector line between parent and children
-function Connector({ count }: { count: number }) {
-  if (count === 0) return null;
-  const childWidth = 148;
-  const gap = 12;
-  const totalWidth = count * childWidth + (count - 1) * gap;
-  const segW = childWidth + gap;
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: totalWidth }}>
-      {/* vertical stem down from parent */}
-      <div style={{ width: 2, height: 16, background: "#E2E0DA" }} />
-      {count > 1 ? (
-        <>
-          {/* horizontal bar */}
-          <div style={{ position: "relative", width: "100%", height: 2, background: "#E2E0DA" }} />
-          {/* vertical drops to each child */}
-          <div style={{ display: "flex", gap: `${gap}px`, width: "100%" }}>
-            {Array.from({ length: count }).map((_, i) => (
-              <div key={i} style={{ width: childWidth, display: "flex", justifyContent: "center" }}>
-                <div style={{ width: 2, height: 16, background: "#E2E0DA" }} />
-              </div>
-            ))}
-          </div>
-        </>
-      ) : (
-        <div style={{ width: 2, height: 16, background: "#E2E0DA" }} />
-      )}
-    </div>
-  );
+/** Width of a VP column = max(VP card, sum of children cards + gaps) */
+function colWidth(vp: Person): number {
+  const childCount = vp.children?.length || 0;
+  const childrenWidth = childCount * CW + Math.max(0, childCount - 1) * GAP;
+  return Math.max(CW, childrenWidth);
 }
 
 export default function OrgPage() {
   const [selected, setSelected] = useState<Person | null>(null);
-
-  const vpList = org.children || [];
-  const marketingTeam = vpList.find(v => v.id === "claire")?.children || [];
+  const vps = org.children || [];
 
   function handleSelect(p: Person) {
     setSelected(prev => prev?.id === p.id ? null : p);
   }
 
+  const totalWidth = vps.reduce((s, vp) => s + colWidth(vp), 0) + (vps.length - 1) * COL_GAP;
+
   return (
     <PageShell nav={<NavBar role="newcomer" active="Org" />}>
-
-      {/* Header */}
       <div>
         <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0A0A0A", marginBottom: 4 }}>Org Chart</h2>
         <p style={{ fontSize: 13, color: "#6B6B6B" }}>Meridian Group · Click any person to see their details</p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 280px", gap: 16, alignItems: "start" }}>
+        <Card style={{ overflowX: "auto", padding: "24px 16px" }}>
+          <div style={{ width: totalWidth, margin: "0 auto" }}>
 
-        {/* Chart area */}
-        <Card style={{ overflowX: "auto", padding: "28px 24px" }}>
-
-          {/* Level 0 — CEO */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 0 }}>
-            <NodeCard person={org} selected={selected?.id || null} onSelect={handleSelect} />
-
-            {/* connector to VPs */}
-            <Connector count={vpList.length} />
-
-            {/* Level 1 — VPs */}
-            <div style={{ display: "flex", gap: 12 }}>
-              {vpList.map(vp => (
-                <div key={vp.id} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <NodeCard person={vp} selected={selected?.id || null} onSelect={handleSelect} />
-
-                  {/* connector to children */}
-                  {vp.children && vp.children.length > 0 && (
-                    <>
-                      <Connector count={vp.children.length} />
-                      {/* Level 2 — team members */}
-                      <div style={{ display: "flex", gap: 12 }}>
-                        {vp.children.map(member => (
-                          <NodeCard key={member.id} person={member} selected={selected?.id || null} onSelect={handleSelect} />
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-              ))}
+            {/* ROW 0: CEO */}
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 0 }}>
+              <NodeCard person={org} selected={selected?.id || null} onSelect={handleSelect} />
             </div>
+
+            {/* Vertical line from CEO */}
+            <div style={{ width: 2, height: 16, background: "#E2E0DA", margin: "0 auto" }} />
+
+            {/* ROW 1: VP horizontal bar — single continuous line from first center to last center */}
+            <div style={{ display: "flex", height: 2 }}>
+              {vps.map((vp, i) => {
+                const w = colWidth(vp) + (i < vps.length - 1 ? COL_GAP : 0);
+                const isFirst = i === 0;
+                const isLast = i === vps.length - 1;
+                return (
+                  <div key={vp.id + "-hbar"} style={{ width: w, display: "flex", height: 2 }}>
+                    <div style={{ flex: 1, background: isFirst ? "transparent" : "#E2E0DA" }} />
+                    <div style={{ flex: 1, background: isLast ? "transparent" : "#E2E0DA" }} />
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* ROW 2: VP vertical drops + cards */}
+            <div style={{ display: "flex", gap: COL_GAP }}>
+              {vps.map(vp => {
+                const w = colWidth(vp);
+                return (
+                  <div key={vp.id} style={{ width: w, display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <div style={{ width: 2, height: 16, background: "#E2E0DA" }} />
+                    <NodeCard person={vp} selected={selected?.id || null} onSelect={handleSelect} />
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* ROW 3: VP→children vertical lines + connector bars */}
+            <div style={{ display: "flex", gap: COL_GAP }}>
+              {vps.map(vp => {
+                const w = colWidth(vp);
+                const kids = vp.children || [];
+                return (
+                  <div key={vp.id + "-conn"} style={{ width: w }}>
+                    {kids.length > 0 && (
+                      <>
+                        <div style={{ width: 2, height: 16, background: "#E2E0DA", margin: "0 auto" }} />
+                        {kids.length > 1 && (
+                          <div style={{ display: "flex", height: 2 }}>
+                            {kids.map((_, ci) => {
+                              const isFirst = ci === 0;
+                              const isLast = ci === kids.length - 1;
+                              return (
+                                <div key={ci} style={{ flex: 1, display: "flex", height: 2 }}>
+                                  <div style={{ flex: 1, background: isFirst ? "transparent" : "#E2E0DA" }} />
+                                  <div style={{ flex: 1, background: isLast ? "transparent" : "#E2E0DA" }} />
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* ROW 4: Team member cards (all at same level) */}
+            <div style={{ display: "flex", gap: COL_GAP }}>
+              {vps.map(vp => {
+                const w = colWidth(vp);
+                const kids = vp.children || [];
+                return (
+                  <div key={vp.id + "-kids"} style={{ width: w, display: "flex", gap: GAP, justifyContent: "center" }}>
+                    {kids.map(kid => (
+                      <div key={kid.id} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                        {kids.length > 1 && <div style={{ width: 2, height: 16, background: "#E2E0DA" }} />}
+                        <NodeCard person={kid} selected={selected?.id || null} onSelect={handleSelect} />
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+
           </div>
         </Card>
 
@@ -255,30 +205,15 @@ export default function OrgPage() {
           {selected ? (
             <Card>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                <div style={{
-                  width: 44, height: 44, borderRadius: 99,
-                  background: deptColors[selected.dept]?.bg || "#F5F4F0",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: deptColors[selected.dept]?.color || "#6B6B6B" }}>
-                    {selected.avatar}
-                  </span>
+                <div style={{ width: 44, height: 44, borderRadius: 99, background: deptColors[selected.dept]?.bg || "#F5F4F0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: deptColors[selected.dept]?.color || "#6B6B6B" }}>{selected.avatar}</span>
                 </div>
                 <div>
                   <p style={{ fontSize: 15, fontWeight: 700, color: "#0A0A0A" }}>{selected.name}</p>
                   <p style={{ fontSize: 12, color: "#6B6B6B" }}>{selected.role}</p>
                 </div>
               </div>
-              {selected.tag && (
-                <span style={{
-                  display: "inline-block", fontSize: 11, fontWeight: 600,
-                  padding: "3px 10px", borderRadius: 99,
-                  background: selected.tagBg, color: selected.tagColor,
-                  marginBottom: 14,
-                }}>
-                  {selected.tag}
-                </span>
-              )}
+              {selected.tag && <span style={{ display: "inline-block", fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 99, background: selected.tagBg, color: selected.tagColor, marginBottom: 14 }}>{selected.tag}</span>}
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ fontSize: 12, color: "#AEABA3" }}>Department</span>
@@ -290,38 +225,16 @@ export default function OrgPage() {
                     <span style={{ fontSize: 12, fontWeight: 600, color: "#0A0A0A" }}>{selected.children.length}</span>
                   </div>
                 )}
-                {selected.id === "sofia" && (
-                  <div style={{ marginTop: 8, background: "#EEEEF5", borderRadius: 10, padding: "10px 12px" }}>
-                    <p style={{ fontSize: 11, color: "#6B6B6B", lineHeight: 1.6 }}>
-                      Day 18 · Arrival phase · On track across all three buckets.
-                    </p>
-                  </div>
-                )}
-                {selected.id === "claire" && (
-                  <div style={{ marginTop: 8, background: "#EAF4EF", borderRadius: 10, padding: "10px 12px" }}>
-                    <p style={{ fontSize: 11, color: "#2D6A4F", lineHeight: 1.6 }}>
-                      Sofia's direct manager. Monthly check-ins scheduled. Divergence alert active.
-                    </p>
-                  </div>
-                )}
-                {selected.id === "james" && (
-                  <div style={{ marginTop: 8, background: "#FEF3E2", borderRadius: 10, padding: "10px 12px" }}>
-                    <p style={{ fontSize: 11, color: "#B7791F", lineHeight: 1.6 }}>
-                      Sofia's assigned buddy. First meeting completed on Day 3.
-                    </p>
-                  </div>
-                )}
+                {selected.id === "sofia" && <div style={{ marginTop: 8, background: "#EEEEF5", borderRadius: 10, padding: "10px 12px" }}><p style={{ fontSize: 11, color: "#6B6B6B", lineHeight: 1.6 }}>Day 18 · Arrival phase · On track across FIT · ACE · TIE.</p></div>}
+                {selected.id === "claire" && <div style={{ marginTop: 8, background: "#EAF4EF", borderRadius: 10, padding: "10px 12px" }}><p style={{ fontSize: 11, color: "#2D6A4F", lineHeight: 1.6 }}>Sofia's direct manager. Monthly check-ins scheduled.</p></div>}
+                {selected.id === "james" && <div style={{ marginTop: 8, background: "#FEF3E2", borderRadius: 10, padding: "10px 12px" }}><p style={{ fontSize: 11, color: "#B7791F", lineHeight: 1.6 }}>Sofia's assigned buddy. First meeting completed on Day 3.</p></div>}
               </div>
             </Card>
           ) : (
             <Card style={{ background: "#F5F4F0", border: "1px solid #E2E0DA" }}>
-              <p style={{ fontSize: 12, color: "#AEABA3", textAlign: "center", padding: "16px 0" }}>
-                Click any person to see their details
-              </p>
+              <p style={{ fontSize: 12, color: "#AEABA3", textAlign: "center", padding: "16px 0" }}>Click any person to see their details</p>
             </Card>
           )}
-
-          {/* Legend */}
           <Card>
             <SectionLabel>Departments</SectionLabel>
             <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
@@ -333,8 +246,6 @@ export default function OrgPage() {
               ))}
             </div>
           </Card>
-
-          {/* My connections */}
           <Card>
             <SectionLabel>Your key connections</SectionLabel>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -357,7 +268,6 @@ export default function OrgPage() {
           </Card>
         </div>
       </div>
-
     </PageShell>
   );
 }

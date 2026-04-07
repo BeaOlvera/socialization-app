@@ -4,47 +4,47 @@ import { NavBar, PageShell, Card, SectionLabel } from "@/components/ui";
 
 const buckets = [
   {
-    id: "job", label: "My Job", num: "01", color: "#1A1A2E", bg: "#EEEEF5",
+    id: "fit", label: "FIT · Role Clarity", num: "01", color: "#1A1A2E", bg: "#EEEEF5",
     questions: [
-      "Sofia clearly understands her role and responsibilities",
-      "She is performing her core tasks with confidence",
-      "She knows how to find the resources she needs",
-      "She understands how her performance is evaluated",
-      "She has already delivered meaningful results",
+      "Sofia clearly understands her role, responsibilities and reporting line",
+      "She knows where her role fits in the org structure",
+      "She understands her KPIs and how success is measured",
+      "She is clear on decision rights and RACI boundaries",
+      "She sees how her work connects to the company strategy",
     ],
   },
   {
-    id: "org", label: "My Organization", num: "02", color: "#2D6A4F", bg: "#EAF4EF",
+    id: "ace", label: "ACE · Task Mastery", num: "02", color: "#2D6A4F", bg: "#EAF4EF",
     questions: [
-      "She understands how decisions are made here",
-      "She is aligning with the company's values and culture",
-      "She grasps how her role fits the broader strategy",
-      "She navigates the organization comfortably",
-      "She participates in team rituals and norms",
+      "She is following her onboarding plan and hitting milestones",
+      "She navigates the tools and systems she needs with confidence",
+      "She knows where to find SOPs and follows documented processes",
+      "She understands how her performance will be appraised",
+      "She is actively closing her skill gaps",
     ],
   },
   {
-    id: "people", label: "My People", num: "03", color: "#9B2335", bg: "#FBEAEC",
+    id: "tie", label: "TIE · Social Acceptance", num: "03", color: "#9B2335", bg: "#FBEAEC",
     questions: [
-      "She is building meaningful relationships with the team",
+      "She has a good relationship with her buddy/mentor",
+      "She participates in team rituals and informal gatherings",
+      "She is aligning with the company values in her behaviour",
+      "She is connecting with people beyond her immediate team",
       "She seems to feel a sense of belonging",
-      "She asks for help when needed",
-      "She is connecting with key cross-functional contacts",
-      "She is becoming socially integrated",
     ],
   },
 ];
 
-const sofiaScores = { job: 62, org: 48, people: 35 };
+const sofiaScores = { fit: 62, ace: 48, tie: 35 };
 
 export default function ManagerCheckinPage() {
-  const [tab, setTab] = useState("job");
+  const [tab, setTab] = useState("fit");
   const [ratings, setRatings] = useState<Record<string, number[]>>({
-    job:    [0, 0, 0, 0, 0],
-    org:    [0, 0, 0, 0, 0],
-    people: [0, 0, 0, 0, 0],
+    fit:  [0, 0, 0, 0, 0],
+    ace:  [0, 0, 0, 0, 0],
+    tie:  [0, 0, 0, 0, 0],
   });
-  const [notes, setNotes] = useState<Record<string, string>>({ job: "", org: "", people: "" });
+  const [notes, setNotes] = useState<Record<string, string>>({ fit: "", ace: "", tie: "" });
   const [submitted, setSubmitted] = useState(false);
 
   const activeBucket = buckets.find(b => b.id === tab)!;

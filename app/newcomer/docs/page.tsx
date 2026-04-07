@@ -28,7 +28,7 @@ const docs = [
   },
   {
     id: "your-role",
-    category: "My Job",
+    category: "FIT",
     icon: "01",
     title: "Your role & 90-day plan",
     subtitle: "What success looks like · 5 min read",
@@ -85,7 +85,7 @@ const docs = [
   },
   {
     id: "culture-guide",
-    category: "My Organization",
+    category: "ACE",
     icon: "02",
     title: "Culture guide",
     subtitle: "How we work at Meridian · 6 min read",
@@ -134,8 +134,8 @@ const docs = [
   },
   {
     id: "org-structure",
-    category: "My Organization",
-    icon: "02",
+    category: "FIT",
+    icon: "01",
     title: "Org structure & key people",
     subtitle: "Who's who at Meridian · 4 min read",
     tag: null,
@@ -173,8 +173,8 @@ const docs = [
   },
   {
     id: "first-week",
-    category: "My Job",
-    icon: "01",
+    category: "ACE",
+    icon: "02",
     title: "Your first week schedule",
     subtitle: "Day by day · March 3–7, 2026",
     tag: "Starts Mar 3",
@@ -376,13 +376,13 @@ export default function DocsPage() {
 
   const categoryColor: Record<string, string> = {
     "Personal": "#B7791F",
-    "My Job": "#1A1A2E",
-    "My Organization": "#2D6A4F",
+    "FIT": "#1A1A2E",
+    "ACE": "#2D6A4F",
   };
   const categoryBg: Record<string, string> = {
     "Personal": "#FEF3E2",
-    "My Job": "#EEEEF5",
-    "My Organization": "#EAF4EF",
+    "FIT": "#EEEEF5",
+    "ACE": "#EAF4EF",
   };
 
   return (

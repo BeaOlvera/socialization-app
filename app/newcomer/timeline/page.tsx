@@ -11,22 +11,22 @@ const initialPhases = [
     status: "active",
     description: "Learn the basics, meet the team, get oriented.",
     buckets: {
-      job: [
-        { label: "Complete tool onboarding", done: true },
-        { label: "Review job description & goals", done: true },
-        { label: "Understand performance criteria", done: false },
-        { label: "Map key stakeholders", done: false },
+      fit: [
+        { label: "Review job description & reporting line", done: true },
+        { label: "Explore org chart and team structure", done: true },
+        { label: "Understand first-quarter KPIs with manager", done: false },
+        { label: "Map key stakeholders (RACI)", done: false },
       ],
-      org: [
-        { label: "Read culture guide", done: true },
-        { label: "Watch strategy video", done: false },
-        { label: "Browse org chart", done: true },
-        { label: "Attend first All-Hands", done: true },
+      ace: [
+        { label: "Complete tool onboarding (Slack, HubSpot, Asana)", done: true },
+        { label: "Start 30-60-90 day training plan", done: false },
+        { label: "Locate SOPs & playbooks in Notion", done: true },
+        { label: "Understand performance review timeline", done: true },
       ],
-      people: [
+      tie: [
         { label: "Meet buddy James", done: true },
-        { label: "Intro to direct team", done: true },
-        { label: "Coffee with manager Claire", done: true },
+        { label: "Attend first team stand-up and All-Hands", done: true },
+        { label: "Read company values guide", done: true },
         { label: "Meet 2 cross-functional contacts", done: false },
       ],
     },
@@ -37,25 +37,25 @@ const initialPhases = [
     period: "Days 31–90",
     months: "Apr – May 2026",
     status: "upcoming",
-    description: "Deepen relationships, take ownership, deliver first results.",
+    description: "Deepen understanding, take ownership, deliver first results.",
     buckets: {
-      job: [
-        { label: "Lead first campaign brief", done: false },
+      fit: [
+        { label: "Align priorities with strategic plan", done: false },
+        { label: "Clarify RACI for cross-functional projects", done: false },
         { label: "Present 90-day marketing calendar", done: false },
-        { label: "Own one project end-to-end", done: false },
-        { label: "Get first performance feedback", done: false },
+        { label: "Get first KPI review from manager", done: false },
       ],
-      org: [
-        { label: "Understand budget & approval process", done: false },
+      ace: [
+        { label: "Lead first campaign brief end-to-end", done: false },
+        { label: "Complete all mandatory training modules", done: false },
+        { label: "Execute one process using documented SOP", done: false },
+        { label: "Identify top skill gap and start closing it", done: false },
+      ],
+      tie: [
+        { label: "Build working relationship with Product & Sales", done: false },
         { label: "Attend quarterly off-site", done: false },
-        { label: "Grasp strategic priorities for the year", done: false },
-        { label: "Know how decisions are made", done: false },
-      ],
-      people: [
-        { label: "Build working relationship with Product", done: false },
-        { label: "Build working relationship with Sales", done: false },
-        { label: "Have regular 1:1 rhythm with manager", done: false },
-        { label: "Connect with 5+ colleagues informally", done: false },
+        { label: "Join one employee community or ERG", done: false },
+        { label: "Complete 60-day pulse survey", done: false },
       ],
     },
   },
@@ -67,22 +67,22 @@ const initialPhases = [
     status: "future",
     description: "Work independently, expand your network, find your voice.",
     buckets: {
-      job: [
+      fit: [
+        { label: "Own Q3 marketing roadmap priorities", done: false },
+        { label: "Identify one boundary/RACI improvement", done: false },
+        { label: "Connect work to annual strategic goals", done: false },
+        { label: "Update job scope with manager if needed", done: false },
+      ],
+      ace: [
         { label: "Deliver measurable campaign results", done: false },
-        { label: "Identify one process improvement", done: false },
-        { label: "Own Q3 marketing roadmap", done: false },
-        { label: "Mentor a junior team member", done: false },
+        { label: "Master all core tools independently", done: false },
+        { label: "Propose one process improvement", done: false },
+        { label: "Complete mid-year performance self-assessment", done: false },
       ],
-      org: [
-        { label: "Understand how culture affects decisions", done: false },
-        { label: "Be known outside your department", done: false },
-        { label: "Know the informal power structure", done: false },
-        { label: "Feel at home in the organization", done: false },
-      ],
-      people: [
+      tie: [
         { label: "Have a network beyond immediate team", done: false },
-        { label: "Be someone others come to for advice", done: false },
-        { label: "Participate in informal social rituals", done: false },
+        { label: "Participate in informal social rituals regularly", done: false },
+        { label: "Demonstrate values alignment in daily work", done: false },
         { label: "Feel genuine belonging", done: false },
       ],
     },
@@ -95,23 +95,23 @@ const initialPhases = [
     status: "future",
     description: "Consolidate your position, refine your approach, grow.",
     buckets: {
-      job: [
-        { label: "Consistently high performance", done: false },
-        { label: "Lead a cross-functional initiative", done: false },
-        { label: "Be the go-to expert in your area", done: false },
-        { label: "Define your development path", done: false },
+      fit: [
+        { label: "Be the go-to expert for your domain", done: false },
+        { label: "Lead cross-functional initiatives with clarity", done: false },
+        { label: "Contribute to team strategic planning", done: false },
+        { label: "Define your development path forward", done: false },
       ],
-      org: [
-        { label: "Contribute to culture, not just absorb it", done: false },
-        { label: "Influence decisions in your domain", done: false },
-        { label: "Understand long-term company direction", done: false },
-        { label: "Recognized as a reliable colleague", done: false },
+      ace: [
+        { label: "Consistently high-quality deliverables", done: false },
+        { label: "Mentor a newer team member on tools/processes", done: false },
+        { label: "Complete required certifications", done: false },
+        { label: "Get strong performance appraisal feedback", done: false },
       ],
-      people: [
+      tie: [
         { label: "Have trusted allies across departments", done: false },
         { label: "Give and receive honest peer feedback", done: false },
-        { label: "Support new newcomers", done: false },
-        { label: "Strong sense of identity within org", done: false },
+        { label: "Support new newcomers (pay it forward)", done: false },
+        { label: "Strong sense of identity within the org", done: false },
       ],
     },
   },
@@ -123,22 +123,22 @@ const initialPhases = [
     status: "future",
     description: "You are no longer new. You are part of the fabric.",
     buckets: {
-      job: [
+      fit: [
         { label: "Strategic contributor, not just executor", done: false },
         { label: "Define next year's goals with manager", done: false },
         { label: "Recognized for unique value you bring", done: false },
-        { label: "Complete 12-month reflection", done: false },
+        { label: "Complete 12-month role reflection", done: false },
       ],
-      org: [
-        { label: "Deep understanding of org dynamics", done: false },
-        { label: "Shape culture through actions", done: false },
-        { label: "Confidently navigate any situation", done: false },
-        { label: "Feel like you've always been here", done: false },
+      ace: [
+        { label: "Full mastery of role's technical demands", done: false },
+        { label: "Shape SOPs and processes for the team", done: false },
+        { label: "Skills matrix shows no critical gaps", done: false },
+        { label: "Exceed performance appraisal expectations", done: false },
       ],
-      people: [
+      tie: [
         { label: "Rich network of genuine relationships", done: false },
         { label: "Trusted across the organization", done: false },
-        { label: "Part of informal and formal networks", done: false },
+        { label: "Part of informal and formal communities", done: false },
         { label: "Fully socially embedded", done: false },
       ],
     },
@@ -146,9 +146,9 @@ const initialPhases = [
 ];
 
 const bucketConfig = {
-  job:    { label: "My Job",          color: "#1A1A2E", bg: "#EEEEF5", num: "01" },
-  org:    { label: "My Organization", color: "#2D6A4F", bg: "#EAF4EF", num: "02" },
-  people: { label: "My People",       color: "#9B2335", bg: "#FBEAEC", num: "03" },
+  fit: { label: "FIT · Role Clarity",       color: "#1A1A2E", bg: "#EEEEF5", num: "01" },
+  ace: { label: "ACE · Task Mastery",        color: "#2D6A4F", bg: "#EAF4EF", num: "02" },
+  tie: { label: "TIE · Social Acceptance",   color: "#9B2335", bg: "#FBEAEC", num: "03" },
 };
 
 const statusConfig = {
@@ -250,9 +250,9 @@ export default function TimelinePage() {
         </div>
       </Card>
 
-      {/* Overall bucket progress bars */}
+      {/* Overall dimension progress bars */}
       <Card>
-        <SectionLabel>Overall progress by bucket</SectionLabel>
+        <SectionLabel>Overall progress by dimension</SectionLabel>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {(Object.keys(bucketConfig) as BucketKey[]).map(key => {
             const bc = bucketConfig[key];
@@ -285,7 +285,6 @@ export default function TimelinePage() {
         {/* Phase selector tabs */}
         <div style={{ display: "flex", gap: 4, marginBottom: 18, overflowX: "auto" }}>
           {phases.map(p => {
-            const sc = statusConfig[p.status as keyof typeof statusConfig];
             const isSelected = p.id === activePhase;
             return (
               <button
@@ -335,9 +334,9 @@ export default function TimelinePage() {
           <div style={{ height: "100%", background: "#0A0A0A", borderRadius: 99, width: `${pct(currentPhase)}%`, transition: "width 0.5s" }} />
         </div>
 
-        {/* Three bucket columns — interactive */}
+        {/* Three dimension columns — interactive */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-          {(Object.entries(currentPhase.buckets) as [BucketKey, typeof currentPhase.buckets.job][]).map(([key, items]) => {
+          {(Object.entries(currentPhase.buckets) as [BucketKey, typeof currentPhase.buckets.fit][]).map(([key, items]) => {
             const bc = bucketConfig[key];
             const bucketDone = items.filter(i => i.done).length;
             const bucketPct = Math.round((bucketDone / items.length) * 100);

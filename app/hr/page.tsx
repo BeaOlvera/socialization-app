@@ -28,12 +28,12 @@ export default function HRHome() {
 
     {/* Avg scores */}
     <Card>
-      <SectionLabel>Average bucket scores</SectionLabel>
+      <SectionLabel>Average dimension scores</SectionLabel>
       <div className="space-y-3">
         {[
-          { label: "My Job", score: hrOverview.avgScores.job },
-          { label: "My Organization", score: hrOverview.avgScores.org },
-          { label: "My People", score: hrOverview.avgScores.people },
+          { label: "FIT · Role Clarity", score: hrOverview.avgScores.fit },
+          { label: "ACE · Task Mastery", score: hrOverview.avgScores.ace },
+          { label: "TIE · Social Acceptance", score: hrOverview.avgScores.tie },
         ].map(s => (
           <div key={s.label}>
             <div className="flex justify-between mb-1">
@@ -53,7 +53,7 @@ export default function HRHome() {
       <div className="mt-4 bg-[#FEF3E2] rounded-lg p-3">
         <p className="text-xs font-semibold text-[#B7791F] mb-1">Organization insight</p>
         <p className="text-sm text-[#B7791F]">
-          &quot;My People&quot; is the weakest bucket (52%). Social integration is the main gap — consider strengthening the buddy program.
+          TIE is the weakest dimension (52%). Social integration is the main gap — consider strengthening the buddy program.
         </p>
       </div>
     </Card>

@@ -79,7 +79,7 @@ export function NavBar({ role, active }: { role: "newcomer" | "manager" | "hr"; 
     ],
     manager: [
       { href: "/manager", label: "My Team" },
-      { href: "/manager/newcomer/sofia", label: "Sofia M." },
+      { href: "/manager/newcomer/sofia", label: "Newcomer Detail" },
     ],
     hr: [
       { href: "/hr", label: "Overview" },
@@ -172,14 +172,17 @@ export function SectionLabel({ children }: { children: ReactNode }) {
 
 export function BucketTag({ bucket }: { bucket: string }) {
   const map: Record<string, string> = {
-    job: "My Job", org: "My Org", people: "My People"
+    fit: "FIT", ace: "ACE", tie: "TIE"
   };
   const colors: Record<string, string> = {
-    job: "#EEEEF5", org: "#F5F4F0", people: "#F5F4F0"
+    fit: "#EEEEF5", ace: "#EAF4EF", tie: "#FBEAEC"
+  };
+  const textColors: Record<string, string> = {
+    fit: "#1A1A2E", ace: "#2D6A4F", tie: "#9B2335"
   };
   return (
-    <span className="text-xs font-medium px-2 py-0.5 rounded-full text-[#6B6B6B]"
-      style={{ background: colors[bucket] }}>
+    <span className="text-xs font-bold px-2 py-0.5 rounded-full"
+      style={{ background: colors[bucket], color: textColors[bucket] }}>
       {map[bucket]}
     </span>
   );

@@ -8,7 +8,7 @@ export default function BucketsPage() {
     <PageShell nav={<NavBar role="newcomer" active="My Journey" />}>
       <div className="space-y-1">
         <h2 className="text-xl font-bold">My Journey</h2>
-        <p className="text-sm text-[#6B6B6B]">Three tracks running in parallel — all day, every day.</p>
+        <p className="text-sm text-[#6B6B6B]">Three dimensions running in parallel — FIT · ACE · TIE.</p>
       </div>
 
       {buckets.map((b, bi) => (
@@ -52,13 +52,13 @@ export default function BucketsPage() {
           {bi === 0 && (
             <div className="mt-4 bg-[#EEEEF5] rounded-lg p-3">
               <p className="text-xs font-semibold text-[#1A1A2E] mb-1">Next step</p>
-              <p className="text-sm text-[#1A1A2E]">Ask Claire to walk you through your performance KPIs in your next 1:1.</p>
+              <p className="text-sm text-[#1A1A2E]">Ask Claire to walk you through your KPIs and how success is measured in your next 1:1.</p>
             </div>
           )}
           {bi === 1 && (
-            <div className="mt-4 bg-[#FEF3E2] rounded-lg p-3">
-              <p className="text-xs font-semibold text-[#B7791F] mb-1">Tip</p>
-              <p className="text-sm text-[#B7791F]">Watch the 5-min strategy video in your resources section — it will unlock three items at once.</p>
+            <div className="mt-4 bg-[#EAF4EF] rounded-lg p-3">
+              <p className="text-xs font-semibold text-[#2D6A4F] mb-1">Tip</p>
+              <p className="text-sm text-[#2D6A4F]">Find the SOPs and playbooks in Notion — completing one process end-to-end will unlock confidence fast.</p>
             </div>
           )}
           {bi === 2 && (

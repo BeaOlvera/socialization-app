@@ -2,8 +2,8 @@
 import { NavBar, PageShell, Card, SectionLabel, ScoreRing } from "@/components/ui";
 import Link from "next/link";
 
-const finalScores = { job: 88, org: 84, people: 85 };
-const startScores = { job: 30, org: 20, people: 15 };
+const finalScores = { fit: 88, ace: 84, tie: 85 };
+const startScores = { fit: 30, ace: 20, tie: 15 };
 
 const milestones = [
   { month: "Day 1",    label: "First day at Meridian Group", icon: "🏁" },
@@ -16,13 +16,13 @@ const milestones = [
 ];
 
 const bucketConfig = {
-  job:    { label: "My Job",          color: "#1A1A2E", bg: "#EEEEF5", num: "01" },
-  org:    { label: "My Organization", color: "#2D6A4F", bg: "#EAF4EF", num: "02" },
-  people: { label: "My People",       color: "#9B2335", bg: "#FBEAEC", num: "03" },
+  fit: { label: "FIT · Role Clarity",       color: "#1A1A2E", bg: "#EEEEF5", num: "01" },
+  ace: { label: "ACE · Task Mastery",        color: "#2D6A4F", bg: "#EAF4EF", num: "02" },
+  tie: { label: "TIE · Social Acceptance",   color: "#9B2335", bg: "#FBEAEC", num: "03" },
 };
 
 export default function CompletePage() {
-  const avg = Math.round((finalScores.job + finalScores.org + finalScores.people) / 3);
+  const avg = Math.round((finalScores.fit + finalScores.ace + finalScores.tie) / 3);
 
   return (
     <PageShell nav={<NavBar role="newcomer" active="Home" />}>
@@ -51,7 +51,7 @@ export default function CompletePage() {
 
         {/* Final scores */}
         <Card>
-          <SectionLabel>Final scores — all three buckets</SectionLabel>
+          <SectionLabel>Final scores — all three dimensions</SectionLabel>
           <div style={{ display: "flex", gap: 12, justifyContent: "space-around", marginBottom: 20 }}>
             {(Object.entries(finalScores) as [keyof typeof bucketConfig, number][]).map(([key, score]) => (
               <div key={key} style={{ textAlign: "center" }}>
@@ -102,7 +102,7 @@ export default function CompletePage() {
             <p style={{ fontSize: 16, fontWeight: 700, color: "#0A0A0A", marginBottom: 4 }}>Sofia Martínez</p>
             <p style={{ fontSize: 12, color: "#6B6B6B", marginBottom: 16 }}>has successfully completed the 12-month<br />socialization journey at Meridian Group</p>
             <div style={{ display: "flex", gap: 6, justifyContent: "center", flexWrap: "wrap" }}>
-              {["Fully embedded", "3/3 buckets ≥ 80%", "No flight risk", "Social network built"].map(tag => (
+              {["Fully embedded", "FIT · ACE · TIE ≥ 80%", "No flight risk", "Social network built"].map(tag => (
                 <span key={tag} style={{ fontSize: 10, fontWeight: 600, background: "#EEEEF5", color: "#1A1A2E", padding: "3px 10px", borderRadius: 99 }}>
                   {tag}
                 </span>
@@ -115,7 +115,7 @@ export default function CompletePage() {
           <Card style={{ background: "#ECECEA", border: "1px solid #DDDBD5" }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: "#AEABA3", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>Reflection</p>
             <p style={{ fontSize: 13, color: "#0A0A0A", lineHeight: 1.7 }}>
-              Your <strong>My People</strong> track showed the most growth (+70 pts). The social integration effort in months 2–4 paid off long-term. You are now someone others seek out.
+              Your <strong>TIE</strong> track showed the most growth (+70 pts). The social integration effort in months 2–4 paid off long-term. You are now someone others seek out.
             </p>
           </Card>
 

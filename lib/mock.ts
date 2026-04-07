@@ -1,3 +1,10 @@
+/**
+ * MOCK DATA — Development fallback only.
+ * In production, all data comes from the Supabase API.
+ * Pages import this as fallback when API is unavailable.
+ * See lib/framework.ts for the canonical FIT/ACE/TIE definitions.
+ */
+
 export const newcomer = {
   name: "Sofia Martínez",
   role: "Senior Marketing Manager",
@@ -12,53 +19,53 @@ export const newcomer = {
 
 export const buckets = [
   {
-    id: "job",
-    label: "My Job",
+    id: "fit",
+    label: "FIT · Role Clarity",
     number: "01",
     score: 62,
     color: "accent",
     items: [
-      { label: "Role clarity", done: true },
-      { label: "30-60-90 day goals", done: true },
-      { label: "Performance criteria", done: false },
-      { label: "Tools & systems access", done: true },
-      { label: "Who to ask for what", done: false },
+      { label: "Reviewed job description & reporting line", done: true },
+      { label: "Explored org chart & cross-functional links", done: true },
+      { label: "Understand KPIs and success criteria", done: false },
+      { label: "Clear on RACI and decision rights", done: false },
+      { label: "Connect role to strategic plan", done: false },
     ],
   },
   {
-    id: "org",
-    label: "My Organization",
+    id: "ace",
+    label: "ACE · Task Mastery",
     number: "02",
     score: 48,
     color: "ink",
     items: [
-      { label: "Org chart & team structure", done: true },
-      { label: "Company values & culture", done: true },
-      { label: "Strategy & current priorities", done: false },
-      { label: "How decisions are made", done: false },
-      { label: "Norms & rituals", done: false },
+      { label: "Started training & onboarding plan", done: true },
+      { label: "Set up tools & systems access", done: true },
+      { label: "Located SOPs & playbooks", done: false },
+      { label: "Understand performance appraisal process", done: false },
+      { label: "Reviewed skills matrix & development gaps", done: false },
     ],
   },
   {
-    id: "people",
-    label: "My People",
+    id: "tie",
+    label: "TIE · Social Acceptance",
     number: "03",
     score: 35,
     color: "muted",
     items: [
-      { label: "Met my buddy", done: true },
-      { label: "Met my direct team", done: true },
-      { label: "Key cross-functional contacts", done: false },
-      { label: "Informal networks", done: false },
-      { label: "Sense of belonging", done: false },
+      { label: "Met buddy / mentor", done: true },
+      { label: "Participated in team rituals", done: true },
+      { label: "Explored company values in action", done: false },
+      { label: "Joined employee communities", done: false },
+      { label: "Completed first pulse survey", done: false },
     ],
   },
 ];
 
 export const todayActions = [
-  { bucket: "job", text: "Review your 90-day goals with Claire", urgent: true },
-  { bucket: "people", text: "Send a coffee chat request to Ana Lima (Finance)", urgent: false },
-  { bucket: "org", text: "Watch the 5-min company strategy video", urgent: false },
+  { bucket: "fit", text: "Review your 90-day goals with Claire", urgent: true },
+  { bucket: "tie", text: "Send a coffee chat request to Ana Lima (Finance)", urgent: false },
+  { bucket: "ace", text: "Complete the HubSpot onboarding module", urgent: false },
 ];
 
 export const myTeam = [
@@ -76,7 +83,7 @@ export const managerNewcomers = [
     day: 18,
     phase: "Arrival",
     status: "yellow",
-    scores: { job: 62, org: 48, people: 35 },
+    scores: { fit: 62, ace: 48, tie: 35 },
     selfScore: 48,
     managerScore: 65,
     flag: "Self vs manager divergence — schedule a check-in",
@@ -87,7 +94,7 @@ export const managerNewcomers = [
     day: 54,
     phase: "Integration",
     status: "green",
-    scores: { job: 78, org: 72, people: 68 },
+    scores: { fit: 78, ace: 72, tie: 68 },
     selfScore: 72,
     managerScore: 74,
     flag: null,
@@ -98,10 +105,10 @@ export const managerNewcomers = [
     day: 91,
     phase: "Adjustment",
     status: "red",
-    scores: { job: 55, org: 40, people: 28 },
+    scores: { fit: 55, ace: 40, tie: 28 },
     selfScore: 38,
     managerScore: 60,
-    flag: "Social isolation — Bucket 3 critically low",
+    flag: "Social isolation — TIE score critically low",
   },
 ];
 
@@ -110,7 +117,7 @@ export const hrOverview = {
   green: 8,
   yellow: 4,
   red: 2,
-  avgScores: { job: 69, org: 58, people: 52 },
+  avgScores: { fit: 69, ace: 58, tie: 52 },
   flightRisk: 2,
   phases: { arrival: 5, integration: 4, adjustment: 3, stabilization: 1, embedding: 1 },
 };
@@ -125,25 +132,25 @@ export const hrNewcomers = [
 ];
 
 export const evalQuestions = {
-  job: [
-    "I clearly understand what is expected of me in my role",
-    "I feel confident performing my core tasks",
-    "I know where to find the resources I need",
-    "I understand how my performance will be evaluated",
-    "I have achieved meaningful results since joining",
+  fit: [
+    "I clearly understand my role, responsibilities and reporting line",
+    "I know where my role sits in the org structure and who to collaborate with",
+    "I understand my KPIs and what success looks like",
+    "I'm clear on decision rights and where my role ends and others' begin",
+    "I see how my daily work connects to the company's strategic objectives",
   ],
-  org: [
-    "I understand how decisions are made in this company",
-    "I feel aligned with the company's values and culture",
-    "I understand how my role contributes to company goals",
-    "I know who to go to for information outside my team",
-    "I feel comfortable navigating this organization",
+  ace: [
+    "I'm following a structured onboarding plan with clear milestones",
+    "I can navigate the tools and systems I need for my daily work",
+    "I know where to find SOPs, playbooks and quality standards",
+    "I understand how my performance will be evaluated and when",
+    "I know my skill gaps and have a plan to close them",
   ],
-  people: [
-    "I have built meaningful relationships with colleagues",
-    "I feel like I belong in this team",
-    "I feel comfortable asking others for help",
-    "I know who my key contacts are across the company",
-    "I feel socially integrated in this organization",
+  tie: [
+    "My buddy/mentor has been a valuable support in my first weeks",
+    "I'm included in team rituals — meetings, lunches, informal chats",
+    "I see the company values lived in action, not just on the wall",
+    "I've connected with people beyond my immediate team",
+    "I feel like I belong here and people have my back",
   ],
 };

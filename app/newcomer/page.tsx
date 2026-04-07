@@ -54,7 +54,7 @@ export default function NewcomerHome() {
   const right = <>
     {/* Three buckets */}
     <div>
-      <SectionLabel>My three tracks</SectionLabel>
+      <SectionLabel>My three dimensions</SectionLabel>
       <div className="space-y-2">
         {buckets.map(b => (
           <Link key={b.id} href="/newcomer/buckets">
