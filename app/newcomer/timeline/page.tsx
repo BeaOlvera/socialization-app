@@ -354,14 +354,15 @@ export default function TimelinePage() {
                   <div style={{ height: "100%", background: bc.color, borderRadius: 99, width: `${bucketPct}%`, transition: "width 0.4s" }} />
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  {items.map((item, i) => (
+                  {items.map((item: any, i: number) => (
                     <button
                       key={i}
                       onClick={() => toggle(currentPhase.id, key, i)}
                       style={{
                         display: "flex", alignItems: "flex-start", gap: 8,
-                        background: "none", border: "none", cursor: "pointer",
-                        padding: "4px 0", textAlign: "left", width: "100%",
+                        background: item.done ? "transparent" : "#FFFFFF",
+                        border: "none", cursor: "pointer", borderRadius: 8,
+                        padding: "6px 8px", textAlign: "left", width: "100%",
                       }}
                     >
                       <div style={{
@@ -373,13 +374,29 @@ export default function TimelinePage() {
                       }}>
                         {item.done && <span style={{ fontSize: 9, color: "#FFFFFF", fontWeight: 700 }}>✓</span>}
                       </div>
-                      <span style={{
-                        fontSize: 11, color: item.done ? "#AEABA3" : "#0A0A0A",
-                        textDecoration: item.done ? "line-through" : "none",
-                        lineHeight: 1.4, transition: "color 0.15s",
-                      }}>
-                        {item.label}
-                      </span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <span style={{
+                          fontSize: 11, color: item.done ? "#AEABA3" : "#0A0A0A",
+                          textDecoration: item.done ? "line-through" : "none",
+                          lineHeight: 1.4, display: "block",
+                        }}>
+                          {item.label}
+                        </span>
+                        {(item.estimated_time || item.output) && !item.done && (
+                          <div style={{ display: "flex", gap: 6, marginTop: 3, flexWrap: "wrap" }}>
+                            {item.estimated_time && (
+                              <span style={{ fontSize: 8, color: "#AEABA3", background: "#F5F4F0", padding: "1px 5px", borderRadius: 4 }}>
+                                {item.estimated_time}
+                              </span>
+                            )}
+                            {item.output && (
+                              <span style={{ fontSize: 8, color: "#6B6B6B", lineHeight: 1.3 }}>
+                                → {item.output}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </button>
                   ))}
                 </div>

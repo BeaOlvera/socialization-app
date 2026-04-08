@@ -70,6 +70,7 @@ export function NavBar({ role, active }: { role: "newcomer" | "manager" | "hr"; 
     newcomer: [
       { href: "/newcomer", label: "Home" },
       { href: "/newcomer/docs", label: "Documents" },
+      { href: "/newcomer/activities", label: "Activities" },
       { href: "/newcomer/timeline", label: "Timeline" },
       { href: "/newcomer/progress", label: "Progress" },
       { href: "/newcomer/buckets", label: "My Journey" },
