@@ -2,6 +2,7 @@
 import { NavBar, PageShell, Card, SectionLabel, BucketTag } from "@/components/ui";
 import { PHASES, DIMENSIONS } from "@/lib/framework";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Task {
   id: string;
@@ -16,6 +17,10 @@ interface Task {
   days: string | null;
   done: boolean;
   completed_at: string | null;
+  type: string;
+  assigned_to: string;
+  due_date: string | null;
+  format: string | null;
 }
 
 type Phase = keyof typeof PHASES;
@@ -27,6 +32,7 @@ const DIM_COLORS: Record<string, { border: string; bg: string; text: string }> =
 };
 
 export default function ActivitiesPage() {
+  const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [activePhase, setActivePhase] = useState<Phase>("arrival");
@@ -209,15 +215,44 @@ export default function ActivitiesPage() {
 
                     {/* Content */}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{
-                        fontSize: 14,
-                        fontWeight: 600,
-                        color: "#0A0A0A",
-                        textDecoration: task.done ? "line-through" : "none",
-                        marginBottom: 6,
-                      }}>
-                        {task.activity}
-                      </p>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                        <p
+                          onClick={() => {
+                            if ((task.type || "activity") === "checkin" && !task.done) {
+                              router.push(`/newcomer/checkin/${task.id}`);
+                            }
+                          }}
+                          style={{
+                            fontSize: 14,
+                            fontWeight: 600,
+                            color: "#0A0A0A",
+                            textDecoration: task.done ? "line-through" : "none",
+                            cursor: (task.type || "activity") === "checkin" && !task.done ? "pointer" : "default",
+                          }}
+                        >
+                          {task.activity}
+                        </p>
+                        {(task.type || "activity") === "checkin" && (
+                          <span style={{
+                            fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: 20,
+                            background: "#FEF3E2", color: "#B7791F", flexShrink: 0,
+                          }}>
+                            Check-in
+                          </span>
+                        )}
+                        {(task.type || "activity") === "checkin" && !task.done && (
+                          <button
+                            onClick={() => router.push(`/newcomer/checkin/${task.id}`)}
+                            style={{
+                              fontSize: 10, fontWeight: 600, padding: "3px 10px", borderRadius: 6,
+                              background: "#0A0A0A", color: "#FFF", border: "none", cursor: "pointer",
+                              flexShrink: 0, marginLeft: "auto",
+                            }}
+                          >
+                            Open
+                          </button>
+                        )}
+                      </div>
 
                       {/* Meta row */}
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, fontSize: 12, color: "#6B6B6B" }}>
@@ -231,7 +266,12 @@ export default function ActivitiesPage() {
                             <span style={{ color: "#AEABA3" }}>With:</span> {task.who}
                           </span>
                         )}
-                        {task.days && (
+                        {task.due_date && (
+                          <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                            <span style={{ color: "#AEABA3" }}>Due:</span> {task.due_date}
+                          </span>
+                        )}
+                        {task.days && !task.due_date && (
                           <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
                             <span style={{ color: "#AEABA3" }}>When:</span> {task.days}
                           </span>

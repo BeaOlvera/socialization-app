@@ -35,7 +35,7 @@ export default function CompanyDetail() {
   const [newcomers, setNewcomers] = useState<Newcomer[]>([]);
   const [config, setConfig] = useState<Config>({ has_buddies: true, checkin_frequency: "monthly" });
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"templates" | "checkins" | "newcomers" | "config">("templates");
+  const [tab, setTab] = useState<"templates" | "checkins" | "people" | "newcomers" | "config">("templates");
   const [uploading, setUploading] = useState(false);
   const [assigning, setAssigning] = useState<string | null>(null);
   const [message, setMessage] = useState("");
@@ -118,6 +118,38 @@ export default function CompanyDetail() {
     e.target.value = "";
   }
 
+  async function handleImportPeople(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setMessage("");
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("autoAssign", "true");
+
+    const res = await fetch(`/api/admin/companies/${id}/import-people`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const parts = [];
+      if (data.users_created) parts.push(`${data.users_created} users`);
+      if (data.newcomers_created) parts.push(`${data.newcomers_created} newcomers`);
+      if (data.org_links) parts.push(`${data.org_links} org links`);
+      setMessage(`Imported: ${parts.join(", ")}${data.errors?.length ? ` (${data.errors.length} errors)` : ""}`);
+      // Refresh newcomers
+      fetchNewcomers();
+    } else {
+      const err = await res.json();
+      setMessage(`Error: ${err.error}`);
+    }
+    setUploading(false);
+    e.target.value = "";
+  }
+
   async function assignToNewcomer(newcomerId: string) {
     setAssigning(newcomerId);
     setMessage("");
@@ -184,7 +216,7 @@ export default function CompanyDetail() {
 
       {/* Tabs */}
       <div style={{ display: "flex", gap: 6 }}>
-        {(["templates", "checkins", "newcomers", "config"] as const).map(t => (
+        {(["templates", "checkins", "people", "newcomers", "config"] as const).map(t => (
           <button key={t} onClick={() => setTab(t)} style={{
             padding: "8px 18px", borderRadius: 10, border: tab === t ? "2px solid #0A0A0A" : "1px solid #E2E0DA",
             background: tab === t ? "#0A0A0A" : "#FFFFFF", color: tab === t ? "#FFFFFF" : "#6B6B6B",
@@ -192,6 +224,7 @@ export default function CompanyDetail() {
           }}>
             {t === "templates" ? `Activities (${activities.length})` :
              t === "checkins" ? `Check-ins (${checkins.length})` :
+             t === "people" ? "Import People" :
              t === "newcomers" ? `Newcomers (${newcomers.length})` : "Config"}
           </button>
         ))}
@@ -290,6 +323,62 @@ export default function CompanyDetail() {
               </table>
             </div>
           )}
+        </Card>
+      )}
+
+      {/* People import tab */}
+      {tab === "people" && (
+        <Card>
+          <SectionLabel>Bulk Import Employees & Newcomers</SectionLabel>
+          <p style={{ fontSize: 13, color: "#6B6B6B", marginBottom: 16, lineHeight: 1.6 }}>
+            Upload an Excel file with all employees. The system will create user accounts, newcomer records,
+            org chart relationships, and auto-assign all activities + check-ins.
+          </p>
+
+          <div style={{ background: "#F5F4F0", borderRadius: 12, padding: 20, marginBottom: 16 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Required Excel columns:</p>
+            <table style={{ fontSize: 12, borderCollapse: "collapse", width: "100%" }}>
+              <thead>
+                <tr style={{ borderBottom: "2px solid #E2E0DA" }}>
+                  <th style={{ textAlign: "left", padding: "4px 8px", color: "#0A0A0A", fontWeight: 700 }}>Column</th>
+                  <th style={{ textAlign: "left", padding: "4px 8px", color: "#0A0A0A", fontWeight: 700 }}>Required</th>
+                  <th style={{ textAlign: "left", padding: "4px 8px", color: "#0A0A0A", fontWeight: 700 }}>Example</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ["Name", "Yes", "Sofia Martinez"],
+                  ["Email", "Yes", "sofia@company.com"],
+                  ["Role/Position", "No", "Sr. Marketing Manager"],
+                  ["Department", "No", "Marketing"],
+                  ["Reports To", "No", "claire@company.com"],
+                  ["Is Newcomer", "Yes", "Yes / No"],
+                  ["Start Date", "If newcomer", "2026-03-03"],
+                  ["Buddy Email", "No", "james@company.com"],
+                  ["Password", "No", "Defaults to welcome123"],
+                ].map(([col, req, ex]) => (
+                  <tr key={col} style={{ borderBottom: "1px solid #E2E0DA" }}>
+                    <td style={{ padding: "4px 8px", fontWeight: 600 }}>{col}</td>
+                    <td style={{ padding: "4px 8px", color: req === "Yes" ? "#9B2335" : "#6B6B6B" }}>{req}</td>
+                    <td style={{ padding: "4px 8px", color: "#AEABA3" }}>{ex}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <label style={{
+              padding: "10px 20px", borderRadius: 10, background: "#0A0A0A", color: "#FFFFFF",
+              fontSize: 13, fontWeight: 600, cursor: "pointer",
+            }}>
+              {uploading ? "Importing..." : "Upload People Excel"}
+              <input type="file" accept=".xlsx,.xls" onChange={handleImportPeople} hidden />
+            </label>
+            <p style={{ fontSize: 11, color: "#AEABA3" }}>
+              Activities & check-ins will be auto-assigned to newcomers
+            </p>
+          </div>
         </Card>
       )}
 
