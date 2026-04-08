@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import React, { ReactNode } from "react";
+import { useCompanyConfig } from "@/lib/use-config";
 
 export function Card({ children, className = "", style }: { children: ReactNode; className?: string; style?: React.CSSProperties }) {
   return (
@@ -66,21 +67,26 @@ export function Avatar({ initials, size = 36 }: { initials: string; size?: numbe
 }
 
 export function NavBar({ role, active }: { role: "newcomer" | "manager" | "hr" | "admin"; active: string }) {
+  const { visible_pages } = useCompanyConfig();
+
+  // Map page keys to nav links
+  const allNewcomerLinks = [
+    { href: "/newcomer", label: "Home", key: "home" },
+    { href: "/newcomer/docs", label: "Documents", key: "docs" },
+    { href: "/newcomer/activities", label: "Activities", key: "activities" },
+    { href: "/newcomer/timeline", label: "Timeline", key: "timeline" },
+    { href: "/newcomer/progress", label: "Progress", key: "progress" },
+    { href: "/newcomer/buckets", label: "My Journey", key: "buckets" },
+    { href: "/newcomer/org", label: "Org Chart", key: "org" },
+    { href: "/newcomer/people", label: "My People", key: "people" },
+    { href: "/newcomer/evaluation", label: "Check-in", key: "evaluation" },
+  ];
+
   const links = {
     admin: [
       { href: "/admin", label: "Companies" },
     ],
-    newcomer: [
-      { href: "/newcomer", label: "Home" },
-      { href: "/newcomer/docs", label: "Documents" },
-      { href: "/newcomer/activities", label: "Activities" },
-      { href: "/newcomer/timeline", label: "Timeline" },
-      { href: "/newcomer/progress", label: "Progress" },
-      { href: "/newcomer/buckets", label: "My Journey" },
-      { href: "/newcomer/org", label: "Org Chart" },
-      { href: "/newcomer/people", label: "My People" },
-      { href: "/newcomer/evaluation", label: "Check-in" },
-    ],
+    newcomer: allNewcomerLinks.filter(l => visible_pages.includes(l.key)),
     manager: [
       { href: "/manager", label: "My Team" },
     ],

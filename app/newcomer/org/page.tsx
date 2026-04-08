@@ -1,273 +1,191 @@
 "use client";
-import { useState } from "react";
-import { NavBar, PageShell, Card, SectionLabel } from "@/components/ui";
+import { useEffect, useState } from "react";
+import { NavBar, PageShell, Card, SectionLabel, Avatar } from "@/components/ui";
 
-type Person = {
-  id: string; name: string; role: string; dept: string; avatar: string;
-  tag?: string; tagColor?: string; tagBg?: string; children?: Person[];
-};
-
-const org: Person = {
-  id: "ceo", name: "Sarah Chen", role: "CEO", dept: "Executive", avatar: "SC",
-  children: [
-    {
-      id: "claire", name: "Claire Bennett", role: "VP Marketing", dept: "Marketing", avatar: "CB",
-      tag: "Your manager", tagColor: "#2D6A4F", tagBg: "#EAF4EF",
-      children: [
-        { id: "sofia", name: "Sofia Martínez", role: "Mkt. Specialist", dept: "Marketing", avatar: "SM", tag: "You", tagColor: "#1A1A2E", tagBg: "#EEEEF5" },
-        { id: "james", name: "James Okafor", role: "Sr. Mkt. Manager", dept: "Marketing", avatar: "JO", tag: "Buddy", tagColor: "#B7791F", tagBg: "#FEF3E2" },
-        { id: "maya", name: "Maya Torres", role: "Content Lead", dept: "Marketing", avatar: "MT" },
-        { id: "raj", name: "Raj Patel", role: "Brand Designer", dept: "Marketing", avatar: "RP" },
-      ],
-    },
-    {
-      id: "jp", name: "James Park", role: "VP Product", dept: "Product", avatar: "JP",
-      children: [
-        { id: "lc", name: "Lisa Chen", role: "Product Manager", dept: "Product", avatar: "LC" },
-        { id: "ar", name: "Alex Rivera", role: "UX Lead", dept: "Product", avatar: "AR" },
-      ],
-    },
-    {
-      id: "al", name: "Ana Lima", role: "VP Sales", dept: "Sales", avatar: "AL",
-      children: [
-        { id: "bm", name: "Ben Morris", role: "Account Exec", dept: "Sales", avatar: "BM" },
-        { id: "ps", name: "Priya Shah", role: "Sales Manager", dept: "Sales", avatar: "PS" },
-        { id: "tn", name: "Tom Nielsen", role: "Account Exec", dept: "Sales", avatar: "TN" },
-      ],
-    },
-    {
-      id: "dr", name: "David Ross", role: "CFO", dept: "Finance", avatar: "DR",
-      children: [
-        { id: "km", name: "Kate Murphy", role: "Finance Mgr", dept: "Finance", avatar: "KM" },
-      ],
-    },
-  ],
-};
-
-const deptColors: Record<string, { color: string; bg: string }> = {
-  Executive: { color: "#1A1A2E", bg: "#EEEEF5" },
-  Marketing: { color: "#9B2335", bg: "#FBEAEC" },
-  Product:   { color: "#2D6A4F", bg: "#EAF4EF" },
-  Sales:     { color: "#B7791F", bg: "#FEF3E2" },
-  Finance:   { color: "#6B6B6B", bg: "#F5F4F0" },
-};
-
-const CW = 80;  // card width
-const GAP = 4;   // gap between cards
-const COL_GAP = 10; // gap between VP columns
-const CH = 82;  // card height (fixed for alignment)
-
-function NodeCard({ person, selected, onSelect }: { person: Person; selected: string | null; onSelect: (p: Person) => void }) {
-  const dc = deptColors[person.dept] || deptColors.Finance;
-  const isSelected = selected === person.id;
-  const isMe = person.id === "sofia";
-  return (
-    <button onClick={() => onSelect(person)} style={{
-      background: isMe ? "#0A0A0A" : "#FFFFFF",
-      border: isSelected ? `2px solid ${dc.color}` : isMe ? "2px solid #0A0A0A" : "1px solid #E2E0DA",
-      borderRadius: 10, padding: "6px 4px", cursor: "pointer", textAlign: "center",
-      width: CW, minWidth: CW, height: CH, flexShrink: 0, transition: "all 0.15s",
-      boxShadow: isSelected ? `0 0 0 3px ${dc.bg}` : "none",
-      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-      position: "relative",
-    }}>
-      {/* Tag dot indicator */}
-      {person.tag && (
-        <div style={{ position: "absolute", top: 4, right: 4, width: 8, height: 8, borderRadius: 99, background: isMe ? "#FFF" : person.tagColor, border: isMe ? "none" : `2px solid ${person.tagBg}` }} />
-      )}
-      <div style={{ width: 24, height: 24, borderRadius: 99, marginBottom: 3, background: isMe ? "#FFFFFF22" : dc.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-        <span style={{ fontSize: 8, fontWeight: 800, color: isMe ? "#FFF" : dc.color }}>{person.avatar}</span>
-      </div>
-      <p style={{ fontSize: 9, fontWeight: 700, color: isMe ? "#FFF" : "#0A0A0A", lineHeight: 1.15, marginBottom: 1, overflow: "hidden", textOverflow: "ellipsis", width: "100%", padding: "0 2px" }}>{person.name}</p>
-      <p style={{ fontSize: 7, color: isMe ? "#AAA" : "#6B6B6B", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", width: "100%", padding: "0 2px" }}>{person.role}</p>
-    </button>
-  );
+interface TeamMember {
+  id: string;
+  name: string;
+  role: string | null;
+  relation: string;
+  avatar: string | null;
+  email: string | null;
 }
 
-/** Width of a VP column = max(VP card, sum of children cards + gaps) */
-function colWidth(vp: Person): number {
-  const childCount = vp.children?.length || 0;
-  const childrenWidth = childCount * CW + Math.max(0, childCount - 1) * GAP;
-  return Math.max(CW, childrenWidth);
-}
+const RELATION_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
+  manager: { label: "Your manager", color: "#2D6A4F", bg: "#EAF4EF" },
+  buddy: { label: "Your buddy", color: "#B7791F", bg: "#FEF3E2" },
+  peer: { label: "Peer", color: "#6B6B6B", bg: "#F5F4F0" },
+  key_contact: { label: "Key contact", color: "#1A1A2E", bg: "#EEEEF5" },
+};
 
 export default function OrgPage() {
-  const [selected, setSelected] = useState<Person | null>(null);
-  const vps = org.children || [];
+  const [team, setTeam] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  function handleSelect(p: Person) {
-    setSelected(prev => prev?.id === p.id ? null : p);
+  useEffect(() => {
+    fetch("/api/newcomer/me")
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.team_members) setTeam(data.team_members);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  function initials(name: string) {
+    return name.split(" ").map(w => w[0]).join("");
   }
 
-  const totalWidth = vps.reduce((s, vp) => s + colWidth(vp), 0) + (vps.length - 1) * COL_GAP;
+  const manager = team.find(t => t.relation === "manager");
+  const buddy = team.find(t => t.relation === "buddy");
+  const peers = team.filter(t => t.relation === "peer");
+  const keyContacts = team.filter(t => t.relation === "key_contact");
+
+  if (loading) {
+    return (
+      <PageShell nav={<NavBar role="newcomer" active="Org Chart" />}>
+        <div style={{ textAlign: "center", padding: 60, color: "#6B6B6B" }}>Loading...</div>
+      </PageShell>
+    );
+  }
+
+  if (team.length === 0) {
+    return (
+      <PageShell nav={<NavBar role="newcomer" active="Org Chart" />}>
+        <div style={{ textAlign: "center", padding: 60 }}>
+          <p style={{ fontSize: 16, color: "#6B6B6B" }}>Org chart not available yet.</p>
+          <p style={{ fontSize: 13, color: "#AEABA3" }}>Your team connections will appear here once set up.</p>
+        </div>
+      </PageShell>
+    );
+  }
 
   return (
-    <PageShell nav={<NavBar role="newcomer" active="Org" />}>
-      <div>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0A0A0A", marginBottom: 4 }}>Org Chart</h2>
-        <p style={{ fontSize: 13, color: "#6B6B6B" }}>Meridian Group · Click any person to see their details</p>
+    <PageShell nav={<NavBar role="newcomer" active="Org Chart" />}>
+      <div className="space-y-1">
+        <h2 className="text-xl font-bold">Your Network</h2>
+        <p className="text-sm text-[#6B6B6B]">The people around you — your local org structure.</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 280px", gap: 16, alignItems: "start" }}>
-        <Card style={{ overflowX: "auto", padding: "24px 16px" }}>
-          <div style={{ width: totalWidth, margin: "0 auto" }}>
+      {/* Visual org tree */}
+      <Card style={{ background: "#0A0A0A", border: "none", overflow: "hidden" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20, padding: "20px 0" }}>
+          {/* Manager */}
+          {manager && (
+            <>
+              <PersonNode name={manager.name} role={manager.role} avatar={manager.avatar || initials(manager.name)}
+                tag="Your manager" tagColor="#2D6A4F" tagBg="#EAF4EF" />
+              <div style={{ width: 2, height: 20, background: "#333" }} />
+            </>
+          )}
 
-            {/* ROW 0: CEO */}
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: 0 }}>
-              <NodeCard person={org} selected={selected?.id || null} onSelect={handleSelect} />
+          {/* You */}
+          <div style={{
+            padding: "12px 20px", borderRadius: 12, background: "#1A1A2E",
+            border: "2px solid #EEEEF5", textAlign: "center",
+          }}>
+            <div style={{
+              width: 48, height: 48, borderRadius: 99, background: "#EEEEF5",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              margin: "0 auto 8px", fontWeight: 700, fontSize: 14, color: "#1A1A2E",
+            }}>
+              You
             </div>
+            <span style={{ fontSize: 10, fontWeight: 700, color: "#EEEEF5", letterSpacing: "0.05em" }}>YOU</span>
+          </div>
 
-            {/* Vertical line from CEO */}
-            <div style={{ width: 2, height: 16, background: "#E2E0DA", margin: "0 auto" }} />
+          {/* Branches */}
+          {(peers.length > 0 || buddy || keyContacts.length > 0) && (
+            <>
+              <div style={{ width: 2, height: 20, background: "#333" }} />
+              <div style={{ display: "flex", gap: 24, flexWrap: "wrap", justifyContent: "center" }}>
+                {buddy && (
+                  <PersonNode name={buddy.name} role={buddy.role} avatar={buddy.avatar || initials(buddy.name)}
+                    tag="Buddy" tagColor="#B7791F" tagBg="#FEF3E2" />
+                )}
+                {peers.map(p => (
+                  <PersonNode key={p.id} name={p.name} role={p.role} avatar={p.avatar || initials(p.name)}
+                    tag="Peer" tagColor="#6B6B6B" tagBg="#333" />
+                ))}
+                {keyContacts.map(p => (
+                  <PersonNode key={p.id} name={p.name} role={p.role} avatar={p.avatar || initials(p.name)}
+                    tag="Key contact" tagColor="#EEEEF5" tagBg="#1A1A2E" />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </Card>
 
-            {/* ROW 1: VP horizontal bar — single continuous line from first center to last center */}
-            <div style={{ display: "flex", height: 2 }}>
-              {vps.map((vp, i) => {
-                const w = colWidth(vp) + (i < vps.length - 1 ? COL_GAP : 0);
-                const isFirst = i === 0;
-                const isLast = i === vps.length - 1;
-                return (
-                  <div key={vp.id + "-hbar"} style={{ width: w, display: "flex", height: 2 }}>
-                    <div style={{ flex: 1, background: isFirst ? "transparent" : "#E2E0DA" }} />
-                    <div style={{ flex: 1, background: isLast ? "transparent" : "#E2E0DA" }} />
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* ROW 2: VP vertical drops + cards */}
-            <div style={{ display: "flex", gap: COL_GAP }}>
-              {vps.map(vp => {
-                const w = colWidth(vp);
-                return (
-                  <div key={vp.id} style={{ width: w, display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    <div style={{ width: 2, height: 16, background: "#E2E0DA" }} />
-                    <NodeCard person={vp} selected={selected?.id || null} onSelect={handleSelect} />
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* ROW 3: VP→children vertical lines + connector bars */}
-            <div style={{ display: "flex", gap: COL_GAP }}>
-              {vps.map(vp => {
-                const w = colWidth(vp);
-                const kids = vp.children || [];
-                return (
-                  <div key={vp.id + "-conn"} style={{ width: w }}>
-                    {kids.length > 0 && (
-                      <>
-                        <div style={{ width: 2, height: 16, background: "#E2E0DA", margin: "0 auto" }} />
-                        {kids.length > 1 && (
-                          <div style={{ display: "flex", height: 2 }}>
-                            {kids.map((_, ci) => {
-                              const isFirst = ci === 0;
-                              const isLast = ci === kids.length - 1;
-                              return (
-                                <div key={ci} style={{ flex: 1, display: "flex", height: 2 }}>
-                                  <div style={{ flex: 1, background: isFirst ? "transparent" : "#E2E0DA" }} />
-                                  <div style={{ flex: 1, background: isLast ? "transparent" : "#E2E0DA" }} />
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* ROW 4: Team member cards (all at same level) */}
-            <div style={{ display: "flex", gap: COL_GAP }}>
-              {vps.map(vp => {
-                const w = colWidth(vp);
-                const kids = vp.children || [];
-                return (
-                  <div key={vp.id + "-kids"} style={{ width: w, display: "flex", gap: GAP, justifyContent: "center" }}>
-                    {kids.map(kid => (
-                      <div key={kid.id} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                        {kids.length > 1 && <div style={{ width: 2, height: 16, background: "#E2E0DA" }} />}
-                        <NodeCard person={kid} selected={selected?.id || null} onSelect={handleSelect} />
-                      </div>
-                    ))}
-                  </div>
-                );
-              })}
-            </div>
-
+      {/* Detailed list */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        {/* Manager & Buddy */}
+        <Card>
+          <SectionLabel>Direct support</SectionLabel>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {manager && <TeamRow member={manager} />}
+            {buddy && <TeamRow member={buddy} />}
+            {!manager && !buddy && <p style={{ fontSize: 12, color: "#AEABA3" }}>Not assigned yet</p>}
           </div>
         </Card>
 
-        {/* Detail panel */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {selected ? (
-            <Card>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 99, background: deptColors[selected.dept]?.bg || "#F5F4F0", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: deptColors[selected.dept]?.color || "#6B6B6B" }}>{selected.avatar}</span>
-                </div>
-                <div>
-                  <p style={{ fontSize: 15, fontWeight: 700, color: "#0A0A0A" }}>{selected.name}</p>
-                  <p style={{ fontSize: 12, color: "#6B6B6B" }}>{selected.role}</p>
-                </div>
-              </div>
-              {selected.tag && <span style={{ display: "inline-block", fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 99, background: selected.tagBg, color: selected.tagColor, marginBottom: 14 }}>{selected.tag}</span>}
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: 12, color: "#AEABA3" }}>Department</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: "#0A0A0A" }}>{selected.dept}</span>
-                </div>
-                {selected.children && (
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ fontSize: 12, color: "#AEABA3" }}>Direct reports</span>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: "#0A0A0A" }}>{selected.children.length}</span>
-                  </div>
-                )}
-                {selected.id === "sofia" && <div style={{ marginTop: 8, background: "#EEEEF5", borderRadius: 10, padding: "10px 12px" }}><p style={{ fontSize: 11, color: "#6B6B6B", lineHeight: 1.6 }}>Day 18 · Arrival phase · On track across FIT · ACE · TIE.</p></div>}
-                {selected.id === "claire" && <div style={{ marginTop: 8, background: "#EAF4EF", borderRadius: 10, padding: "10px 12px" }}><p style={{ fontSize: 11, color: "#2D6A4F", lineHeight: 1.6 }}>Sofia's direct manager. Monthly check-ins scheduled.</p></div>}
-                {selected.id === "james" && <div style={{ marginTop: 8, background: "#FEF3E2", borderRadius: 10, padding: "10px 12px" }}><p style={{ fontSize: 11, color: "#B7791F", lineHeight: 1.6 }}>Sofia's assigned buddy. First meeting completed on Day 3.</p></div>}
-              </div>
-            </Card>
-          ) : (
-            <Card style={{ background: "#F5F4F0", border: "1px solid #E2E0DA" }}>
-              <p style={{ fontSize: 12, color: "#AEABA3", textAlign: "center", padding: "16px 0" }}>Click any person to see their details</p>
-            </Card>
-          )}
-          <Card>
-            <SectionLabel>Departments</SectionLabel>
-            <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-              {Object.entries(deptColors).map(([dept, c]) => (
-                <div key={dept} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div style={{ width: 10, height: 10, borderRadius: 3, background: c.bg, border: `1.5px solid ${c.color}22` }} />
-                  <span style={{ fontSize: 12, color: "#6B6B6B" }}>{dept}</span>
-                </div>
-              ))}
-            </div>
-          </Card>
-          <Card>
-            <SectionLabel>Your key connections</SectionLabel>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {[
-                { name: "Claire Bennett", role: "Manager", color: "#2D6A4F", bg: "#EAF4EF", avatar: "CB" },
-                { name: "James Okafor", role: "Buddy", color: "#B7791F", bg: "#FEF3E2", avatar: "JO" },
-                { name: "Maya Torres", role: "Colleague", color: "#9B2335", bg: "#FBEAEC", avatar: "MT" },
-              ].map(p => (
-                <div key={p.name} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 99, background: p.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <span style={{ fontSize: 9, fontWeight: 800, color: p.color }}>{p.avatar}</span>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: 12, fontWeight: 600, color: "#0A0A0A" }}>{p.name}</p>
-                    <p style={{ fontSize: 10, color: "#AEABA3" }}>{p.role}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
+        {/* Peers & Key contacts */}
+        <Card>
+          <SectionLabel>Team & key contacts</SectionLabel>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {[...peers, ...keyContacts].map(p => (
+              <TeamRow key={p.id} member={p} />
+            ))}
+            {peers.length === 0 && keyContacts.length === 0 && (
+              <p style={{ fontSize: 12, color: "#AEABA3" }}>No peers or contacts assigned yet</p>
+            )}
+          </div>
+        </Card>
       </div>
     </PageShell>
+  );
+}
+
+function PersonNode({ name, role, avatar, tag, tagColor, tagBg }: {
+  name: string; role: string | null; avatar: string; tag: string; tagColor: string; tagBg: string;
+}) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+      <div style={{
+        width: 44, height: 44, borderRadius: 99, background: "#333",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontWeight: 700, fontSize: 13, color: "#FFFFFF",
+      }}>
+        {avatar}
+      </div>
+      <span style={{ fontSize: 11, color: "#FFFFFF", fontWeight: 600, textAlign: "center", maxWidth: 80 }}>
+        {name.split(" ")[0]}
+      </span>
+      {role && <span style={{ fontSize: 9, color: "#6B6B6B", textAlign: "center", maxWidth: 80 }}>{role}</span>}
+      <span style={{
+        fontSize: 8, fontWeight: 700, padding: "2px 6px", borderRadius: 10,
+        background: tagBg, color: tagColor,
+      }}>
+        {tag}
+      </span>
+    </div>
+  );
+}
+
+function TeamRow({ member }: { member: TeamMember }) {
+  const config = RELATION_CONFIG[member.relation] || RELATION_CONFIG.peer;
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 0" }}>
+      <Avatar initials={member.avatar || member.name.split(" ").map(w => w[0]).join("")} size={36} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: "#0A0A0A" }}>{member.name}</p>
+        <p style={{ fontSize: 11, color: "#6B6B6B" }}>{member.role || "Team member"}</p>
+      </div>
+      <span style={{
+        fontSize: 9, fontWeight: 600, padding: "2px 8px", borderRadius: 10,
+        background: config.bg, color: config.color,
+      }}>
+        {config.label}
+      </span>
+    </div>
   );
 }

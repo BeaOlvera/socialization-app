@@ -23,9 +23,22 @@ interface Newcomer {
   users?: { name: string; email: string };
 }
 
+const ALL_PAGES = [
+  { key: "home", label: "Home", description: "Dashboard with progress overview" },
+  { key: "activities", label: "Activities", description: "Full activity checklist with check-ins" },
+  { key: "timeline", label: "Timeline", description: "12-month journey overview by phase" },
+  { key: "buckets", label: "My Journey", description: "FIT/ACE/TIE dimension breakdown" },
+  { key: "progress", label: "Progress", description: "Completion stats and insights" },
+  { key: "org", label: "Org Chart", description: "Newcomer's local org structure" },
+  { key: "people", label: "My People", description: "Team members and connections" },
+  { key: "docs", label: "Documents", description: "Onboarding documents and resources" },
+  { key: "evaluation", label: "Check-in", description: "Monthly self-assessment survey" },
+];
+
 interface Config {
   has_buddies: boolean;
   checkin_frequency: string;
+  visible_pages: string[];
 }
 
 export default function CompanyDetail() {
@@ -33,7 +46,7 @@ export default function CompanyDetail() {
   const [company, setCompany] = useState<any>(null);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [newcomers, setNewcomers] = useState<Newcomer[]>([]);
-  const [config, setConfig] = useState<Config>({ has_buddies: true, checkin_frequency: "monthly" });
+  const [config, setConfig] = useState<Config>({ has_buddies: true, checkin_frequency: "monthly", visible_pages: ALL_PAGES.map(p => p.key) });
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"templates" | "checkins" | "people" | "newcomers" | "config">("templates");
   const [uploading, setUploading] = useState(false);
@@ -447,6 +460,45 @@ export default function CompanyDetail() {
                 <option value="monthly">Monthly</option>
                 <option value="quarterly">Quarterly</option>
               </select>
+            </div>
+
+            <div style={{ borderTop: "1px solid #E2E0DA", paddingTop: 16 }}>
+              <p style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Visible Pages</p>
+              <p style={{ fontSize: 12, color: "#6B6B6B", marginBottom: 12 }}>Choose which pages newcomers can see. Hidden pages won't appear in the navigation.</p>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                {ALL_PAGES.map(page => {
+                  const isOn = config.visible_pages.includes(page.key);
+                  const isRequired = page.key === "home" || page.key === "activities";
+                  return (
+                    <label key={page.key} style={{
+                      display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px",
+                      background: isOn ? "#F5F4F0" : "#FFFFFF", borderRadius: 10,
+                      border: `1px solid ${isOn ? "#E2E0DA" : "#F5F4F0"}`,
+                      cursor: isRequired ? "default" : "pointer", opacity: isRequired ? 0.7 : 1,
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={isOn}
+                        disabled={isRequired}
+                        onChange={() => {
+                          if (isRequired) return;
+                          const newPages = isOn
+                            ? config.visible_pages.filter(p => p !== page.key)
+                            : [...config.visible_pages, page.key];
+                          updateConfig({ visible_pages: newPages });
+                        }}
+                        style={{ width: 16, height: 16, marginTop: 2 }}
+                      />
+                      <div>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: "#0A0A0A" }}>
+                          {page.label} {isRequired && <span style={{ fontSize: 10, color: "#AEABA3" }}>(required)</span>}
+                        </p>
+                        <p style={{ fontSize: 11, color: "#6B6B6B" }}>{page.description}</p>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </Card>
