@@ -1,10 +1,48 @@
 "use client";
 import { NavBar, PageShell, Card, ScoreRing, SectionLabel, Avatar, BucketTag, TwoCol } from "@/components/ui";
-import { newcomer, buckets, todayActions } from "@/lib/mock";
+import { DIMENSIONS, PHASES } from "@/lib/framework";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
+type Dim = keyof typeof DIMENSIONS;
+
+interface Task {
+  id: string;
+  phase: string;
+  dimension: string;
+  activity: string;
+  done: boolean;
+  estimated_time: string | null;
+}
+
 export default function NewcomerHome() {
-  const overall = Math.round(buckets.reduce((s, b) => s + b.score, 0) / buckets.length);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/newcomer/tasks")
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data)) setTasks(data); })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const totalDone = tasks.filter(t => t.done).length;
+  const overall = tasks.length > 0 ? Math.round((totalDone / tasks.length) * 100) : 0;
+
+  // Next undone activities (up to 4)
+  const nextActivities = tasks.filter(t => !t.done).slice(0, 4);
+
+  // Dimension scores
+  const dims: Dim[] = ["fit", "ace", "tie"];
+  const dimScores = dims.map(dim => {
+    const dt = tasks.filter(t => t.dimension === dim);
+    const done = dt.filter(t => t.done).length;
+    return {
+      dim,
+      info: DIMENSIONS[dim],
+      score: dt.length > 0 ? Math.round((done / dt.length) * 100) : 0,
+    };
+  });
 
   const left = <>
     {/* Header */}
@@ -12,89 +50,92 @@ export default function NewcomerHome() {
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
         <div>
           <p style={{ fontSize: 10, color: "#AEABA3", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>
-            Day {newcomer.day} of 365
+            {loading ? "Loading..." : `${totalDone} of ${tasks.length} activities done`}
           </p>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0A0A0A", marginBottom: 4 }}>Good morning, Sofia.</h2>
-          <p style={{ fontSize: 13, color: "#6B6B6B" }}>{newcomer.role} · {newcomer.company}</p>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0A0A0A", marginBottom: 4 }}>Welcome back.</h2>
+          <p style={{ fontSize: 13, color: "#6B6B6B" }}>Your onboarding journey</p>
         </div>
         <div style={{ textAlign: "center" }}>
           <ScoreRing score={overall} size={64} />
           <p style={{ fontSize: 10, color: "#AEABA3", marginTop: 4 }}>Overall</p>
         </div>
       </div>
-      <div style={{ marginTop: 16, background: "#DDDBD5", borderRadius: 10, padding: "12px 14px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-          <span style={{ fontSize: 12, fontWeight: 600, color: "#0A0A0A" }}>Phase: Arrival</span>
-          <span style={{ fontSize: 11, color: "#6B6B6B" }}>Day 1–30</span>
-        </div>
-        <div style={{ height: 6, background: "#C8C6C0", borderRadius: 99, overflow: "hidden" }}>
-          <div style={{ height: "100%", background: "#0A0A0A", borderRadius: 99, width: `${(newcomer.day / 30) * 100}%` }} />
-        </div>
-      </div>
     </Card>
 
-    {/* Today */}
+    {/* Next activities */}
     <div>
-      <SectionLabel>Today&apos;s actions</SectionLabel>
+      <SectionLabel>Up next</SectionLabel>
       <div className="space-y-2">
-        {todayActions.map((a, i) => (
-          <Card key={i} className={`flex items-start gap-3 ${a.urgent ? "border-[#1A1A2E]" : ""}`}>
-            <div className={`w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0 ${a.urgent ? "bg-[#1A1A2E]" : "bg-[#E2E0DA]"}`} />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm text-[#0A0A0A]">{a.text}</p>
-              <BucketTag bucket={a.bucket} />
-            </div>
-            {a.urgent && <span className="text-xs font-semibold text-[#1A1A2E] flex-shrink-0">Priority</span>}
-          </Card>
-        ))}
+        {loading ? (
+          <Card><p style={{ fontSize: 13, color: "#6B6B6B" }}>Loading activities...</p></Card>
+        ) : nextActivities.length === 0 ? (
+          <Card><p style={{ fontSize: 13, color: "#6B6B6B" }}>All activities completed!</p></Card>
+        ) : (
+          nextActivities.map(a => (
+            <Link key={a.id} href="/newcomer/activities" style={{ textDecoration: "none" }}>
+              <Card className="flex items-start gap-3 hover:border-[#0A0A0A] transition-colors cursor-pointer">
+                <div className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0 bg-[#1A1A2E]" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-[#0A0A0A]">{a.activity}</p>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 4 }}>
+                    <BucketTag bucket={a.dimension} />
+                    {a.estimated_time && (
+                      <span style={{ fontSize: 11, color: "#AEABA3" }}>{a.estimated_time}</span>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            </Link>
+          ))
+        )}
       </div>
     </div>
   </>;
 
   const right = <>
-    {/* Three buckets */}
+    {/* Three dimensions */}
     <div>
       <SectionLabel>My three dimensions</SectionLabel>
       <div className="space-y-2">
-        {buckets.map(b => (
-          <Link key={b.id} href="/newcomer/buckets">
+        {dimScores.map(({ dim, info, score }) => (
+          <Link key={dim} href="/newcomer/buckets" style={{ textDecoration: "none" }}>
             <Card className="flex items-center gap-4 hover:border-[#0A0A0A] transition-colors cursor-pointer">
-              <div className="w-9 h-9 rounded-lg bg-[#F5F4F0] flex items-center justify-center flex-shrink-0">
-                <span className="text-xs font-bold text-[#6B6B6B]">{b.number}</span>
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: info.bg }}>
+                <span className="text-xs font-bold" style={{ color: info.color }}>{info.num}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm text-[#0A0A0A]">{b.label}</p>
+                <p className="font-semibold text-sm text-[#0A0A0A]">{info.label}</p>
                 <div className="flex items-center gap-2 mt-1.5">
                   <div className="flex-1 h-1.5 bg-[#F5F4F0] rounded-full overflow-hidden">
-                    <div className="h-full rounded-full transition-all"
-                      style={{
-                        width: `${b.score}%`,
-                        background: b.score >= 70 ? "#2D6A4F" : b.score >= 50 ? "#B7791F" : "#9B2335"
-                      }} />
+                    <div className="h-full rounded-full transition-all" style={{ width: `${score}%`, background: info.color }} />
                   </div>
-                  <span className="text-xs text-[#6B6B6B] flex-shrink-0">{b.score}%</span>
+                  <span className="text-xs text-[#6B6B6B] flex-shrink-0">{score}%</span>
                 </div>
               </div>
-              <span className="text-[#AEABA3] text-sm">›</span>
+              <span className="text-[#AEABA3] text-sm">&#8250;</span>
             </Card>
           </Link>
         ))}
       </div>
     </div>
 
-    {/* Buddy */}
+    {/* Quick links */}
     <div>
-      <SectionLabel>Your buddy</SectionLabel>
-      <Card className="flex items-center gap-3">
-        <Avatar initials="JO" size={44} />
-        <div className="flex-1">
-          <p className="font-semibold text-sm">{newcomer.buddy.name}</p>
-          <p className="text-xs text-[#6B6B6B]">{newcomer.buddy.role}</p>
-        </div>
-        <button className="text-sm font-medium text-[#1A1A2E] bg-[#EEEEF5] px-3 py-1.5 rounded-lg hover:bg-[#DDD] transition-colors">
-          Message
-        </button>
-      </Card>
+      <SectionLabel>Quick links</SectionLabel>
+      <div className="space-y-2">
+        <Link href="/newcomer/activities" style={{ textDecoration: "none" }}>
+          <Card className="hover:border-[#0A0A0A] transition-colors cursor-pointer">
+            <p className="font-semibold text-sm">All Activities</p>
+            <p className="text-xs text-[#6B6B6B] mt-1">View and complete your onboarding activities</p>
+          </Card>
+        </Link>
+        <Link href="/newcomer/timeline" style={{ textDecoration: "none" }}>
+          <Card className="hover:border-[#0A0A0A] transition-colors cursor-pointer">
+            <p className="font-semibold text-sm">Timeline</p>
+            <p className="text-xs text-[#6B6B6B] mt-1">See your 12-month journey overview</p>
+          </Card>
+        </Link>
+      </div>
     </div>
   </>;
 

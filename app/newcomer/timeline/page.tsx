@@ -1,194 +1,108 @@
 "use client";
-import { useState } from "react";
-import { NavBar, PageShell, Card, SectionLabel } from "@/components/ui";
+import { useState, useEffect } from "react";
+import { NavBar, PageShell, Card, SectionLabel, BucketTag } from "@/components/ui";
+import { PHASES, DIMENSIONS } from "@/lib/framework";
+import Link from "next/link";
 
-const initialPhases = [
-  {
-    id: "arrival",
-    label: "Arrival",
-    period: "Days 1–30",
-    months: "March 2026",
-    status: "active",
-    description: "Learn the basics, meet the team, get oriented.",
-    buckets: {
-      fit: [
-        { label: "Review job description & reporting line", done: true },
-        { label: "Explore org chart and team structure", done: true },
-        { label: "Understand first-quarter KPIs with manager", done: false },
-        { label: "Map key stakeholders (RACI)", done: false },
-      ],
-      ace: [
-        { label: "Complete tool onboarding (Slack, HubSpot, Asana)", done: true },
-        { label: "Start 30-60-90 day training plan", done: false },
-        { label: "Locate SOPs & playbooks in Notion", done: true },
-        { label: "Understand performance review timeline", done: true },
-      ],
-      tie: [
-        { label: "Meet buddy James", done: true },
-        { label: "Attend first team stand-up and All-Hands", done: true },
-        { label: "Read company values guide", done: true },
-        { label: "Meet 2 cross-functional contacts", done: false },
-      ],
-    },
-  },
-  {
-    id: "integration",
-    label: "Integration",
-    period: "Days 31–90",
-    months: "Apr – May 2026",
-    status: "upcoming",
-    description: "Deepen understanding, take ownership, deliver first results.",
-    buckets: {
-      fit: [
-        { label: "Align priorities with strategic plan", done: false },
-        { label: "Clarify RACI for cross-functional projects", done: false },
-        { label: "Present 90-day marketing calendar", done: false },
-        { label: "Get first KPI review from manager", done: false },
-      ],
-      ace: [
-        { label: "Lead first campaign brief end-to-end", done: false },
-        { label: "Complete all mandatory training modules", done: false },
-        { label: "Execute one process using documented SOP", done: false },
-        { label: "Identify top skill gap and start closing it", done: false },
-      ],
-      tie: [
-        { label: "Build working relationship with Product & Sales", done: false },
-        { label: "Attend quarterly off-site", done: false },
-        { label: "Join one employee community or ERG", done: false },
-        { label: "Complete 60-day pulse survey", done: false },
-      ],
-    },
-  },
-  {
-    id: "adjustment",
-    label: "Adjustment",
-    period: "Months 4–6",
-    months: "Jun – Aug 2026",
-    status: "future",
-    description: "Work independently, expand your network, find your voice.",
-    buckets: {
-      fit: [
-        { label: "Own Q3 marketing roadmap priorities", done: false },
-        { label: "Identify one boundary/RACI improvement", done: false },
-        { label: "Connect work to annual strategic goals", done: false },
-        { label: "Update job scope with manager if needed", done: false },
-      ],
-      ace: [
-        { label: "Deliver measurable campaign results", done: false },
-        { label: "Master all core tools independently", done: false },
-        { label: "Propose one process improvement", done: false },
-        { label: "Complete mid-year performance self-assessment", done: false },
-      ],
-      tie: [
-        { label: "Have a network beyond immediate team", done: false },
-        { label: "Participate in informal social rituals regularly", done: false },
-        { label: "Demonstrate values alignment in daily work", done: false },
-        { label: "Feel genuine belonging", done: false },
-      ],
-    },
-  },
-  {
-    id: "stabilization",
-    label: "Stabilization",
-    period: "Months 7–9",
-    months: "Sep – Nov 2026",
-    status: "future",
-    description: "Consolidate your position, refine your approach, grow.",
-    buckets: {
-      fit: [
-        { label: "Be the go-to expert for your domain", done: false },
-        { label: "Lead cross-functional initiatives with clarity", done: false },
-        { label: "Contribute to team strategic planning", done: false },
-        { label: "Define your development path forward", done: false },
-      ],
-      ace: [
-        { label: "Consistently high-quality deliverables", done: false },
-        { label: "Mentor a newer team member on tools/processes", done: false },
-        { label: "Complete required certifications", done: false },
-        { label: "Get strong performance appraisal feedback", done: false },
-      ],
-      tie: [
-        { label: "Have trusted allies across departments", done: false },
-        { label: "Give and receive honest peer feedback", done: false },
-        { label: "Support new newcomers (pay it forward)", done: false },
-        { label: "Strong sense of identity within the org", done: false },
-      ],
-    },
-  },
-  {
-    id: "embedding",
-    label: "Embedding",
-    period: "Months 10–12",
-    months: "Dec 2026 – Feb 2027",
-    status: "future",
-    description: "You are no longer new. You are part of the fabric.",
-    buckets: {
-      fit: [
-        { label: "Strategic contributor, not just executor", done: false },
-        { label: "Define next year's goals with manager", done: false },
-        { label: "Recognized for unique value you bring", done: false },
-        { label: "Complete 12-month role reflection", done: false },
-      ],
-      ace: [
-        { label: "Full mastery of role's technical demands", done: false },
-        { label: "Shape SOPs and processes for the team", done: false },
-        { label: "Skills matrix shows no critical gaps", done: false },
-        { label: "Exceed performance appraisal expectations", done: false },
-      ],
-      tie: [
-        { label: "Rich network of genuine relationships", done: false },
-        { label: "Trusted across the organization", done: false },
-        { label: "Part of informal and formal communities", done: false },
-        { label: "Fully socially embedded", done: false },
-      ],
-    },
-  },
-];
+type Phase = keyof typeof PHASES;
+type Dim = keyof typeof DIMENSIONS;
 
-const bucketConfig = {
-  fit: { label: "FIT · Role Clarity",       color: "#1A1A2E", bg: "#EEEEF5", num: "01" },
-  ace: { label: "ACE · Task Mastery",        color: "#2D6A4F", bg: "#EAF4EF", num: "02" },
-  tie: { label: "TIE · Social Acceptance",   color: "#9B2335", bg: "#FBEAEC", num: "03" },
-};
-
-const statusConfig = {
-  active:   { bg: "#0A0A0A", color: "#FFFFFF", label: "In progress" },
-  upcoming: { bg: "#F5F4F0", color: "#0A0A0A", label: "Up next" },
-  future:   { bg: "#F5F4F0", color: "#AEABA3", label: "Ahead" },
-};
-
-type BucketKey = keyof typeof bucketConfig;
-type PhaseData = typeof initialPhases[number];
-
-function pct(phase: PhaseData) {
-  const all = Object.values(phase.buckets).flat();
-  return Math.round((all.filter(i => i.done).length / all.length) * 100);
+interface Task {
+  id: string;
+  phase: string;
+  dimension: string;
+  label: string;
+  activity: string;
+  estimated_time: string | null;
+  output: string | null;
+  done: boolean;
 }
 
+const bucketConfig = {
+  fit: { label: "FIT · Role Clarity", color: "#1A1A2E", bg: "#EEEEF5", num: "01" },
+  ace: { label: "ACE · Task Mastery", color: "#2D6A4F", bg: "#EAF4EF", num: "02" },
+  tie: { label: "TIE · Social Acceptance", color: "#9B2335", bg: "#FBEAEC", num: "03" },
+};
+
+const statusConfig: Record<string, { bg: string; color: string; label: string }> = {
+  active: { bg: "#0A0A0A", color: "#FFFFFF", label: "In progress" },
+  upcoming: { bg: "#F5F4F0", color: "#0A0A0A", label: "Up next" },
+  future: { bg: "#F5F4F0", color: "#AEABA3", label: "Ahead" },
+};
+
 export default function TimelinePage() {
-  const [phases, setPhases] = useState(initialPhases);
-  const [activePhase, setActivePhase] = useState("arrival");
-  const [expandedBucket, setExpandedBucket] = useState<string | null>(null);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activePhase, setActivePhase] = useState<Phase>("arrival");
 
-  const today = { day: 18, total: 365 };
-  const overallPct = Math.round((today.day / today.total) * 100);
+  useEffect(() => {
+    fetch("/api/newcomer/tasks")
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setTasks(data);
+          const phases = Object.keys(PHASES) as Phase[];
+          const first = phases.find(p => data.some((t: Task) => t.phase === p));
+          if (first) setActivePhase(first);
+        }
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-  function toggle(phaseId: string, bucket: BucketKey, itemIdx: number) {
-    setPhases(prev => prev.map(p => {
-      if (p.id !== phaseId) return p;
-      return {
-        ...p,
-        buckets: {
-          ...p.buckets,
-          [bucket]: p.buckets[bucket].map((item, i) =>
-            i === itemIdx ? { ...item, done: !item.done } : item
-          ),
-        },
-      };
-    }));
+  // Determine phase status based on completion
+  function phaseStatus(phase: Phase): string {
+    const pt = tasks.filter(t => t.phase === phase);
+    if (pt.length === 0) return "future";
+    const done = pt.filter(t => t.done).length;
+    if (done === pt.length) return "completed";
+    if (done > 0) return "active";
+    // Check if any earlier phase is still active
+    const phases = Object.keys(PHASES) as Phase[];
+    const idx = phases.indexOf(phase);
+    for (let i = 0; i < idx; i++) {
+      const earlier = tasks.filter(t => t.phase === phases[i]);
+      if (earlier.length > 0 && earlier.some(t => !t.done)) return "upcoming";
+    }
+    if (idx === 0) return "active";
+    return "upcoming";
   }
 
-  const currentPhase = phases.find(p => p.id === activePhase)!;
+  function phasePct(phase: string): number {
+    const pt = tasks.filter(t => t.phase === phase);
+    if (pt.length === 0) return 0;
+    return Math.round((pt.filter(t => t.done).length / pt.length) * 100);
+  }
+
+  // Calculate day based on start_date (approximation: day 18 for demo)
+  const today = { day: 18, total: 365 };
+  const overallPct = tasks.length > 0
+    ? Math.round((tasks.filter(t => t.done).length / tasks.length) * 100)
+    : 0;
+
+  const phasesWithTasks = (Object.keys(PHASES) as Phase[]).filter(
+    p => tasks.some(t => t.phase === p)
+  );
+  const currentPhaseTasks = tasks.filter(t => t.phase === activePhase);
+  const dims: Dim[] = ["fit", "ace", "tie"];
+
+  if (loading) {
+    return (
+      <PageShell nav={<NavBar role="newcomer" active="Timeline" />}>
+        <div style={{ textAlign: "center", padding: 60, color: "#6B6B6B" }}>Loading timeline...</div>
+      </PageShell>
+    );
+  }
+
+  if (tasks.length === 0) {
+    return (
+      <PageShell nav={<NavBar role="newcomer" active="Timeline" />}>
+        <div style={{ textAlign: "center", padding: 60 }}>
+          <p style={{ fontSize: 16, color: "#6B6B6B" }}>No activities assigned yet.</p>
+          <p style={{ fontSize: 13, color: "#AEABA3" }}>Your HR admin will assign your onboarding activities soon.</p>
+        </div>
+      </PageShell>
+    );
+  }
 
   return (
     <PageShell nav={<NavBar role="newcomer" active="Timeline" />}>
@@ -199,7 +113,7 @@ export default function TimelinePage() {
           <div>
             <p style={{ fontSize: 11, fontWeight: 600, color: "#AEABA3", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 4 }}>Your 12-month journey</p>
             <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0A0A0A" }}>Day {today.day} of 365</h2>
-            <p style={{ fontSize: 13, color: "#6B6B6B", marginTop: 2 }}>Currently in <strong>Arrival phase</strong> · March 2026</p>
+            <p style={{ fontSize: 13, color: "#6B6B6B", marginTop: 2 }}>Currently in <strong>{PHASES[activePhase].label} phase</strong> · {PHASES[activePhase].period}</p>
           </div>
           <div style={{ textAlign: "right" }}>
             <p style={{ fontSize: 28, fontWeight: 700, color: "#0A0A0A" }}>{overallPct}%</p>
@@ -207,61 +121,52 @@ export default function TimelinePage() {
           </div>
         </div>
 
-        {/* Clickable phase ribbon */}
+        {/* Phase ribbon */}
         <div style={{ display: "flex", gap: 6 }}>
-          {phases.map((p) => {
-            const isActive = p.id === activePhase;
-            const phasePct = pct(p);
+          {phasesWithTasks.map(p => {
+            const isActive = p === activePhase;
+            const pp = phasePct(p);
+            const status = phaseStatus(p);
             return (
               <button
-                key={p.id}
-                onClick={() => setActivePhase(p.id)}
-                style={{
-                  flex: 1, background: "none", border: "none", cursor: "pointer",
-                  padding: 0, textAlign: "left",
-                }}
+                key={p}
+                onClick={() => setActivePhase(p)}
+                style={{ flex: 1, background: "none", border: "none", cursor: "pointer", padding: 0, textAlign: "left" }}
               >
-                {/* bar */}
                 <div style={{
                   height: 10, borderRadius: 99, overflow: "hidden",
-                  background: p.status === "future" ? "#EBEBEB" : "#DDDBD5",
+                  background: status === "future" ? "#EBEBEB" : "#DDDBD5",
                   border: isActive ? "2px solid #0A0A0A" : "2px solid transparent",
                   transition: "border 0.15s",
-                  position: "relative",
                 }}>
                   <div style={{
                     height: "100%", borderRadius: 99,
-                    background: p.status === "active" ? "#0A0A0A" : p.status === "upcoming" ? "#6B6B6B" : "#DDDBD5",
-                    width: `${phasePct}%`,
-                    transition: "width 0.4s ease",
+                    background: status === "active" || status === "completed" ? "#0A0A0A" : status === "upcoming" ? "#6B6B6B" : "#DDDBD5",
+                    width: `${pp}%`, transition: "width 0.4s ease",
                   }} />
                 </div>
-                <p style={{
-                  fontSize: 9, marginTop: 4, fontWeight: isActive ? 700 : 400,
-                  color: isActive ? "#0A0A0A" : "#AEABA3",
-                  transition: "color 0.15s",
-                }}>
-                  {p.label}
+                <p style={{ fontSize: 9, marginTop: 4, fontWeight: isActive ? 700 : 400, color: isActive ? "#0A0A0A" : "#AEABA3" }}>
+                  {PHASES[p].label}
                 </p>
-                <p style={{ fontSize: 9, color: "#AEABA3" }}>{phasePct}%</p>
+                <p style={{ fontSize: 9, color: "#AEABA3" }}>{pp}%</p>
               </button>
             );
           })}
         </div>
       </Card>
 
-      {/* Overall dimension progress bars */}
+      {/* Overall dimension progress */}
       <Card>
         <SectionLabel>Overall progress by dimension</SectionLabel>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {(Object.keys(bucketConfig) as BucketKey[]).map(key => {
-            const bc = bucketConfig[key];
-            const allItems = phases.flatMap(p => p.buckets[key]);
-            const done = allItems.filter(i => i.done).length;
-            const total = allItems.length;
-            const p = Math.round((done / total) * 100);
+          {dims.map(dim => {
+            const bc = bucketConfig[dim];
+            const dimTasks = tasks.filter(t => t.dimension === dim);
+            const done = dimTasks.filter(t => t.done).length;
+            const total = dimTasks.length;
+            const p = total > 0 ? Math.round((done / total) * 100) : 0;
             return (
-              <div key={key}>
+              <div key={dim}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
                     <div style={{ width: 18, height: 18, borderRadius: 5, background: bc.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -281,128 +186,118 @@ export default function TimelinePage() {
       </Card>
 
       {/* Active phase detail */}
-      <Card style={{ border: currentPhase.status === "active" ? "2px solid #0A0A0A" : "1px solid #E2E0DA" }}>
-        {/* Phase selector tabs */}
+      <Card style={{ border: phaseStatus(activePhase) === "active" ? "2px solid #0A0A0A" : "1px solid #E2E0DA" }}>
+        {/* Phase tabs */}
         <div style={{ display: "flex", gap: 4, marginBottom: 18, overflowX: "auto" }}>
-          {phases.map(p => {
-            const isSelected = p.id === activePhase;
-            return (
-              <button
-                key={p.id}
-                onClick={() => setActivePhase(p.id)}
-                style={{
-                  padding: "6px 14px", borderRadius: 99, border: "none", cursor: "pointer",
-                  fontSize: 12, fontWeight: 600, whiteSpace: "nowrap",
-                  background: isSelected ? "#0A0A0A" : "#F5F4F0",
-                  color: isSelected ? "#FFFFFF" : "#6B6B6B",
-                  transition: "all 0.15s",
-                }}
-              >
-                {p.label}
-              </button>
-            );
-          })}
+          {phasesWithTasks.map(p => (
+            <button
+              key={p}
+              onClick={() => setActivePhase(p)}
+              style={{
+                padding: "6px 14px", borderRadius: 99, border: "none", cursor: "pointer",
+                fontSize: 12, fontWeight: 600, whiteSpace: "nowrap",
+                background: p === activePhase ? "#0A0A0A" : "#F5F4F0",
+                color: p === activePhase ? "#FFFFFF" : "#6B6B6B",
+                transition: "all 0.15s",
+              }}
+            >
+              {PHASES[p].label}
+            </button>
+          ))}
         </div>
 
         {/* Phase header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: "#0A0A0A" }}>{currentPhase.label}</h3>
-              <span style={{
-                fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99,
-                background: statusConfig[currentPhase.status as keyof typeof statusConfig].bg,
-                color: statusConfig[currentPhase.status as keyof typeof statusConfig].color,
-              }}>
-                {statusConfig[currentPhase.status as keyof typeof statusConfig].label}
-              </span>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: "#0A0A0A" }}>{PHASES[activePhase].label}</h3>
+              {(() => {
+                const s = phaseStatus(activePhase);
+                const cfg = statusConfig[s] || statusConfig.future;
+                return (
+                  <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99, background: cfg.bg, color: cfg.color }}>
+                    {cfg.label}
+                  </span>
+                );
+              })()}
             </div>
-            <p style={{ fontSize: 12, color: "#6B6B6B" }}>{currentPhase.period} · {currentPhase.months}</p>
-            <p style={{ fontSize: 12, color: "#AEABA3", fontStyle: "italic", marginTop: 3 }}>{currentPhase.description}</p>
+            <p style={{ fontSize: 12, color: "#6B6B6B" }}>{PHASES[activePhase].period}</p>
+            <p style={{ fontSize: 12, color: "#AEABA3", fontStyle: "italic", marginTop: 3 }}>{PHASES[activePhase].description}</p>
           </div>
           <div style={{ textAlign: "right", flexShrink: 0 }}>
-            <p style={{ fontSize: 24, fontWeight: 700, color: "#0A0A0A" }}>{pct(currentPhase)}%</p>
+            <p style={{ fontSize: 24, fontWeight: 700, color: "#0A0A0A" }}>{phasePct(activePhase)}%</p>
             <p style={{ fontSize: 10, color: "#AEABA3" }}>
-              {Object.values(currentPhase.buckets).flat().filter(i => i.done).length}/
-              {Object.values(currentPhase.buckets).flat().length} done
+              {currentPhaseTasks.filter(t => t.done).length}/{currentPhaseTasks.length} done
             </p>
           </div>
         </div>
 
         {/* Progress bar */}
         <div style={{ height: 6, background: "#F5F4F0", borderRadius: 99, marginBottom: 18, overflow: "hidden" }}>
-          <div style={{ height: "100%", background: "#0A0A0A", borderRadius: 99, width: `${pct(currentPhase)}%`, transition: "width 0.5s" }} />
+          <div style={{ height: "100%", background: "#0A0A0A", borderRadius: 99, width: `${phasePct(activePhase)}%`, transition: "width 0.5s" }} />
         </div>
 
-        {/* Three dimension columns — interactive */}
+        {/* Three dimension columns — read-only overview */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-          {(Object.entries(currentPhase.buckets) as [BucketKey, typeof currentPhase.buckets.fit][]).map(([key, items]) => {
-            const bc = bucketConfig[key];
-            const bucketDone = items.filter(i => i.done).length;
-            const bucketPct = Math.round((bucketDone / items.length) * 100);
+          {dims.map(dim => {
+            const bc = bucketConfig[dim];
+            const dimTasks = currentPhaseTasks.filter(t => t.dimension === dim);
+            const done = dimTasks.filter(t => t.done).length;
+            const dimPct = dimTasks.length > 0 ? Math.round((done / dimTasks.length) * 100) : 0;
             return (
-              <div key={key} style={{ background: "#F5F4F0", borderRadius: 12, padding: "12px 14px" }}>
+              <div key={dim} style={{ background: "#F5F4F0", borderRadius: 12, padding: "12px 14px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
                   <div style={{ width: 20, height: 20, borderRadius: 6, background: bc.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <span style={{ fontSize: 8, fontWeight: 800, color: bc.color }}>{bc.num}</span>
                   </div>
                   <span style={{ fontSize: 11, fontWeight: 700, color: "#0A0A0A" }}>{bc.label}</span>
-                  <span style={{ fontSize: 10, color: "#AEABA3", marginLeft: "auto" }}>{bucketDone}/{items.length}</span>
+                  <span style={{ fontSize: 10, color: "#AEABA3", marginLeft: "auto" }}>{done}/{dimTasks.length}</span>
                 </div>
-                {/* mini progress bar */}
                 <div style={{ height: 4, background: "#E2E0DA", borderRadius: 99, marginBottom: 10, overflow: "hidden" }}>
-                  <div style={{ height: "100%", background: bc.color, borderRadius: 99, width: `${bucketPct}%`, transition: "width 0.4s" }} />
+                  <div style={{ height: "100%", background: bc.color, borderRadius: 99, width: `${dimPct}%`, transition: "width 0.4s" }} />
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  {items.map((item: any, i: number) => (
-                    <button
-                      key={i}
-                      onClick={() => toggle(currentPhase.id, key, i)}
+                  {dimTasks.map(task => (
+                    <div
+                      key={task.id}
                       style={{
                         display: "flex", alignItems: "flex-start", gap: 8,
-                        background: item.done ? "transparent" : "#FFFFFF",
-                        border: "none", cursor: "pointer", borderRadius: 8,
-                        padding: "6px 8px", textAlign: "left", width: "100%",
+                        background: task.done ? "transparent" : "#FFFFFF",
+                        borderRadius: 8, padding: "6px 8px",
                       }}
                     >
                       <div style={{
                         width: 16, height: 16, borderRadius: 4, flexShrink: 0, marginTop: 1,
-                        background: item.done ? bc.color : "transparent",
-                        border: item.done ? `2px solid ${bc.color}` : "2px solid #DDDBD5",
+                        background: task.done ? bc.color : "transparent",
+                        border: task.done ? `2px solid ${bc.color}` : "2px solid #DDDBD5",
                         display: "flex", alignItems: "center", justifyContent: "center",
-                        transition: "all 0.15s",
                       }}>
-                        {item.done && <span style={{ fontSize: 9, color: "#FFFFFF", fontWeight: 700 }}>✓</span>}
+                        {task.done && <span style={{ fontSize: 9, color: "#FFFFFF", fontWeight: 700 }}>&#10003;</span>}
                       </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <span style={{
-                          fontSize: 11, color: item.done ? "#AEABA3" : "#0A0A0A",
-                          textDecoration: item.done ? "line-through" : "none",
-                          lineHeight: 1.4, display: "block",
-                        }}>
-                          {item.label}
-                        </span>
-                        {(item.estimated_time || item.output) && !item.done && (
-                          <div style={{ display: "flex", gap: 6, marginTop: 3, flexWrap: "wrap" }}>
-                            {item.estimated_time && (
-                              <span style={{ fontSize: 8, color: "#AEABA3", background: "#F5F4F0", padding: "1px 5px", borderRadius: 4 }}>
-                                {item.estimated_time}
-                              </span>
-                            )}
-                            {item.output && (
-                              <span style={{ fontSize: 8, color: "#6B6B6B", lineHeight: 1.3 }}>
-                                → {item.output}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </button>
+                      <span style={{
+                        fontSize: 11, color: task.done ? "#AEABA3" : "#0A0A0A",
+                        textDecoration: task.done ? "line-through" : "none",
+                        lineHeight: 1.4,
+                      }}>
+                        {task.activity || task.label}
+                      </span>
+                    </div>
                   ))}
                 </div>
               </div>
             );
           })}
+        </div>
+
+        {/* Link to Activities */}
+        <div style={{ marginTop: 16, textAlign: "center" }}>
+          <Link href="/newcomer/activities" style={{
+            fontSize: 13, fontWeight: 600, color: "#1A1A2E", textDecoration: "none",
+            padding: "8px 20px", borderRadius: 10, background: "#EEEEF5",
+            display: "inline-block",
+          }}>
+            View full activity details →
+          </Link>
         </div>
       </Card>
 
