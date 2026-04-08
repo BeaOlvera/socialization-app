@@ -68,6 +68,10 @@ for i, t in enumerate(templates):
         'estimated_time': t.get('estimated_time'),
         'builds_on': t.get('builds_on'),
         'output': t.get('output'),
+        'type': t.get('type', 'activity'),
+        'assigned_to': t.get('assigned_to', 'newcomer'),
+        'format': t.get('format'),
+        'duration': t.get('duration'),
         'done': False,
     })
 

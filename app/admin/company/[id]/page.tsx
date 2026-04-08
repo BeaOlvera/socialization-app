@@ -149,14 +149,14 @@ export default function CompanyDetail() {
 
   if (loading) {
     return (
-      <PageShell nav={<NavBar role={"hr" as any} active="Admin" />}>
+      <PageShell nav={<NavBar role="admin" active="Admin" />}>
         <div style={{ textAlign: "center", padding: 60, color: "#6B6B6B" }}>Loading...</div>
       </PageShell>
     );
   }
 
   return (
-    <PageShell nav={<NavBar role={"hr" as any} active="Admin" />}>
+    <PageShell nav={<NavBar role="admin" active="Admin" />}>
       {/* Header */}
       <Card style={{ background: "#ECECEA", border: "1px solid #DDDBD5" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>

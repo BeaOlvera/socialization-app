@@ -20,9 +20,24 @@ export default function HRHome() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/hr/dashboard")
+    fetch("/api/hr/newcomers")
       .then(r => r.json())
-      .then(data => { if (Array.isArray(data)) setNewcomers(data); })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setNewcomers(data.map((n: any) => ({
+            id: n.id,
+            user_name: n.user?.name || "Unknown",
+            user_email: n.user?.email || "",
+            department: n.department,
+            position: n.position,
+            start_date: n.start_date,
+            status: n.status,
+            current_phase: n.current_phase,
+            task_total: 0,
+            task_done: 0,
+          })));
+        }
+      })
       .finally(() => setLoading(false));
   }, []);
 

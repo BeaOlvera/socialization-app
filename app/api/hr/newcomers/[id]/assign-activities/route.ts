@@ -53,6 +53,10 @@ export async function POST(
     estimated_time: t.estimated_time,
     builds_on: t.builds_on,
     output: t.output,
+    type: t.type || 'activity',
+    assigned_to: t.assigned_to || 'newcomer',
+    format: t.format || null,
+    duration: t.duration || null,
     done: false,
   }))
 

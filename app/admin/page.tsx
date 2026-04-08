@@ -41,7 +41,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <PageShell nav={<NavBar role={"hr" as any} active="Admin" />}>
+    <PageShell nav={<NavBar role="admin" active="Admin" />}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <h2 style={{ fontSize: 22, fontWeight: 700, color: "#0A0A0A" }}>Admin Dashboard</h2>

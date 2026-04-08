@@ -10,7 +10,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-production'
 export interface SessionPayload {
   userId: string
   role: UserRole
-  companyId: string
+  companyId: string | null
   name: string
   email: string
 }

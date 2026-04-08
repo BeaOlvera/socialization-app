@@ -83,7 +83,6 @@ export function NavBar({ role, active }: { role: "newcomer" | "manager" | "hr" |
     ],
     manager: [
       { href: "/manager", label: "My Team" },
-      { href: "/manager/newcomer/sofia", label: "Newcomer Detail" },
     ],
     hr: [
       { href: "/hr", label: "Overview" },

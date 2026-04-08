@@ -30,7 +30,7 @@ export default function ManagerHome() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/hr/newcomers").then(r => r.json()),
+      fetch("/api/manager/newcomers").then(r => r.json()),
       fetch("/api/manager/my-tasks").then(r => r.ok ? r.json() : []),
     ]).then(([nData, tData]) => {
       if (Array.isArray(nData)) setNewcomers(nData);
