@@ -1,179 +1,154 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { NavBar, PageShell, Card, StatusDot, Avatar, SectionLabel, ScoreRing, TwoCol } from "@/components/ui";
-import { managerNewcomers } from "@/lib/mock";
-import { DIMENSIONS } from "@/lib/framework";
+import { NavBar, PageShell, Card, StatusDot, SectionLabel, BucketTag } from "@/components/ui";
+import { DIMENSIONS, PHASES } from "@/lib/framework";
 
-// Fallback mock data (used when API is unavailable)
-const mockNudges = [
-  { text: "Review 90-day goals together in your next 1:1 — they may need more clarity on KPIs." },
-  { text: "Introduce them to 1–2 people outside their team this week — their TIE score is the lowest." },
-];
-const mockQualQuotes = [
-  { q: "What has surprised you most?", a: "How fast-paced everything is. I'm learning a lot but sometimes feel I'm missing context." },
-  { q: "What feels most unclear?", a: "I'm still not sure exactly how my work connects to the broader strategy." },
-];
-const mockHistory = [
-  { month: "Month 1 (Feb)", self: 42, manager: 60 },
-  { month: "Month 1 wk3 (now)", self: 48, manager: 65 },
-];
+type Dim = keyof typeof DIMENSIONS;
+
+interface Task {
+  id: string;
+  phase: string;
+  dimension: string;
+  activity: string;
+  label: string;
+  estimated_time: string | null;
+  output: string | null;
+  who: string | null;
+  type: string;
+  done: boolean;
+  due_date: string | null;
+}
+
+interface NewcomerInfo {
+  id: string;
+  department: string;
+  position: string;
+  start_date: string;
+  status: string;
+  current_phase: string;
+  user: { name: string; email: string };
+}
 
 export default function NewcomerDetailPage() {
-  const params = useParams();
-  const id = params.id as string;
-
-  // Try API, fall back to mock (first newcomer)
-  const fallback = managerNewcomers[0];
-  const [data, setData] = useState(fallback);
+  const { id } = useParams<{ id: string }>();
+  const [newcomer, setNewcomer] = useState<NewcomerInfo | null>(null);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/manager/newcomers/${id}`)
-      .then(r => r.ok ? r.json() : null)
-      .then(d => {
-        if (d?.newcomer) {
-          const n = d.newcomer;
-          setData({
-            name: n.user?.name || fallback.name,
-            role: n.position || fallback.role,
-            day: n.day || fallback.day,
-            phase: n.current_phase || fallback.phase,
-            status: n.status || fallback.status,
-            scores: { fit: 0, ace: 0, tie: 0, ...d.newcomer },
-            selfScore: fallback.selfScore,
-            managerScore: fallback.managerScore,
-            flag: fallback.flag,
-          });
-        }
-      })
-      .catch(() => {}); // fallback to mock
+    Promise.all([
+      fetch(`/api/manager/newcomers/${id}`).then(r => r.ok ? r.json() : null),
+      fetch(`/api/manager/newcomers/${id}/tasks`).then(r => r.ok ? r.json() : []),
+    ]).then(([nData, tData]) => {
+      setNewcomer(nData);
+      if (Array.isArray(tData)) setTasks(tData);
+    }).finally(() => setLoading(false));
   }, [id]);
 
-  const nudges = mockNudges;
-  const qualQuotes = mockQualQuotes;
-  const history = mockHistory;
+  function daysSince(startDate: string) {
+    const diff = Date.now() - new Date(startDate).getTime();
+    return Math.max(1, Math.floor(diff / (1000 * 60 * 60 * 24)));
+  }
 
-  const left = <>
-    <Card>
-      <div className="flex items-start gap-3">
-        <Avatar initials={data.name.split(" ").map(w => w[0]).join("")} size={48} />
-        <div className="flex-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h2 className="text-lg font-bold">{data.name}</h2>
-            <StatusDot status={data.status as "green" | "yellow" | "red"} />
-          </div>
-          <p className="text-sm text-[#6B6B6B]">{data.role} · Day {data.day} · {data.phase} phase</p>
-        </div>
-      </div>
-    </Card>
+  const dims: Dim[] = ["fit", "ace", "tie"];
+  const totalDone = tasks.filter(t => t.done).length;
+  const overallPct = tasks.length > 0 ? Math.round((totalDone / tasks.length) * 100) : 0;
 
-    <Card style={{ background: "#FEF3E2", border: "1px solid #B7791F" }}>
-      <p className="text-xs font-semibold text-[#B7791F] uppercase tracking-widest mb-1">Divergence detected</p>
-      <p className="text-sm text-[#B7791F] leading-relaxed">
-        Self-rating at <strong>{data.selfScore}%</strong> — manager rating at <strong>{data.managerScore}%</strong>.
-        This gap suggests they may be struggling in ways not yet visible. A direct conversation is recommended.
-      </p>
-    </Card>
-
-    <Card>
-      <SectionLabel>Score comparison</SectionLabel>
-      <div className="flex justify-around mb-5">
-        <div className="text-center">
-          <ScoreRing score={data.selfScore} size={72} />
-          <p className="text-xs text-[#6B6B6B] mt-2">Self-rating</p>
-        </div>
-        <div className="flex items-center text-[#E2E0DA] text-2xl font-light">vs</div>
-        <div className="text-center">
-          <ScoreRing score={data.managerScore} size={72} />
-          <p className="text-xs text-[#6B6B6B] mt-2">Your rating</p>
-        </div>
-      </div>
-      <div className="space-y-3">
-        {(["fit", "ace", "tie"] as const).map(b => {
-          const dim = DIMENSIONS[b];
-          return (
-            <div key={b}>
-              <div className="flex justify-between mb-1">
-                <span className="text-xs font-medium">{dim.label}</span>
-                <span className="text-xs text-[#6B6B6B]">{data.scores[b]}%</span>
-              </div>
-              <div className="h-2 bg-[#F5F4F0] rounded-full overflow-hidden">
-                <div className="h-full rounded-full"
-                  style={{
-                    width: `${data.scores[b]}%`,
-                    background: data.scores[b] >= 70 ? "#2D6A4F" : data.scores[b] >= 50 ? "#B7791F" : "#9B2335"
-                  }} />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </Card>
-  </>;
-
-  const right = <>
-    <div>
-      <SectionLabel>What they said</SectionLabel>
-      <div className="space-y-2">
-        {qualQuotes.map((q, i) => (
-          <Card key={i}>
-            <p className="text-xs font-semibold text-[#AEABA3] mb-1.5">{q.q}</p>
-            <p className="text-sm text-[#0A0A0A] italic leading-relaxed">&quot;{q.a}&quot;</p>
-          </Card>
-        ))}
-      </div>
-    </div>
-
-    <div>
-      <SectionLabel>Suggested actions for you</SectionLabel>
-      <div className="space-y-2">
-        {nudges.map((n, i) => (
-          <Card key={i} className="flex items-start gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#1A1A2E] mt-2 flex-shrink-0" />
-            <p className="text-sm text-[#0A0A0A] leading-relaxed">{n.text}</p>
-          </Card>
-        ))}
-      </div>
-    </div>
-
-    <div>
-      <SectionLabel>Trend</SectionLabel>
-      <Card>
-        <div className="space-y-3">
-          {history.map((h, i) => (
-            <div key={i}>
-              <div className="flex justify-between mb-1">
-                <span className="text-xs text-[#6B6B6B]">{h.month}</span>
-                <span className="text-xs text-[#AEABA3]">self {h.self}% · you {h.manager}%</span>
-              </div>
-              <div className="flex gap-1.5">
-                <div className="flex-1 h-2 bg-[#F5F4F0] rounded-full overflow-hidden">
-                  <div className="h-full bg-[#B7791F] rounded-full" style={{ width: `${h.self}%` }} />
-                </div>
-                <div className="flex-1 h-2 bg-[#F5F4F0] rounded-full overflow-hidden">
-                  <div className="h-full bg-[#1A1A2E] rounded-full" style={{ width: `${h.manager}%` }} />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-4 mt-3">
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-1.5 rounded bg-[#B7791F]" />
-            <span className="text-xs text-[#6B6B6B]">Self</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-1.5 rounded bg-[#1A1A2E]" />
-            <span className="text-xs text-[#6B6B6B]">Manager</span>
-          </div>
-        </div>
-      </Card>
-    </div>
-  </>;
+  if (loading) {
+    return (
+      <PageShell nav={<NavBar role="manager" active="My Team" />}>
+        <div style={{ textAlign: "center", padding: 60, color: "#6B6B6B" }}>Loading...</div>
+      </PageShell>
+    );
+  }
 
   return (
     <PageShell nav={<NavBar role="manager" active="My Team" />}>
-      <TwoCol left={left} right={right} />
+      {/* Header */}
+      <Card style={{ background: "#ECECEA", border: "1px solid #DDDBD5" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: "#0A0A0A" }}>
+              {newcomer?.user?.name || "Unknown"}
+            </h2>
+            <p style={{ fontSize: 13, color: "#6B6B6B" }}>
+              {newcomer?.position} · {newcomer?.department} · Day {newcomer ? daysSince(newcomer.start_date) : "?"}
+            </p>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            {newcomer && <StatusDot status={newcomer.status as "green" | "yellow" | "red"} />}
+            <div style={{ textAlign: "right" }}>
+              <p style={{ fontSize: 24, fontWeight: 700 }}>{overallPct}%</p>
+              <p style={{ fontSize: 10, color: "#AEABA3" }}>{totalDone}/{tasks.length} done</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Dimension progress */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+        {dims.map(dim => {
+          const info = DIMENSIONS[dim];
+          const dimTasks = tasks.filter(t => t.dimension === dim);
+          const done = dimTasks.filter(t => t.done).length;
+          const pct = dimTasks.length > 0 ? Math.round((done / dimTasks.length) * 100) : 0;
+          return (
+            <Card key={dim}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: info.color }}>{info.label}</span>
+                <span style={{ fontSize: 11, color: "#AEABA3" }}>{done}/{dimTasks.length}</span>
+              </div>
+              <div style={{ height: 6, background: "#F5F4F0", borderRadius: 99, overflow: "hidden" }}>
+                <div style={{ height: "100%", background: info.color, borderRadius: 99, width: `${pct}%` }} />
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Activity list */}
+      <Card>
+        <SectionLabel>All Activities & Check-ins</SectionLabel>
+        {tasks.length === 0 ? (
+          <p style={{ fontSize: 13, color: "#6B6B6B" }}>No activities assigned yet.</p>
+        ) : (
+          <div style={{ maxHeight: 500, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
+            {tasks.map(t => (
+              <div key={t.id} style={{
+                display: "flex", alignItems: "center", gap: 10, padding: "8px 10px",
+                background: t.done ? "#F5F4F0" : "#FFFFFF", borderRadius: 8,
+                borderLeft: `3px solid ${DIMENSIONS[t.dimension as Dim]?.color || "#E2E0DA"}`,
+                opacity: t.done ? 0.6 : 1,
+              }}>
+                <div style={{
+                  width: 16, height: 16, borderRadius: 4, flexShrink: 0,
+                  background: t.done ? DIMENSIONS[t.dimension as Dim]?.color : "transparent",
+                  border: t.done ? "none" : "2px solid #DDDBD5",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  {t.done && <span style={{ fontSize: 9, color: "#FFF", fontWeight: 700 }}>&#10003;</span>}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{
+                    fontSize: 12, color: "#0A0A0A",
+                    textDecoration: t.done ? "line-through" : "none",
+                  }}>
+                    {t.activity || t.label}
+                  </p>
+                  <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
+                    <BucketTag bucket={t.dimension} />
+                    {t.type === "checkin" && (
+                      <span style={{ fontSize: 9, fontWeight: 600, padding: "1px 6px", borderRadius: 10, background: "#FEF3E2", color: "#B7791F" }}>Check-in</span>
+                    )}
+                    {t.due_date && <span style={{ fontSize: 10, color: "#AEABA3" }}>Due: {t.due_date}</span>}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
     </PageShell>
   );
 }

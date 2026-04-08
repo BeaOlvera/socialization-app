@@ -1,23 +1,57 @@
 "use client";
 import { NavBar, PageShell, Card, StatusDot, SectionLabel, TwoCol, ThreeCol } from "@/components/ui";
-import { hrOverview, hrNewcomers } from "@/lib/mock";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
+interface NewcomerRow {
+  id: string;
+  user_name: string;
+  department: string;
+  position: string;
+  start_date: string;
+  status: string;
+  current_phase: string;
+  task_total: number;
+  task_done: number;
+}
+
 export default function HRHome() {
-  const total = hrOverview.total;
+  const [newcomers, setNewcomers] = useState<NewcomerRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/hr/dashboard")
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data)) setNewcomers(data); })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const total = newcomers.length;
+  const green = newcomers.filter(n => n.status === "green").length;
+  const yellow = newcomers.filter(n => n.status === "yellow").length;
+  const red = newcomers.filter(n => n.status === "red").length;
+
+  // Day calculation helper
+  function daysSince(startDate: string) {
+    const diff = Date.now() - new Date(startDate).getTime();
+    return Math.max(1, Math.floor(diff / (1000 * 60 * 60 * 24)));
+  }
+
+  // Phase distribution
+  const phases = ["arrival", "integration", "adjustment", "stabilization", "embedding"];
+  const phaseCounts = phases.map(p => newcomers.filter(n => n.current_phase === p).length);
 
   const left = <>
     <div className="space-y-1">
       <h2 className="text-xl font-bold">Organization Overview</h2>
-      <p className="text-sm text-[#6B6B6B]">Meridian Group · {total} active newcomers</p>
+      <p className="text-sm text-[#6B6B6B]">{total} active newcomer{total !== 1 ? "s" : ""}</p>
     </div>
 
-    {/* Health summary */}
     <ThreeCol>
       {[
-        { label: "On track", value: hrOverview.green, color: "#2D6A4F" },
-        { label: "Attention", value: hrOverview.yellow, color: "#B7791F" },
-        { label: "At risk", value: hrOverview.red, color: "#9B2335" },
+        { label: "On track", value: green, color: "#2D6A4F" },
+        { label: "Attention", value: yellow, color: "#B7791F" },
+        { label: "At risk", value: red, color: "#9B2335" },
       ].map(s => (
         <Card key={s.label} className="text-center py-4" style={{ borderColor: s.color + "33" }}>
           <p className="text-3xl font-bold" style={{ color: s.color }}>{s.value}</p>
@@ -26,118 +60,59 @@ export default function HRHome() {
       ))}
     </ThreeCol>
 
-    {/* Avg scores */}
+    {/* Assign activities */}
     <Card>
-      <SectionLabel>Average dimension scores</SectionLabel>
-      <div className="space-y-3">
-        {[
-          { label: "FIT · Role Clarity", score: hrOverview.avgScores.fit },
-          { label: "ACE · Task Mastery", score: hrOverview.avgScores.ace },
-          { label: "TIE · Social Acceptance", score: hrOverview.avgScores.tie },
-        ].map(s => (
-          <div key={s.label}>
-            <div className="flex justify-between mb-1">
-              <span className="text-sm font-medium">{s.label}</span>
-              <span className="text-sm text-[#6B6B6B]">{s.score}%</span>
-            </div>
-            <div className="h-2.5 bg-[#F5F4F0] rounded-full overflow-hidden">
-              <div className="h-full rounded-full"
-                style={{
-                  width: `${s.score}%`,
-                  background: s.score >= 70 ? "#2D6A4F" : s.score >= 50 ? "#B7791F" : "#9B2335"
-                }} />
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="mt-4 bg-[#FEF3E2] rounded-lg p-3">
-        <p className="text-xs font-semibold text-[#B7791F] mb-1">Organization insight</p>
-        <p className="text-sm text-[#B7791F]">
-          TIE is the weakest dimension (52%). Social integration is the main gap — consider strengthening the buddy program.
-        </p>
-      </div>
-    </Card>
-
-    {/* Flight risk */}
-    <Card style={{ background: "#FBEAEC", border: "1px solid #9B2335" }}>
-      <p className="text-xs font-semibold text-[#9B2335] uppercase tracking-widest mb-2">Flight risk</p>
-      <p className="text-3xl font-bold text-[#9B2335]">{hrOverview.flightRisk}</p>
-      <p className="text-sm text-[#9B2335] mt-1">newcomers with declining scores for 2+ consecutive check-ins</p>
-      <Link href="/hr/newcomers">
-        <button className="mt-3 text-xs font-semibold text-[#9B2335] underline underline-offset-2">
-          View all newcomers →
-        </button>
-      </Link>
+      <SectionLabel>Assign Activities</SectionLabel>
+      <p style={{ fontSize: 13, color: "#6B6B6B", marginBottom: 12 }}>
+        One-click assign all uploaded activities and check-ins to a newcomer.
+      </p>
+      {newcomers.map(n => (
+        <AssignRow key={n.id} newcomer={n} />
+      ))}
     </Card>
   </>;
 
   const right = <>
-    {/* Phase distribution */}
     <Card>
       <SectionLabel>Newcomers by phase</SectionLabel>
       <div className="space-y-2">
-        {[
-          { phase: "Arrival (Days 1–30)", count: hrOverview.phases.arrival, pct: hrOverview.phases.arrival / total },
-          { phase: "Integration (Days 31–90)", count: hrOverview.phases.integration, pct: hrOverview.phases.integration / total },
-          { phase: "Adjustment (Months 4–6)", count: hrOverview.phases.adjustment, pct: hrOverview.phases.adjustment / total },
-          { phase: "Stabilization (Months 7–9)", count: hrOverview.phases.stabilization, pct: hrOverview.phases.stabilization / total },
-          { phase: "Embedding (Months 10–12)", count: hrOverview.phases.embedding, pct: hrOverview.phases.embedding / total },
-        ].map(p => (
-          <div key={p.phase} className="flex items-center gap-3">
-            <span className="text-xs text-[#6B6B6B] w-44 flex-shrink-0">{p.phase}</span>
+        {phases.map((p, i) => (
+          <div key={p} className="flex items-center gap-3">
+            <span className="text-xs text-[#6B6B6B] w-32 flex-shrink-0 capitalize">{p}</span>
             <div className="flex-1 h-2 bg-[#F5F4F0] rounded-full overflow-hidden">
-              <div className="h-full bg-[#0A0A0A] rounded-full" style={{ width: `${p.pct * 100}%` }} />
+              <div className="h-full bg-[#0A0A0A] rounded-full"
+                style={{ width: total > 0 ? `${(phaseCounts[i] / total) * 100}%` : "0%" }} />
             </div>
-            <span className="text-xs font-semibold w-4 text-right">{p.count}</span>
+            <span className="text-xs font-semibold w-4 text-right">{phaseCounts[i]}</span>
           </div>
         ))}
       </div>
     </Card>
 
-    {/* Manager effectiveness */}
     <Card>
-      <SectionLabel>Manager effectiveness</SectionLabel>
+      <SectionLabel>All newcomers</SectionLabel>
       <div className="space-y-2">
-        {[
-          { name: "Ravi Sharma", newcomers: 2, avgScore: 75, trend: "↑" },
-          { name: "Claire Bennett", newcomers: 2, avgScore: 49, trend: "↓" },
-          { name: "Lee Park", newcomers: 1, avgScore: 72, trend: "→" },
-        ].map(m => (
-          <div key={m.name} className="flex items-center justify-between py-2 border-b border-[#F5F4F0] last:border-0">
-            <div>
-              <p className="text-sm font-medium">{m.name}</p>
-              <p className="text-xs text-[#6B6B6B]">{m.newcomers} newcomer{m.newcomers > 1 ? "s" : ""}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm font-semibold">{m.avgScore}%</p>
-              <p className={`text-xs ${m.trend === "↑" ? "text-[#2D6A4F]" : m.trend === "↓" ? "text-[#9B2335]" : "text-[#6B6B6B]"}`}>
-                {m.trend} avg adjustment
-              </p>
-            </div>
-          </div>
-        ))}
+        {loading ? (
+          <p style={{ fontSize: 13, color: "#6B6B6B" }}>Loading...</p>
+        ) : newcomers.length === 0 ? (
+          <p style={{ fontSize: 13, color: "#6B6B6B" }}>No newcomers yet.</p>
+        ) : (
+          newcomers.map(n => (
+            <Link key={n.id} href={`/hr/newcomers/${n.id}`} style={{ textDecoration: "none" }}>
+              <div className="flex items-center justify-between py-2 border-b border-[#F5F4F0] last:border-0 hover:bg-[#FAFAF8] px-2 rounded">
+                <div>
+                  <p className="text-sm font-medium text-[#0A0A0A]">{n.user_name}</p>
+                  <p className="text-xs text-[#6B6B6B]">
+                    {n.department || "No dept"} · Day {daysSince(n.start_date)} ·
+                    {n.task_total > 0 ? ` ${n.task_done}/${n.task_total} tasks` : " No tasks"}
+                  </p>
+                </div>
+                <StatusDot status={n.status as "green" | "yellow" | "red"} />
+              </div>
+            </Link>
+          ))
+        )}
       </div>
-    </Card>
-
-    {/* All newcomers shortcut */}
-    <Card>
-      <SectionLabel>Quick view — all newcomers</SectionLabel>
-      <div className="space-y-2">
-        {hrNewcomers.slice(0, 4).map((n, i) => (
-          <div key={i} className="flex items-center justify-between py-1.5 border-b border-[#F5F4F0] last:border-0">
-            <div>
-              <p className="text-sm font-medium">{n.name}</p>
-              <p className="text-xs text-[#6B6B6B]">{n.dept} · Day {n.day}</p>
-            </div>
-            <StatusDot status={n.status as "green" | "yellow" | "red"} />
-          </div>
-        ))}
-      </div>
-      <Link href="/hr/newcomers">
-        <button className="mt-3 text-xs font-semibold text-[#0A0A0A] underline underline-offset-2">
-          View all {hrNewcomers.length} →
-        </button>
-      </Link>
     </Card>
   </>;
 
@@ -145,5 +120,44 @@ export default function HRHome() {
     <PageShell nav={<NavBar role="hr" active="Overview" />}>
       <TwoCol left={left} right={right} />
     </PageShell>
+  );
+}
+
+function AssignRow({ newcomer }: { newcomer: NewcomerRow }) {
+  const [assigning, setAssigning] = useState(false);
+  const [result, setResult] = useState("");
+
+  async function assign() {
+    setAssigning(true);
+    const res = await fetch(`/api/hr/newcomers/${newcomer.id}/assign-activities`, { method: "POST" });
+    if (res.ok) {
+      const data = await res.json();
+      setResult(`Assigned ${data.assigned} items`);
+    } else {
+      setResult("Error assigning");
+    }
+    setAssigning(false);
+  }
+
+  return (
+    <div style={{
+      display: "flex", justifyContent: "space-between", alignItems: "center",
+      padding: "8px 0", borderBottom: "1px solid #F5F4F0",
+    }}>
+      <div>
+        <p style={{ fontSize: 13, fontWeight: 600 }}>{newcomer.user_name}</p>
+        <p style={{ fontSize: 11, color: "#6B6B6B" }}>{newcomer.task_done}/{newcomer.task_total} tasks done</p>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        {result && <span style={{ fontSize: 11, color: "#2D6A4F" }}>{result}</span>}
+        <button onClick={assign} disabled={assigning} style={{
+          padding: "6px 14px", borderRadius: 8, border: "none", cursor: "pointer",
+          background: assigning ? "#E2E0DA" : "#1A1A2E", color: "#FFFFFF",
+          fontSize: 11, fontWeight: 600,
+        }}>
+          {assigning ? "..." : "Assign All"}
+        </button>
+      </div>
+    </div>
   );
 }

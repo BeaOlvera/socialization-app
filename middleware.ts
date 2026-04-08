@@ -5,6 +5,8 @@ const SESSION_COOKIE = 'ob_session'
 
 // Map protected path prefixes to allowed roles
 const ROLE_ROUTES: [string, UserRole[]][] = [
+  ['/admin', ['admin']],
+  ['/api/admin', ['admin']],
   ['/newcomer', ['newcomer']],
   ['/manager', ['manager']],
   ['/hr', ['hr_admin']],
@@ -69,6 +71,8 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    '/admin/:path*',
+    '/api/admin/:path*',
     '/newcomer/:path*',
     '/manager/:path*',
     '/hr/:path*',

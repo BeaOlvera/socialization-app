@@ -1,0 +1,84 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { supabaseAdmin } from '@/lib/supabase'
+import { checkRole, getSessionFromRequest } from '@/lib/auth'
+
+// GET — tasks assigned to this manager (check-ins, 1:1s, etc.)
+export async function GET(request: NextRequest) {
+  const authError = checkRole(request, ['manager'])
+  if (authError) return authError
+
+  const session = getSessionFromRequest(request)!
+
+  // Get tasks assigned to this user
+  const { data: tasks } = await supabaseAdmin
+    .from('phase_tasks')
+    .select('id, activity, label, due_date, done, dimension, type, newcomer_id, assigned_to')
+    .eq('assigned_to_user_id', session.userId)
+    .order('due_date', { ascending: true })
+
+  if (!tasks || tasks.length === 0) {
+    // Fallback: get tasks assigned_to='manager' for newcomers managed by this user
+    const { data: newcomers } = await supabaseAdmin
+      .from('newcomers')
+      .select('id, user_id')
+      .eq('manager_id', session.userId)
+
+    if (!newcomers || newcomers.length === 0) return NextResponse.json([])
+
+    const newcomerIds = newcomers.map(n => n.id)
+    const { data: mgrTasks } = await supabaseAdmin
+      .from('phase_tasks')
+      .select('id, activity, label, due_date, done, dimension, type, newcomer_id')
+      .in('newcomer_id', newcomerIds)
+      .eq('assigned_to', 'manager')
+      .order('due_date', { ascending: true })
+
+    // Get newcomer names
+    const userIds = newcomers.map(n => n.user_id)
+    const { data: users } = await supabaseAdmin
+      .from('users')
+      .select('id, name')
+      .in('id', userIds)
+
+    const newcomerUserMap: Record<string, string> = {}
+    newcomers.forEach(n => {
+      const user = users?.find(u => u.id === n.user_id)
+      newcomerUserMap[n.id] = user?.name || 'Unknown'
+    })
+
+    const result = (mgrTasks || []).map(t => ({
+      ...t,
+      activity: t.activity || t.label,
+      newcomer_name: newcomerUserMap[t.newcomer_id] || 'Unknown',
+    }))
+
+    return NextResponse.json(result)
+  }
+
+  // Get newcomer names for the tasks
+  const newcomerIds = [...new Set(tasks.map(t => t.newcomer_id))]
+  const { data: newcomers } = await supabaseAdmin
+    .from('newcomers')
+    .select('id, user_id')
+    .in('id', newcomerIds)
+
+  const userIds = newcomers?.map(n => n.user_id) || []
+  const { data: users } = await supabaseAdmin
+    .from('users')
+    .select('id, name')
+    .in('id', userIds.length > 0 ? userIds : ['none'])
+
+  const newcomerNameMap: Record<string, string> = {}
+  newcomers?.forEach(n => {
+    const user = users?.find(u => u.id === n.user_id)
+    newcomerNameMap[n.id] = user?.name || 'Unknown'
+  })
+
+  const result = tasks.map(t => ({
+    ...t,
+    activity: t.activity || t.label,
+    newcomer_name: newcomerNameMap[t.newcomer_id] || 'Unknown',
+  }))
+
+  return NextResponse.json(result)
+}

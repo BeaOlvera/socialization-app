@@ -21,7 +21,7 @@ export const supabaseAdmin: SupabaseClient = hasConfig && supabaseServiceRoleKey
 
 // ─── TypeScript types matching supabase/schema.sql ──────────
 
-export type UserRole = 'newcomer' | 'manager' | 'hr_admin'
+export type UserRole = 'newcomer' | 'manager' | 'hr_admin' | 'admin'
 export type Phase = 'arrival' | 'integration' | 'adjustment' | 'stabilization' | 'embedding'
 export type Status = 'green' | 'yellow' | 'red'
 export type Dimension = 'fit' | 'ace' | 'tie'

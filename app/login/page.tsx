@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const roleRedirects: Record<string, string> = {
+  admin: "/admin",
   newcomer: "/newcomer",
   manager: "/manager",
   hr_admin: "/hr",

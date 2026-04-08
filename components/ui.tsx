@@ -65,8 +65,11 @@ export function Avatar({ initials, size = 36 }: { initials: string; size?: numbe
   );
 }
 
-export function NavBar({ role, active }: { role: "newcomer" | "manager" | "hr"; active: string }) {
+export function NavBar({ role, active }: { role: "newcomer" | "manager" | "hr" | "admin"; active: string }) {
   const links = {
+    admin: [
+      { href: "/admin", label: "Companies" },
+    ],
     newcomer: [
       { href: "/newcomer", label: "Home" },
       { href: "/newcomer/docs", label: "Documents" },
@@ -88,8 +91,8 @@ export function NavBar({ role, active }: { role: "newcomer" | "manager" | "hr"; 
     ],
   };
 
-  const roleLabel = { newcomer: "Newcomer", manager: "Manager", hr: "HR Admin" };
-  const roleColors = { newcomer: "#1A1A2E", manager: "#2D6A4F", hr: "#9B2335" };
+  const roleLabel = { admin: "Admin", newcomer: "Newcomer", manager: "Manager", hr: "HR Admin" };
+  const roleColors = { admin: "#0A0A0A", newcomer: "#1A1A2E", manager: "#2D6A4F", hr: "#9B2335" };
 
   return (
     <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "#FFFFFF", borderBottom: "1px solid #E2E0DA" }}>
