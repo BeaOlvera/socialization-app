@@ -249,13 +249,21 @@ export default function CompanyDetail() {
           <Card>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <SectionLabel>Activity Templates</SectionLabel>
-              <label style={{
-                padding: "8px 16px", borderRadius: 8, background: "#0A0A0A", color: "#FFFFFF",
-                fontSize: 12, fontWeight: 600, cursor: "pointer",
-              }}>
-                {uploading ? "Uploading..." : "Upload Excel"}
-                <input type="file" accept=".xlsx,.xls" onChange={handleUploadActivities} hidden />
-              </label>
+              <div style={{ display: "flex", gap: 8 }}>
+                <a href="/api/admin/templates?type=activities" style={{
+                  padding: "8px 16px", borderRadius: 8, background: "#F5F4F0", color: "#6B6B6B",
+                  fontSize: 12, fontWeight: 600, textDecoration: "none", border: "1px solid #E2E0DA",
+                }}>
+                  Download Template
+                </a>
+                <label style={{
+                  padding: "8px 16px", borderRadius: 8, background: "#0A0A0A", color: "#FFFFFF",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer",
+                }}>
+                  {uploading ? "Uploading..." : "Upload Excel"}
+                  <input type="file" accept=".xlsx,.xls" onChange={handleUploadActivities} hidden />
+                </label>
+              </div>
             </div>
             {activities.length === 0 ? (
               <p style={{ color: "#6B6B6B", fontSize: 13 }}>No activities uploaded yet. Upload an Excel file to get started.</p>
@@ -292,13 +300,21 @@ export default function CompanyDetail() {
         <Card>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <SectionLabel>Check-in Templates</SectionLabel>
-            <label style={{
-              padding: "8px 16px", borderRadius: 8, background: "#0A0A0A", color: "#FFFFFF",
-              fontSize: 12, fontWeight: 600, cursor: "pointer",
-            }}>
-              {uploading ? "Uploading..." : "Upload Excel"}
-              <input type="file" accept=".xlsx,.xls" onChange={handleUploadCheckins} hidden />
-            </label>
+            <div style={{ display: "flex", gap: 8 }}>
+              <a href="/api/admin/templates?type=checkins" style={{
+                padding: "8px 16px", borderRadius: 8, background: "#F5F4F0", color: "#6B6B6B",
+                fontSize: 12, fontWeight: 600, textDecoration: "none", border: "1px solid #E2E0DA",
+              }}>
+                Download Template
+              </a>
+              <label style={{
+                padding: "8px 16px", borderRadius: 8, background: "#0A0A0A", color: "#FFFFFF",
+                fontSize: 12, fontWeight: 600, cursor: "pointer",
+              }}>
+                {uploading ? "Uploading..." : "Upload Excel"}
+                <input type="file" accept=".xlsx,.xls" onChange={handleUploadCheckins} hidden />
+              </label>
+            </div>
           </div>
           {checkins.length === 0 ? (
             <p style={{ color: "#6B6B6B", fontSize: 13 }}>No check-ins uploaded yet. Upload the check-in schedule Excel.</p>
@@ -381,6 +397,12 @@ export default function CompanyDetail() {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <a href="/api/admin/templates?type=people" style={{
+              padding: "10px 20px", borderRadius: 10, background: "#F5F4F0", color: "#6B6B6B",
+              fontSize: 13, fontWeight: 600, textDecoration: "none", border: "1px solid #E2E0DA",
+            }}>
+              Download Template
+            </a>
             <label style={{
               padding: "10px 20px", borderRadius: 10, background: "#0A0A0A", color: "#FFFFFF",
               fontSize: 13, fontWeight: 600, cursor: "pointer",

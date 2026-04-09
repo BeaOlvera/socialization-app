@@ -43,10 +43,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'name, hr_email, hr_name, hr_password required' }, { status: 400 })
   }
 
-  // Create company
+  // Create company (convert empty strings to null)
   const { data: company, error: compError } = await supabaseAdmin
     .from('companies')
-    .insert({ name, industry, size, mission })
+    .insert({
+      name,
+      industry: industry || null,
+      size: size || null,
+      mission: mission || null,
+    })
     .select()
     .single()
 

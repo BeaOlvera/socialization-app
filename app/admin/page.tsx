@@ -18,6 +18,7 @@ export default function AdminDashboard() {
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState({ name: "", industry: "", size: "", mission: "", hr_email: "", hr_name: "", hr_password: "", has_buddies: true });
   const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState("");
 
   useEffect(() => {
     fetch("/api/admin/companies").then(r => r.json()).then(setCompanies).finally(() => setLoading(false));
@@ -35,7 +36,11 @@ export default function AdminDashboard() {
       const { company } = await res.json();
       setCompanies(prev => [{ ...company, newcomer_count: 0 }, ...prev]);
       setShowCreate(false);
+      setCreateError("");
       setForm({ name: "", industry: "", size: "", mission: "", hr_email: "", hr_name: "", hr_password: "", has_buddies: true });
+    } else {
+      const err = await res.json();
+      setCreateError(err.error || "Failed to create company");
     }
     setCreating(false);
   }
@@ -62,6 +67,18 @@ export default function AdminDashboard() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <InputField label="Company Name *" value={form.name} onChange={v => setForm(f => ({ ...f, name: v }))} />
               <InputField label="Industry" value={form.industry} onChange={v => setForm(f => ({ ...f, industry: v }))} />
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>Company Size</label>
+                <select value={form.size} onChange={e => setForm(f => ({ ...f, size: e.target.value }))}
+                  style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid #E2E0DA", fontSize: 13, background: "#FAFAF8", boxSizing: "border-box" }}>
+                  <option value="">Select size...</option>
+                  <option value="under_50">Under 50</option>
+                  <option value="50_200">50–200</option>
+                  <option value="200_500">200–500</option>
+                  <option value="500_2000">500–2,000</option>
+                  <option value="2000_plus">2,000+</option>
+                </select>
+              </div>
               <InputField label="HR Admin Email *" value={form.hr_email} onChange={v => setForm(f => ({ ...f, hr_email: v }))} type="email" />
               <InputField label="HR Admin Name *" value={form.hr_name} onChange={v => setForm(f => ({ ...f, hr_name: v }))} />
               <InputField label="HR Admin Password *" value={form.hr_password} onChange={v => setForm(f => ({ ...f, hr_password: v }))} type="password" />
@@ -73,6 +90,11 @@ export default function AdminDashboard() {
                 </label>
               </div>
             </div>
+            {createError && (
+              <div style={{ background: "#FBEAEC", borderRadius: 10, padding: "10px 14px" }}>
+                <p style={{ fontSize: 12, color: "#9B2335" }}>{createError}</p>
+              </div>
+            )}
             <button type="submit" disabled={creating} style={{
               padding: "10px 20px", borderRadius: 10, border: "none", cursor: "pointer",
               background: creating ? "#E2E0DA" : "#0A0A0A", color: "#FFFFFF", fontSize: 13, fontWeight: 600,
