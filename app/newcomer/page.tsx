@@ -52,8 +52,11 @@ export default function NewcomerHome() {
 
 // ─── PRE-ARRIVAL HOME ──────────────────────────────────────
 function PreArrivalHome({ tasks: rawTasks, allTasks }: { tasks: Task[]; allTasks: Task[] }) {
+  const [toggling, setToggling] = useState<string | null>(null);
+  const [localTasks, setLocalTasks] = useState(rawTasks);
+
   // Sort: interview first, then check-ins, then activities
-  const tasks = [...rawTasks].sort((a, b) => {
+  const tasks = [...localTasks].sort((a, b) => {
     const aIsInterview = a.activity?.toLowerCase().includes("interview") ? 0 : 1;
     const bIsInterview = b.activity?.toLowerCase().includes("interview") ? 0 : 1;
     if (aIsInterview !== bIsInterview) return aIsInterview - bIsInterview;
@@ -63,6 +66,19 @@ function PreArrivalHome({ tasks: rawTasks, allTasks }: { tasks: Task[]; allTasks
   });
   const done = tasks.filter(t => t.done).length;
   const total = tasks.length;
+
+  async function toggleTask(taskId: string, newDone: boolean) {
+    setToggling(taskId);
+    const res = await fetch("/api/newcomer/tasks", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ taskId, done: newDone }),
+    });
+    if (res.ok) {
+      setLocalTasks(prev => prev.map(t => t.id === taskId ? { ...t, done: newDone } : t));
+    }
+    setToggling(null);
+  }
 
   return (
     <PageShell nav={<NavBar role="newcomer" active="Home" />}>
@@ -89,69 +105,9 @@ function PreArrivalHome({ tasks: rawTasks, allTasks }: { tasks: Task[]; allTasks
       {/* Pre-arrival tasks */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {tasks.map(task => {
-          const isCheckin = (task.type || "activity") === "checkin";
           const isInterview = task.activity?.toLowerCase().includes("interview");
           return (
-            <Link
-              key={task.id}
-              href={isInterview ? `/newcomer/pre-arrival` : `/newcomer/activity/${task.id}`}
-              style={{ textDecoration: "none" }}
-            >
-              <Card
-                className="hover:border-[#1A1A2E] transition-colors cursor-pointer"
-                style={{
-                  borderLeft: `4px solid ${isInterview ? "#1A1A2E" : "#B7791F"}`,
-                  background: task.done ? "#F5F4F0" : "#FFFFFF",
-                  opacity: task.done ? 0.5 : 1,
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-                  <div style={{
-                    width: 24, height: 24, borderRadius: 6, flexShrink: 0, marginTop: 2,
-                    background: task.done ? "#1A1A2E" : "transparent",
-                    border: task.done ? "none" : "2px solid #1A1A2E",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                  }}>
-                    {task.done && (
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                        <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    )}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{
-                      fontSize: 16, fontWeight: 700, color: "#0A0A0A",
-                      textDecoration: task.done ? "line-through" : "none",
-                      marginBottom: 4,
-                    }}>
-                      {task.activity}
-                    </p>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 10, fontSize: 12, color: "#6B6B6B" }}>
-                      {isCheckin && (
-                        <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 10px", borderRadius: 20, background: isInterview ? "#EEEEF5" : "#FEF3E2", color: isInterview ? "#1A1A2E" : "#B7791F" }}>
-                          {isInterview ? "Interview" : "Check-in"}
-                        </span>
-                      )}
-                      {task.estimated_time && <span>{task.estimated_time}</span>}
-                      {task.who && <span>{task.who}</span>}
-                    </div>
-                    {task.output && (
-                      <p style={{ fontSize: 12, color: "#AEABA3", marginTop: 6 }}>
-                        {task.output}
-                      </p>
-                    )}
-                  </div>
-                  {!task.done && (
-                    <span style={{
-                      fontSize: 12, fontWeight: 700, padding: "6px 16px", borderRadius: 8,
-                      background: "#1A1A2E", color: "#FFFFFF", flexShrink: 0, alignSelf: "center",
-                    }}>
-                      {isInterview ? "Start" : "View"}
-                    </span>
-                  )}
-                </div>
-              </Card>
-            </Link>
+            <PreArrivalTaskCard key={task.id} task={task} isInterview={isInterview} onToggle={toggleTask} toggling={toggling} />
           );
         })}
       </div>
@@ -299,5 +255,97 @@ function RegularHome({ tasks, loading }: { tasks: Task[]; loading: boolean }) {
     <PageShell nav={<NavBar role="newcomer" active="Home" />}>
       <TwoCol left={left} right={right} />
     </PageShell>
+  );
+}
+
+// ─── PRE-ARRIVAL TASK CARD ─────────────────────────────────
+function PreArrivalTaskCard({ task, isInterview, onToggle, toggling }: {
+  task: Task; isInterview: boolean; onToggle: (id: string, done: boolean) => void; toggling: string | null;
+}) {
+  if (isInterview) {
+    // Interview: clickable card with "Start" button
+    return (
+      <Link href="/newcomer/pre-arrival" style={{ textDecoration: "none" }}>
+        <Card
+          className="hover:border-[#1A1A2E] transition-colors cursor-pointer"
+          style={{
+            borderLeft: "4px solid #1A1A2E",
+            background: task.done ? "#F5F4F0" : "#FFFFFF",
+            opacity: task.done ? 0.5 : 1,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+            <div style={{
+              width: 24, height: 24, borderRadius: 6, flexShrink: 0, marginTop: 2,
+              background: task.done ? "#1A1A2E" : "transparent",
+              border: task.done ? "none" : "2px solid #1A1A2E",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              {task.done && (
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: 16, fontWeight: 700, color: "#0A0A0A", textDecoration: task.done ? "line-through" : "none", marginBottom: 4 }}>
+                {task.activity}
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10, fontSize: 12, color: "#6B6B6B" }}>
+                <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 10px", borderRadius: 20, background: "#EEEEF5", color: "#1A1A2E" }}>Interview</span>
+                {task.estimated_time && <span>{task.estimated_time}</span>}
+              </div>
+              {task.output && <p style={{ fontSize: 12, color: "#AEABA3", marginTop: 6 }}>{task.output}</p>}
+            </div>
+            {!task.done && (
+              <span style={{ fontSize: 12, fontWeight: 700, padding: "6px 16px", borderRadius: 8, background: "#1A1A2E", color: "#FFFFFF", flexShrink: 0, alignSelf: "center" }}>
+                Start
+              </span>
+            )}
+          </div>
+        </Card>
+      </Link>
+    );
+  }
+
+  // Regular activity: checkbox inline, no link, all info visible
+  return (
+    <Card style={{
+      borderLeft: "4px solid #E2E0DA",
+      background: task.done ? "#F5F4F0" : "#FFFFFF",
+      opacity: task.done ? 0.6 : 1,
+    }}>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+        <button
+          onClick={() => onToggle(task.id, !task.done)}
+          disabled={toggling === task.id}
+          style={{
+            width: 24, height: 24, borderRadius: 6, flexShrink: 0, marginTop: 2,
+            background: task.done ? "#0A0A0A" : "transparent",
+            border: task.done ? "none" : "2px solid #DDDBD5",
+            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+          }}
+        >
+          {task.done && (
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          )}
+        </button>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{
+            fontSize: 15, fontWeight: 600, color: "#0A0A0A",
+            textDecoration: task.done ? "line-through" : "none", marginBottom: 4,
+          }}>
+            {task.activity}
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, fontSize: 12, color: "#6B6B6B" }}>
+            {task.estimated_time && <span>{task.estimated_time}</span>}
+            {task.who && <span>{task.who}</span>}
+          </div>
+          {task.output && <p style={{ fontSize: 12, color: "#AEABA3", marginTop: 6 }}>{task.output}</p>}
+        </div>
+      </div>
+    </Card>
   );
 }
