@@ -57,6 +57,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Interview already completed', isComplete: true }, { status: 400 })
   }
 
+  // If starting fresh (null message) and there's an old in_progress conversation, reset it
+  if (!userMessage && checkin.interview_status === 'in_progress') {
+    await supabaseAdmin.from('messages').delete().eq('checkin_id', checkin.id)
+    await supabaseAdmin.from('checkins').update({ interview_status: 'pending' }).eq('id', checkin.id)
+    checkin.interview_status = 'pending'
+  }
+
   // Save user message
   if (userMessage) {
     await supabaseAdmin.from('messages').insert({
