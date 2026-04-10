@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Onboard — Newcomer Socialization Platform",
-  description: "Accelerating newcomer socialization",
+  title: "FACET — Newcomer Socialization Platform",
+  description: "Three facets of successful socialization: FIT, ACE, TIE",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

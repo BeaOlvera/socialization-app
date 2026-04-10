@@ -96,7 +96,7 @@ export default function PreArrivalInterview() {
           {/* Header */}
           <div style={{ background: "#0A0A0A", padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 32, height: 32, borderRadius: 99, background: "#1A1A2E", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ color: "#FFF", fontWeight: 800, fontSize: 11 }}>ob</span>
+              <svg width="16" height="16" viewBox="0 0 120 120" style={{display:"block"}}><polygon points="60,5 95,40 60,50 25,40" fill="#FFF"/><polygon points="25,40 60,50 60,115" fill="#CCC"/><polygon points="95,40 60,50 60,115" fill="#888"/></svg>
             </div>
             <div>
               <p style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>Pre-Arrival Interview</p>

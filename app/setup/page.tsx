@@ -16,9 +16,9 @@ export default function SetupPage() {
       <div style={{ width: 260, background: "#0A0A0A", padding: "36px 28px", display: "flex", flexDirection: "column", flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 48 }}>
           <div style={{ width: 28, height: 28, borderRadius: 7, background: "#1A1A2E", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ color: "#FFF", fontWeight: 800, fontSize: 11 }}>ob</span>
+            <svg width="16" height="16" viewBox="0 0 120 120" style={{display:"block"}}><polygon points="60,5 95,40 60,50 25,40" fill="#FFF"/><polygon points="25,40 60,50 60,115" fill="#CCC"/><polygon points="95,40 60,50 60,115" fill="#888"/></svg>
           </div>
-          <span style={{ fontWeight: 700, fontSize: 15, color: "#FFFFFF" }}>onboard</span>
+          <span style={{ fontWeight: 700, fontSize: 15, color: "#FFFFFF" }}>FACET</span>
         </div>
 
         <p style={{ fontSize: 10, fontWeight: 700, color: "#444", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 16 }}>

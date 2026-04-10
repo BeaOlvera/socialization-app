@@ -91,10 +91,10 @@ export function InterviewChat({ checkinId, onComplete }: { checkinId: string; on
       {/* Header */}
       <div style={{ background: "#0A0A0A", padding: "12px 18px", display: "flex", alignItems: "center", gap: 10 }}>
         <div style={{ width: 28, height: 28, borderRadius: 99, background: "#1A1A2E", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ color: "#FFF", fontWeight: 800, fontSize: 10 }}>ob</span>
+          <svg width="14" height="14" viewBox="0 0 120 120" style={{display:"block"}}><polygon points="60,5 95,40 60,50 25,40" fill="#FFF"/><polygon points="25,40 60,50 60,115" fill="#CCC"/><polygon points="95,40 60,50 60,115" fill="#888"/></svg>
         </div>
         <div>
-          <p style={{ fontSize: 12, fontWeight: 600, color: "#FFFFFF" }}>Socialization Check-in</p>
+          <p style={{ fontSize: 12, fontWeight: 600, color: "#FFFFFF" }}>FACET Check-in</p>
           <p style={{ fontSize: 10, color: "#888" }}>
             {complete ? "Interview complete" : loading ? "Thinking..." : "AI-guided qualitative interview"}
           </p>

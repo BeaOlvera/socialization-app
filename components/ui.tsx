@@ -3,6 +3,16 @@ import Link from "next/link";
 import React, { ReactNode } from "react";
 import { useCompanyConfig } from "@/lib/use-config";
 
+export function FacetLogo({ size = 28 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 120 120" style={{ display: "block" }}>
+      <polygon points="60,5 95,40 60,50 25,40" fill="#FFFFFF"/>
+      <polygon points="25,40 60,50 60,115" fill="#CCCCCC"/>
+      <polygon points="95,40 60,50 60,115" fill="#888888"/>
+    </svg>
+  );
+}
+
 export function Card({ children, className = "", style }: { children: ReactNode; className?: string; style?: React.CSSProperties }) {
   return (
     <div className={`${className}`} style={{
@@ -112,10 +122,10 @@ export function NavBar({ role, active }: { role: "newcomer" | "manager" | "hr" |
             <span style={{ fontSize: 14 }}>←</span> Home
           </Link>
           <div style={{ width: 1, height: 16, background: "#E2E0DA" }} />
-          <div style={{ width: 28, height: 28, borderRadius: 7, background: "#1A1A2E", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ color: "#FFF", fontWeight: 800, fontSize: 11 }}>ob</span>
+          <div style={{ width: 28, height: 28, borderRadius: 7, background: "#0A0A0A", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <FacetLogo size={20} />
           </div>
-          <span style={{ fontWeight: 700, fontSize: 16, color: "#0A0A0A", letterSpacing: "-0.3px" }}>onboard</span>
+          <span style={{ fontWeight: 700, fontSize: 16, color: "#0A0A0A", letterSpacing: "-0.3px" }}>FACET</span>
           <div style={{ width: 1, height: 16, background: "#E2E0DA" }} />
           <span style={{ fontSize: 12, fontWeight: 600, color: "#FFFFFF", background: roleColors[role], padding: "2px 10px", borderRadius: 20 }}>
             {roleLabel[role]}

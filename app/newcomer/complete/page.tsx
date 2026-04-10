@@ -94,9 +94,9 @@ export default function CompletePage() {
           <Card style={{ border: "2px solid #0A0A0A", textAlign: "center", padding: "28px 24px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center", marginBottom: 16 }}>
               <div style={{ width: 28, height: 28, borderRadius: 8, background: "#1A1A2E", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ color: "#FFF", fontWeight: 800, fontSize: 10 }}>ob</span>
+                <svg width="14" height="14" viewBox="0 0 120 120" style={{display:"block"}}><polygon points="60,5 95,40 60,50 25,40" fill="#FFF"/><polygon points="25,40 60,50 60,115" fill="#CCC"/><polygon points="95,40 60,50 60,115" fill="#888"/></svg>
               </div>
-              <span style={{ fontWeight: 700, fontSize: 15, color: "#0A0A0A" }}>onboard</span>
+              <span style={{ fontWeight: 700, fontSize: 15, color: "#0A0A0A" }}>FACET</span>
             </div>
             <p style={{ fontSize: 10, fontWeight: 700, color: "#AEABA3", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 10 }}>Certificate of embedding</p>
             <p style={{ fontSize: 16, fontWeight: 700, color: "#0A0A0A", marginBottom: 4 }}>Sofia Martínez</p>
