@@ -46,7 +46,8 @@ export default function CompanyDetail() {
   const [company, setCompany] = useState<any>(null);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [newcomers, setNewcomers] = useState<Newcomer[]>([]);
-  const [config, setConfig] = useState<Config>({ has_buddies: true, checkin_frequency: "monthly", visible_pages: ALL_PAGES.map(p => p.key) });
+  const defaultVisiblePages = ALL_PAGES.map(p => p.key);
+  const [config, setConfig] = useState<Config>({ has_buddies: true, checkin_frequency: "monthly", visible_pages: defaultVisiblePages });
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"templates" | "checkins" | "people" | "newcomers" | "config">("templates");
   const [uploading, setUploading] = useState(false);
@@ -496,7 +497,7 @@ export default function CompanyDetail() {
               <p style={{ fontSize: 12, color: "#6B6B6B", marginBottom: 12 }}>Choose which pages newcomers can see. Hidden pages won't appear in the navigation.</p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                 {ALL_PAGES.map(page => {
-                  const isOn = config.visible_pages.includes(page.key);
+                  const isOn = (config.visible_pages || defaultVisiblePages).includes(page.key);
                   const isRequired = page.key === "home" || page.key === "activities";
                   return (
                     <label key={page.key} style={{

@@ -17,7 +17,17 @@ export async function GET(
     .eq('company_id', id)
     .single()
 
-  return NextResponse.json(config || { has_buddies: true, checkin_frequency: 'monthly' })
+  const defaults = {
+    has_buddies: true,
+    checkin_frequency: 'monthly',
+    visible_pages: ["home","activities","timeline","buckets","progress","org","people","docs","evaluation"],
+  }
+  if (!config) return NextResponse.json(defaults)
+  return NextResponse.json({
+    ...defaults,
+    ...config,
+    visible_pages: config.visible_pages || defaults.visible_pages,
+  })
 }
 
 // PATCH — update company config
