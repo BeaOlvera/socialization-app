@@ -48,8 +48,9 @@ export default function CompanyDetail() {
   const [newcomers, setNewcomers] = useState<Newcomer[]>([]);
   const defaultVisiblePages = ALL_PAGES.map(p => p.key);
   const [config, setConfig] = useState<Config>({ has_buddies: true, checkin_frequency: "monthly", visible_pages: defaultVisiblePages });
+  const [docs, setDocs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"templates" | "checkins" | "people" | "newcomers" | "config">("templates");
+  const [tab, setTab] = useState<"templates" | "checkins" | "people" | "newcomers" | "docs" | "config">("templates");
   const [uploading, setUploading] = useState(false);
   const [assigning, setAssigning] = useState<string | null>(null);
   const [message, setMessage] = useState("");
@@ -59,11 +60,13 @@ export default function CompanyDetail() {
       fetch(`/api/admin/companies`).then(r => r.json()),
       fetch(`/api/admin/companies/${id}/templates`).then(r => r.json()),
       fetch(`/api/admin/companies/${id}/config`).then(r => r.json()),
+      fetch(`/api/admin/companies/${id}/documents`).then(r => r.json()),
       fetchNewcomers(),
-    ]).then(([companies, tmpl, cfg]) => {
+    ]).then(([companies, tmpl, cfg, docsData]) => {
       setCompany(companies.find((c: any) => c.id === id));
       setTemplates(Array.isArray(tmpl) ? tmpl : []);
       setConfig(cfg);
+      setDocs(Array.isArray(docsData) ? docsData : []);
     }).finally(() => setLoading(false));
   }, [id]);
 
@@ -230,7 +233,7 @@ export default function CompanyDetail() {
 
       {/* Tabs */}
       <div style={{ display: "flex", gap: 6 }}>
-        {(["templates", "checkins", "people", "newcomers", "config"] as const).map(t => (
+        {(["templates", "checkins", "people", "newcomers", "docs", "config"] as const).map(t => (
           <button key={t} onClick={() => setTab(t)} style={{
             padding: "8px 18px", borderRadius: 10, border: tab === t ? "2px solid #0A0A0A" : "1px solid #E2E0DA",
             background: tab === t ? "#0A0A0A" : "#FFFFFF", color: tab === t ? "#FFFFFF" : "#6B6B6B",
@@ -239,7 +242,8 @@ export default function CompanyDetail() {
             {t === "templates" ? `Activities (${activities.length})` :
              t === "checkins" ? `Check-ins (${checkins.length})` :
              t === "people" ? "Import People" :
-             t === "newcomers" ? `Newcomers (${newcomers.length})` : "Config"}
+             t === "newcomers" ? `Newcomers (${newcomers.length})` :
+             t === "docs" ? `Documents (${docs.length})` : "Config"}
           </button>
         ))}
       </div>
@@ -461,6 +465,96 @@ export default function CompanyDetail() {
               ))}
             </div>
           )}
+        </Card>
+      )}
+
+      {/* Documents tab */}
+      {tab === "docs" && (
+        <Card>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <SectionLabel>Company Documents</SectionLabel>
+            <button onClick={async () => {
+              const title = prompt("Document title:");
+              if (!title) return;
+              const dim = prompt("Dimension (fit / ace / tie):", "fit");
+              if (!dim || !["fit","ace","tie"].includes(dim)) return;
+              const desc = prompt("Description (optional):");
+              const res = await fetch(`/api/admin/companies/${id}/documents`, {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title, dimension: dim, description: desc || null }),
+              });
+              if (res.ok) {
+                const newDoc = await res.json();
+                setDocs(prev => [...prev, newDoc]);
+              }
+            }} style={{
+              padding: "8px 16px", borderRadius: 8, background: "#0A0A0A", color: "#FFFFFF",
+              fontSize: 12, fontWeight: 600, cursor: "pointer", border: "none",
+            }}>
+              + Add Document
+            </button>
+          </div>
+          <p style={{ fontSize: 12, color: "#6B6B6B", marginBottom: 16 }}>
+            Toggle visibility to control which documents newcomers can see. Default documents are pre-defined but can be hidden.
+          </p>
+          {["fit", "ace", "tie"].map(dim => {
+            const dimDocs = docs.filter(d => d.dimension === dim);
+            if (dimDocs.length === 0) return null;
+            const dimLabel = dim === "fit" ? "FIT · Role Clarity" : dim === "ace" ? "ACE · Task Mastery" : "TIE · Social Acceptance";
+            const dimColor = dim === "fit" ? "#1A1A2E" : dim === "ace" ? "#2D6A4F" : "#9B2335";
+            const dimBg = dim === "fit" ? "#EEEEF5" : dim === "ace" ? "#EAF4EF" : "#FBEAEC";
+            return (
+              <div key={dim} style={{ marginBottom: 20 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                  <div style={{ width: 4, height: 16, borderRadius: 2, background: dimColor }} />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: dimColor }}>{dimLabel}</span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {dimDocs.map(doc => (
+                    <div key={doc.id} style={{
+                      display: "flex", alignItems: "center", gap: 12, padding: "10px 14px",
+                      background: doc.visible ? dimBg : "#F5F4F0", borderRadius: 10,
+                      opacity: doc.visible ? 1 : 0.5, transition: "all 0.15s",
+                    }}>
+                      <input type="checkbox" checked={doc.visible}
+                        onChange={async () => {
+                          const res = await fetch(`/api/admin/companies/${id}/documents`, {
+                            method: "PATCH", headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ docId: doc.id, visible: !doc.visible }),
+                          });
+                          if (res.ok) {
+                            setDocs(prev => prev.map(d => d.id === doc.id ? { ...d, visible: !d.visible } : d));
+                          }
+                        }}
+                        style={{ width: 16, height: 16, flexShrink: 0 }}
+                      />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: "#0A0A0A" }}>
+                          {doc.title}
+                          {doc.is_default && <span style={{ fontSize: 9, color: "#AEABA3", marginLeft: 6 }}>(default)</span>}
+                        </p>
+                        {doc.description && <p style={{ fontSize: 11, color: "#6B6B6B", marginTop: 2 }}>{doc.description}</p>}
+                      </div>
+                      {!doc.is_default && (
+                        <button onClick={async () => {
+                          if (!confirm("Delete this document?")) return;
+                          await fetch(`/api/admin/companies/${id}/documents`, {
+                            method: "DELETE", headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ docId: doc.id }),
+                          });
+                          setDocs(prev => prev.filter(d => d.id !== doc.id));
+                        }} style={{
+                          fontSize: 10, color: "#9B2335", background: "none", border: "none", cursor: "pointer", fontWeight: 600,
+                        }}>
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </Card>
       )}
 
