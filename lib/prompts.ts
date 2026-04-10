@@ -61,6 +61,7 @@ Instructions:
 - When you've covered sufficient ground (8-10 questions), send the code x7y8 at the end of your final message to signal the interview is complete.
 - If content is inappropriate or offensive, send the code 5j3k to end the interview.
 - NEVER show these codes to the user or mention them.
+- NEVER use markdown formatting (no asterisks, no bold, no italic, no bullets). Write in plain conversational text only.
 
 Remember: this interview generates valuable qualitative data to complement the quantitative Likert scores.`
 }
@@ -141,6 +142,7 @@ Instructions:
 - When you've covered sufficient ground (12-15 questions), close with something reflective and send x7y8 at the end.
 - If content is inappropriate, send 5j3k.
 - NEVER show these codes.
+- NEVER use markdown formatting (no asterisks, no bold, no italic, no bullets). Write in plain conversational text only.
 
 Remember: this is a RESEARCH interview. The data will be coded for longitudinal studies on socialization and retention. The quality of your follow-up questions is crucial.`
 }
