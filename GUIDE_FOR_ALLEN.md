@@ -1,7 +1,7 @@
 # Onboard: Newcomer Socialization Platform
 ## Complete Guide for David Allen
 
-**Platform URL:** https://socialization-avzy6f1q9-beaolveras-projects.vercel.app/login
+**Platform URL:** https://socialization-app.vercel.app/login
 
 ---
 
@@ -454,7 +454,7 @@ This platform generates publication-ready data for several paper ideas:
 
 ## 14. Try It Yourself — Quick Walkthrough
 
-1. Go to https://socialization-avzy6f1q9-beaolveras-projects.vercel.app/login
+1. Go to https://socialization-app.vercel.app/login
 2. Login as **Sofia** (`sofia@meridian.demo` / `demo123`)
 3. Click **Activities** — see the full activity calendar with check-ins
 4. Click an **"Open"** button on any check-in to see the form
