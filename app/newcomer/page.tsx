@@ -1,6 +1,6 @@
 "use client";
-import { NavBar, PageShell, Card, ScoreRing, SectionLabel, Avatar, BucketTag, TwoCol } from "@/components/ui";
-import { DIMENSIONS, PHASES } from "@/lib/framework";
+import { NavBar, PageShell, Card, ScoreRing, SectionLabel, BucketTag, TwoCol } from "@/components/ui";
+import { DIMENSIONS } from "@/lib/framework";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -14,6 +14,9 @@ interface Task {
   done: boolean;
   estimated_time: string | null;
   type: string;
+  output: string | null;
+  who: string | null;
+  days: string | null;
 }
 
 export default function NewcomerHome() {
@@ -27,22 +30,151 @@ export default function NewcomerHome() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Check if there are undone pre-arrival tasks (phase=arrival tasks that came from pre_arrival templates)
+  const preArrivalTasks = tasks.filter(t =>
+    t.phase === "arrival" && (
+      (t.type || "activity") === "checkin" && t.days && t.days.includes("before")
+      || t.activity?.toLowerCase().includes("pre-arrival")
+      || t.days?.includes("before")
+    )
+  );
+  const preArrivalDone = preArrivalTasks.every(t => t.done);
+  const inPreArrival = preArrivalTasks.length > 0 && !preArrivalDone;
+
+  // If in pre-arrival, show focused pre-arrival page
+  if (!loading && inPreArrival) {
+    return <PreArrivalHome tasks={preArrivalTasks} allTasks={tasks} />;
+  }
+
+  // Otherwise show the regular dashboard
+  return <RegularHome tasks={tasks} loading={loading} />;
+}
+
+// ─── PRE-ARRIVAL HOME ──────────────────────────────────────
+function PreArrivalHome({ tasks, allTasks }: { tasks: Task[]; allTasks: Task[] }) {
+  const done = tasks.filter(t => t.done).length;
+  const total = tasks.length;
+
+  return (
+    <PageShell nav={<NavBar role="newcomer" active="Home" />}>
+      {/* Dark header */}
+      <Card style={{ background: "#1A1A2E", border: "none", color: "#FFFFFF" }}>
+        <p style={{ fontSize: 10, color: "#8888AA", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
+          Before your first day
+        </p>
+        <h2 style={{ fontSize: 24, fontWeight: 800, color: "#FFFFFF", marginBottom: 6 }}>
+          Welcome! Let's get you ready.
+        </h2>
+        <p style={{ fontSize: 14, color: "#AAAACC", lineHeight: 1.7 }}>
+          Complete these steps before you start. They help us understand your expectations
+          and set you up for a great first day.
+        </p>
+        <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ flex: 1, height: 8, background: "#2A2A4E", borderRadius: 99, overflow: "hidden" }}>
+            <div style={{ height: "100%", background: "#EEEEF5", borderRadius: 99, width: `${(done / total) * 100}%`, transition: "width 0.5s" }} />
+          </div>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "#EEEEF5" }}>{done}/{total}</span>
+        </div>
+      </Card>
+
+      {/* Pre-arrival tasks */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {tasks.map(task => {
+          const isCheckin = (task.type || "activity") === "checkin";
+          const isInterview = task.activity?.toLowerCase().includes("interview");
+          return (
+            <Link
+              key={task.id}
+              href={isCheckin ? `/newcomer/checkin/${task.id}` : "/newcomer/activities"}
+              style={{ textDecoration: "none" }}
+            >
+              <Card
+                className="hover:border-[#1A1A2E] transition-colors cursor-pointer"
+                style={{
+                  borderLeft: `4px solid ${isInterview ? "#1A1A2E" : "#B7791F"}`,
+                  background: task.done ? "#F5F4F0" : "#FFFFFF",
+                  opacity: task.done ? 0.5 : 1,
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                  <div style={{
+                    width: 24, height: 24, borderRadius: 6, flexShrink: 0, marginTop: 2,
+                    background: task.done ? "#1A1A2E" : "transparent",
+                    border: task.done ? "none" : "2px solid #1A1A2E",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>
+                    {task.done && (
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{
+                      fontSize: 16, fontWeight: 700, color: "#0A0A0A",
+                      textDecoration: task.done ? "line-through" : "none",
+                      marginBottom: 4,
+                    }}>
+                      {task.activity}
+                    </p>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 10, fontSize: 12, color: "#6B6B6B" }}>
+                      {isCheckin && (
+                        <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 10px", borderRadius: 20, background: isInterview ? "#EEEEF5" : "#FEF3E2", color: isInterview ? "#1A1A2E" : "#B7791F" }}>
+                          {isInterview ? "Interview" : "Check-in"}
+                        </span>
+                      )}
+                      {task.estimated_time && <span>{task.estimated_time}</span>}
+                      {task.who && <span>{task.who}</span>}
+                    </div>
+                    {task.output && (
+                      <p style={{ fontSize: 12, color: "#AEABA3", marginTop: 6 }}>
+                        {task.output}
+                      </p>
+                    )}
+                  </div>
+                  {!task.done && (
+                    <span style={{
+                      fontSize: 12, fontWeight: 700, padding: "6px 16px", borderRadius: 8,
+                      background: "#1A1A2E", color: "#FFFFFF", flexShrink: 0, alignSelf: "center",
+                    }}>
+                      Start
+                    </span>
+                  )}
+                </div>
+              </Card>
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* What's coming next teaser */}
+      <Card style={{ background: "#F5F4F0", border: "1px solid #E2E0DA" }}>
+        <p style={{ fontSize: 10, color: "#AEABA3", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>
+          After you complete these
+        </p>
+        <p style={{ fontSize: 14, color: "#6B6B6B", lineHeight: 1.7 }}>
+          Your full onboarding journey begins with {allTasks.length} activities and check-ins across 12 months,
+          organized around three dimensions: <strong>Role Clarity</strong>, <strong>Task Mastery</strong>, and <strong>Social Acceptance</strong>.
+        </p>
+      </Card>
+    </PageShell>
+  );
+}
+
+// ─── REGULAR HOME (post pre-arrival) ───────────────────────
+function RegularHome({ tasks, loading }: { tasks: Task[]; loading: boolean }) {
   const totalDone = tasks.filter(t => t.done).length;
   const overall = tasks.length > 0 ? Math.round((totalDone / tasks.length) * 100) : 0;
 
-  // Next undone: check-ins first, then activities, ordered by phase
   const phaseOrder = ["arrival", "integration", "adjustment", "stabilization", "embedding"];
   const undone = tasks.filter(t => !t.done).sort((a, b) => {
-    // Check-ins before activities
     const aIsCheckin = (a.type || "activity") === "checkin" ? 0 : 1;
     const bIsCheckin = (b.type || "activity") === "checkin" ? 0 : 1;
     if (aIsCheckin !== bIsCheckin) return aIsCheckin - bIsCheckin;
-    // Then by phase order
     return phaseOrder.indexOf(a.phase) - phaseOrder.indexOf(b.phase);
   });
   const nextActivities = undone.slice(0, 4);
 
-  // Dimension scores
   const dims: Dim[] = ["fit", "ace", "tie"];
   const dimScores = dims.map(dim => {
     const dt = tasks.filter(t => t.dimension === dim);
@@ -55,7 +187,6 @@ export default function NewcomerHome() {
   });
 
   const left = <>
-    {/* Header */}
     <Card style={{ background: "#ECECEA", border: "1px solid #DDDBD5" }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
         <div>
@@ -72,7 +203,6 @@ export default function NewcomerHome() {
       </div>
     </Card>
 
-    {/* Next activities */}
     <div>
       <SectionLabel>Up next</SectionLabel>
       <div className="space-y-2">
@@ -112,7 +242,6 @@ export default function NewcomerHome() {
   </>;
 
   const right = <>
-    {/* Three dimensions */}
     <div>
       <SectionLabel>My three dimensions</SectionLabel>
       <div className="space-y-2">
@@ -138,7 +267,6 @@ export default function NewcomerHome() {
       </div>
     </div>
 
-    {/* Quick links */}
     <div>
       <SectionLabel>Quick links</SectionLabel>
       <div className="space-y-2">
