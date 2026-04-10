@@ -438,17 +438,24 @@ export default function CompanyDetail() {
                       {n.position || "No position"} · {n.department || "No dept"} · Start: {n.start_date}
                     </p>
                   </div>
-                  <button
-                    onClick={() => assignToNewcomer(n.id)}
-                    disabled={assigning === n.id}
-                    style={{
-                      padding: "8px 16px", borderRadius: 8, border: "none", cursor: "pointer",
-                      background: assigning === n.id ? "#E2E0DA" : "#1A1A2E", color: "#FFFFFF",
-                      fontSize: 12, fontWeight: 600,
-                    }}
-                  >
-                    {assigning === n.id ? "Assigning..." : "Assign All"}
-                  </button>
+                  <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                    <a href={`/api/admin/companies/${id}/newcomers/${n.id}/transcript?type=pre-arrival`}
+                      style={{ padding: "6px 12px", borderRadius: 6, background: "#F5F4F0", color: "#6B6B6B", fontSize: 10, fontWeight: 600, textDecoration: "none", border: "1px solid #E2E0DA" }}>
+                      Transcript
+                    </a>
+                    <CodeButton companyId={id} newcomerId={n.id} onResult={(msg: string) => setMessage(msg)} />
+                    <button
+                      onClick={() => assignToNewcomer(n.id)}
+                      disabled={assigning === n.id}
+                      style={{
+                        padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer",
+                        background: assigning === n.id ? "#E2E0DA" : "#1A1A2E", color: "#FFFFFF",
+                        fontSize: 10, fontWeight: 600,
+                      }}
+                    >
+                      {assigning === n.id ? "..." : "Assign All"}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -526,5 +533,41 @@ export default function CompanyDetail() {
         </Card>
       )}
     </PageShell>
+  );
+}
+
+function CodeButton({ companyId, newcomerId, onResult }: { companyId: string; newcomerId: string; onResult: (msg: string) => void }) {
+  const [coding, setCoding] = useState(false);
+
+  async function handleCode() {
+    setCoding(true);
+    onResult("");
+    try {
+      const res = await fetch(`/api/admin/companies/${companyId}/newcomers/${newcomerId}/code-interview`, {
+        method: "POST",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const coded = data.coded?.length || 0;
+        const risk = data.summary?.flight_risk || "unknown";
+        onResult(`Coded ${coded} passages. Flight risk: ${risk}`);
+      } else {
+        const err = await res.json();
+        onResult(`Error: ${err.error}`);
+      }
+    } catch {
+      onResult("Error: Failed to connect");
+    }
+    setCoding(false);
+  }
+
+  return (
+    <button onClick={handleCode} disabled={coding} style={{
+      padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer",
+      background: coding ? "#E2E0DA" : "#2D6A4F", color: "#FFFFFF",
+      fontSize: 10, fontWeight: 600,
+    }}>
+      {coding ? "Coding..." : "Code Interview"}
+    </button>
   );
 }

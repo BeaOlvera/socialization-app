@@ -21,8 +21,11 @@ interface Task {
 }
 
 // Determine check-in form type from activity name
-function detectFormType(activity: string, assignedTo: string): "self-likert" | "self-likert-interview" | "manager-likert" | "manager-notes" | "buddy-log" | "hr-review" | "event" {
+function detectFormType(activity: string, assignedTo: string, phase: string): "pre-arrival-interview" | "self-likert" | "self-likert-interview" | "manager-likert" | "manager-notes" | "buddy-log" | "hr-review" | "event" {
   const a = activity.toLowerCase();
+  // Pre-arrival interviews: welcome call, manager intro, or any pre-arrival self-assessment
+  if (phase === "arrival" && (a.includes("welcome call") || a.includes("manager intro"))) return "pre-arrival-interview";
+  if (a.includes("pre-arrival") && a.includes("interview")) return "pre-arrival-interview";
   if (a.includes("formal check-in (self)") || a.includes("formal check-in (self")) return "self-likert-interview";
   if (a.includes("formal check-in (manager)")) return "manager-likert";
   if (a.includes("self check-in") || a.includes("self check")) return "self-likert";
@@ -37,6 +40,7 @@ function detectFormType(activity: string, assignedTo: string): "self-likert" | "
 }
 
 const formLabels: Record<string, { title: string; color: string; bg: string }> = {
+  "pre-arrival-interview": { title: "Pre-Arrival Interview", color: "#1A1A2E", bg: "#EEEEF5" },
   "self-likert": { title: "Self-Assessment Survey", color: "#1A1A2E", bg: "#EEEEF5" },
   "self-likert-interview": { title: "Self-Assessment + AI Interview", color: "#1A1A2E", bg: "#EEEEF5" },
   "manager-likert": { title: "Manager Assessment", color: "#2D6A4F", bg: "#EAF4EF" },
@@ -117,7 +121,13 @@ export default function CheckinPage() {
     );
   }
 
-  const formType = detectFormType(task.activity, task.assigned_to);
+  const formType = detectFormType(task.activity, task.assigned_to, task.phase);
+
+  // Redirect pre-arrival interviews to the dedicated page
+  if (formType === "pre-arrival-interview" && !submitted) {
+    router.push("/newcomer/pre-arrival");
+    return null;
+  }
   const formInfo = formLabels[formType];
 
   if (submitted) {
