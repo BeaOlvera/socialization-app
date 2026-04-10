@@ -13,13 +13,36 @@ export async function GET(request: NextRequest) {
     .from('newcomers').select('id').eq('user_id', session.userId).single()
   if (!newcomer) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  const { data: tasks } = await supabaseAdmin
+  const { data: allTasks } = await supabaseAdmin
     .from('phase_tasks')
     .select('*')
     .eq('newcomer_id', newcomer.id)
     .order('phase').order('dimension').order('task_index')
 
-  return NextResponse.json(tasks || [])
+  if (!allTasks) return NextResponse.json([])
+
+  // Filter check-ins:
+  // 1. Only show check-ins assigned to 'newcomer' (not manager/buddy/HR ones)
+  // 2. Only show when due (within 7 days) or already done
+  const now = new Date()
+  const windowDays = 7
+  const cutoff = new Date(now.getTime() + windowDays * 24 * 60 * 60 * 1000)
+
+  const tasks = allTasks.filter(t => {
+    // Activities always visible
+    if ((t.type || 'activity') !== 'checkin') return true
+    // Hide check-ins not assigned to newcomer
+    if (t.assigned_to && t.assigned_to !== 'newcomer') return false
+    // Completed check-ins always visible
+    if (t.done) return true
+    // Check-ins without due_date always visible
+    if (!t.due_date) return true
+    // Check-ins with due_date: show if due_date <= today + 7 days
+    const dueDate = new Date(t.due_date)
+    return dueDate <= cutoff
+  })
+
+  return NextResponse.json(tasks)
 }
 
 // PATCH — toggle task completion
