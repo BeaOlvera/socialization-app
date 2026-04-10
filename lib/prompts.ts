@@ -8,7 +8,7 @@ import { PHASES } from './framework'
 
 /**
  * Generate the system prompt for a newcomer's monthly qualitative interview.
- * The AI conducts a structured but adaptive conversation exploring three dimensions.
+ * The AI conducts a structured but adaptive conversation exploring the three FACET dimensions.
  */
 export function getNewcomerInterviewPrompt(
   newcomerName: string,
@@ -45,7 +45,7 @@ Recuerda: esta entrevista genera datos cualitativos valiosos para complementar l
 
   return `You are an experienced HR professional conducting a monthly socialization check-in interview with ${newcomerName}, who joined ${companyName} ${dayNumber} days ago as ${role}. They are currently in the "${phaseInfo.label}" phase (${phaseInfo.period}).
 
-Your goal is to explore their experience across three dimensions:
+Your goal is to explore their experience across the three FACET dimensions:
 1. **FIT (Role Clarity)** — Do they understand their role, KPIs, org chart, responsibilities?
 2. **ACE (Task Mastery)** — Do they feel competent with tools, processes, training?
 3. **TIE (Social Acceptance)** — Do they feel part of the team, have relationships, belong?
@@ -54,7 +54,7 @@ Instructions:
 - Ask between 8 and 10 questions maximum.
 - Start with an open, general question about how things are going.
 - Probe deeper with follow-ups: "Can you give me a specific example?" or "Tell me more about that."
-- Cover all three dimensions but let the conversation flow naturally.
+- Cover all three FACET dimensions but let the conversation flow naturally.
 - Never suggest possible answers or lead the interviewee.
 - Adapt your questions based on their answers — if you detect a problem area, explore it.
 - Be warm, empathetic, and professional.
@@ -69,7 +69,7 @@ Remember: this interview generates valuable qualitative data to complement the q
 /**
  * Generate the system prompt for a pre-arrival qualitative interview.
  * Natural conversation exploring expectations, career fit, embeddedness,
- * values, social needs, and prior experience — grounded in Allen's turnover
+ * values, social needs, and prior experience — grounded in the FACET model and turnover
  * and socialization literature.
  */
 export function getPreArrivalInterviewPrompt(
@@ -94,7 +94,7 @@ Tu objetivo es explorar estas 6 áreas de forma natural, como una conversación 
 
 4. **VALORES Y CONTRATO PSICOLÓGICO** — ¿Qué valora más en un trabajo? ¿Qué espera que la empresa le ofrezca más allá del salario? ¿Qué siente que debe a cambio? (Contrato psicológico — Rousseau)
 
-5. **NECESIDADES SOCIALES** — ¿Es importante para el/ella tener relaciones cercanas en el trabajo? ¿Cómo suele integrarse en un grupo nuevo? ¿Qué le preocupa socialmente? (Tácticas de socialización — Allen & Shanock)
+5. **NECESIDADES SOCIALES** — ¿Es importante para el/ella tener relaciones cercanas en el trabajo? ¿Cómo suele integrarse en un grupo nuevo? ¿Qué le preocupa socialmente? (Tácticas de socialización proactiva)
 
 6. **EXPERIENCIA PREVIA Y ANSIEDAD** — ¿Cómo fue su última incorporación? ¿Qué funcionó y qué no? ¿Qué le emociona? ¿Qué le preocupa? (Historia de socialización)
 
@@ -127,7 +127,7 @@ Your goal is to explore these 6 areas naturally, as a warm and genuine conversat
 
 4. **VALUES & PSYCHOLOGICAL CONTRACT** — What do they value most at work? What do they expect the company will provide beyond salary? What do they feel they owe in return? (Psychological contract — Rousseau)
 
-5. **SOCIAL NEEDS** — How important are close work relationships? How do they typically build connections in a new environment? What social concerns do they have? (Socialization tactics — Allen & Shanock)
+5. **SOCIAL NEEDS** — How important are close work relationships? How do they typically build connections in a new environment? What social concerns do they have? (Proactive socialization tactics)
 
 6. **PRIOR EXPERIENCE & ANXIETY** — What was their last onboarding like? What worked, what didn't? What excites them? What worries them? (Socialization history)
 
@@ -195,7 +195,7 @@ Respond in valid JSON with this structure:
  * but for socialization research constructs.
  */
 export function getPreArrivalCodingPrompt(): string {
-  return `You are an expert organizational psychologist trained in qualitative coding and the Critical Incident Technique, specializing in newcomer socialization and turnover research (Allen, Mitchell, Lee, Holtom, Wanous, Rousseau).
+  return `You are an expert organizational psychologist trained in qualitative coding and the Critical Incident Technique, specializing in newcomer socialization and turnover research, using the FACET model framework.
 
 You will receive a pre-arrival interview transcript. Your task is to code every meaningful passage into one of the following research constructs:
 
@@ -231,7 +231,7 @@ Code passages about:
 - Implicit expectations about development, recognition, flexibility
 - "Deal-breakers" or non-negotiables
 
-### 5. SOCIAL ORIENTATION (Allen & Shanock — Socialization Tactics)
+### 5. SOCIAL ORIENTATION (Proactive Socialization Tactics)
 Code passages revealing:
 - Proactive vs. passive socialization style
 - Social needs intensity (how important are work relationships?)

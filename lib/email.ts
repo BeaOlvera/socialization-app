@@ -106,7 +106,7 @@ function getEnglishTemplate(name: string, company: string, manager: string, url:
         You've been invited to join <strong>${company}'s</strong> newcomer socialization program, managed by <strong>${manager}</strong>.
       </p>
       <p style="font-size: 14px; color: #6B6B6B; line-height: 1.7; margin-bottom: 24px;">
-        Over the next 12 months, we'll track your journey across three dimensions — <strong>FIT</strong> (Role Clarity), <strong>ACE</strong> (Task Mastery), and <strong>TIE</strong> (Social Acceptance) — with monthly check-ins combining ratings and AI-guided interviews.
+        Over the next 12 months, we'll track your journey using the FACET model — three facets of successful socialization: <strong>FIT</strong> (Role Clarity), <strong>ACE</strong> (Task Mastery), and <strong>TIE</strong> (Social Acceptance) — with monthly check-ins combining ratings and AI-guided interviews.
       </p>
       <div style="text-align: center; margin-bottom: 24px;">
         <a href="${url}" style="display: inline-block; padding: 14px 32px; background: #0A0A0A; color: #FFFFFF; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px;">

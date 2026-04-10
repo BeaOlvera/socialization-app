@@ -46,7 +46,7 @@ export default function BucketsPage() {
     <PageShell nav={<NavBar role="newcomer" active="My Journey" />}>
       <div className="space-y-1">
         <h2 className="text-xl font-bold">My Journey</h2>
-        <p className="text-sm text-[#6B6B6B]">Three dimensions running in parallel — FIT · ACE · TIE.</p>
+        <p className="text-sm text-[#6B6B6B]">The three facets of your socialization — FIT · ACE · TIE.</p>
       </div>
 
       {dims.map(dim => {

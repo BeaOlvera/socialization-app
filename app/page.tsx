@@ -79,7 +79,7 @@ export default function Home() {
             Accelerating newcomer<br />socialization
           </h1>
           <p style={{ fontSize: 13, color: "#6B6B6B", lineHeight: 1.7 }}>
-            Three parallel tracks. Twelve months. Built on Allen&apos;s socialization framework.
+            Three facets. Twelve months. Built on the FACET model.
           </p>
         </div>
 
@@ -148,7 +148,7 @@ export default function Home() {
         </div>
 
         <p style={{ fontSize: 11, color: "#AEABA3", textAlign: "center", marginTop: 12 }}>
-          Prototype · v0.1 · Allen Socialization Framework
+          Prototype · v0.1 · FACET Model
         </p>
       </div>
     </div>

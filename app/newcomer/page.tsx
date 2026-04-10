@@ -131,7 +131,7 @@ function PreArrivalHome({ tasks: rawTasks, allTasks }: { tasks: Task[]; allTasks
         </p>
         <p style={{ fontSize: 14, color: "#6B6B6B", lineHeight: 1.7 }}>
           Your full onboarding journey begins with {allTasks.length} activities and check-ins across 12 months,
-          organized around three dimensions: <strong>Role Clarity</strong>, <strong>Task Mastery</strong>, and <strong>Social Acceptance</strong>.
+          organized around the FACET model: <strong>FIT</strong> (Role Clarity), <strong>ACE</strong> (Task Mastery), and <strong>TIE</strong> (Social Acceptance).
         </p>
       </Card>
     </PageShell>
@@ -220,7 +220,7 @@ function RegularHome({ tasks, loading }: { tasks: Task[]; loading: boolean }) {
 
   const right = <>
     <div>
-      <SectionLabel>My three dimensions</SectionLabel>
+      <SectionLabel>My FACET scores</SectionLabel>
       <div className="space-y-2">
         {dimScores.map(({ dim, info, score }) => (
           <Link key={dim} href="/newcomer/buckets" style={{ textDecoration: "none" }}>

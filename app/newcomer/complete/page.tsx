@@ -51,7 +51,7 @@ export default function CompletePage() {
 
         {/* Final scores */}
         <Card>
-          <SectionLabel>Final scores — all three dimensions</SectionLabel>
+          <SectionLabel>Final FACET scores</SectionLabel>
           <div style={{ display: "flex", gap: 12, justifyContent: "space-around", marginBottom: 20 }}>
             {(Object.entries(finalScores) as [keyof typeof bucketConfig, number][]).map(([key, score]) => (
               <div key={key} style={{ textAlign: "center" }}>

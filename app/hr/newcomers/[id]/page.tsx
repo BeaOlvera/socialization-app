@@ -121,7 +121,7 @@ export default function HRNewcomerDetail() {
         {/* Left */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <Card>
-            <SectionLabel>FIT · ACE · TIE completion</SectionLabel>
+            <SectionLabel>FACET scores</SectionLabel>
             <div style={{ display: "flex", gap: 16, justifyContent: "space-around", marginBottom: 16 }}>
               {dims.map(dim => (
                 <div key={dim} style={{ textAlign: "center" }}>

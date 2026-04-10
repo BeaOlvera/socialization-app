@@ -1,5 +1,5 @@
 /**
- * Allen Socialization Framework — FIT / ACE / TIE
+ * FACET Model — FIT / ACE / TIE
  * Static definitions: eval questions, phase task templates, dimension config.
  * These are part of the framework, not user data — they don't belong in the DB.
  */

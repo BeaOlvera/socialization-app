@@ -1,5 +1,5 @@
 /**
- * Score computation helpers for the FIT/ACE/TIE socialization framework.
+ * Score computation helpers for the FACET model (FIT/ACE/TIE).
  */
 
 import type { Phase } from './supabase'
