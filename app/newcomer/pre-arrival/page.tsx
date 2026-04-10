@@ -169,11 +169,11 @@ export default function PreArrivalInterview() {
                 }}>
                   View my profile
                 </a>
-                <a href="/newcomer/activities" style={{
+                <a href="/newcomer" style={{
                   padding: "10px 24px", borderRadius: 10, background: "#0A0A0A", color: "#FFF",
                   fontSize: 13, fontWeight: 600, textDecoration: "none", display: "inline-block",
                 }}>
-                  Back to activities
+                  Back to pre-arrival
                 </a>
               </div>
             </div>
