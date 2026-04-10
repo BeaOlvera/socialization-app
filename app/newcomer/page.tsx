@@ -94,7 +94,7 @@ function PreArrivalHome({ tasks: rawTasks, allTasks }: { tasks: Task[]; allTasks
           return (
             <Link
               key={task.id}
-              href={isInterview ? `/newcomer/pre-arrival` : `/newcomer/activities`}
+              href={isInterview ? `/newcomer/pre-arrival` : `/newcomer/activity/${task.id}`}
               style={{ textDecoration: "none" }}
             >
               <Card
