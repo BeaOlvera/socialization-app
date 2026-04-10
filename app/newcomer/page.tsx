@@ -58,22 +58,22 @@ function PreArrivalHome({ tasks, allTasks }: { tasks: Task[]; allTasks: Task[] }
   return (
     <PageShell nav={<NavBar role="newcomer" active="Home" />}>
       {/* Dark header */}
-      <Card style={{ background: "#1A1A2E", border: "none", color: "#FFFFFF" }}>
-        <p style={{ fontSize: 10, color: "#8888AA", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
+      <Card style={{ background: "#ECECEA", border: "1px solid #DDDBD5" }}>
+        <p style={{ fontSize: 10, color: "#AEABA3", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
           Before your first day
         </p>
-        <h2 style={{ fontSize: 24, fontWeight: 800, color: "#FFFFFF", marginBottom: 6 }}>
+        <h2 style={{ fontSize: 24, fontWeight: 800, color: "#0A0A0A", marginBottom: 6 }}>
           Welcome! Let's get you ready.
         </h2>
-        <p style={{ fontSize: 14, color: "#AAAACC", lineHeight: 1.7 }}>
+        <p style={{ fontSize: 14, color: "#6B6B6B", lineHeight: 1.7 }}>
           Complete these steps before you start. They help us understand your expectations
           and set you up for a great first day.
         </p>
         <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ flex: 1, height: 8, background: "#2A2A4E", borderRadius: 99, overflow: "hidden" }}>
-            <div style={{ height: "100%", background: "#EEEEF5", borderRadius: 99, width: `${(done / total) * 100}%`, transition: "width 0.5s" }} />
+          <div style={{ flex: 1, height: 8, background: "#DDDBD5", borderRadius: 99, overflow: "hidden" }}>
+            <div style={{ height: "100%", background: "#0A0A0A", borderRadius: 99, width: `${(done / total) * 100}%`, transition: "width 0.5s" }} />
           </div>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "#EEEEF5" }}>{done}/{total}</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "#0A0A0A" }}>{done}/{total}</span>
         </div>
       </Card>
 
