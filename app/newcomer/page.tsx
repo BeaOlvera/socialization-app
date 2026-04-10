@@ -137,7 +137,7 @@ function PreArrivalHome({ tasks, allTasks }: { tasks: Task[]; allTasks: Task[] }
                       fontSize: 12, fontWeight: 700, padding: "6px 16px", borderRadius: 8,
                       background: "#1A1A2E", color: "#FFFFFF", flexShrink: 0, alignSelf: "center",
                     }}>
-                      Start
+                      {(task.type || "activity") === "checkin" ? "Start" : "View"}
                     </span>
                   )}
                 </div>
