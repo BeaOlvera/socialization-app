@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Onboard Platform Guide — David Allen</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; color: #0A0A0A; line-height: 1.7; background: #FFFFFF; max-width: 800px; margin: 0 auto; padding: 40px; }
+  h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+  h2 { font-size: 22px; font-weight: 700; margin-top: 48px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #0A0A0A; }
+  h3 { font-size: 17px; font-weight: 700; margin-top: 28px; margin-bottom: 8px; color: #1A1A2E; }
+  h4 { font-size: 14px; font-weight: 700; margin-top: 20px; margin-bottom: 6px; color: #6B6B6B; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { margin-bottom: 12px; font-size: 14px; }
+  ul, ol { margin-bottom: 12px; padding-left: 24px; font-size: 14px; }
+  li { margin-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+  th { background: #0A0A0A; color: #FFFFFF; padding: 8px 12px; text-align: left; font-weight: 600; }
+  td { padding: 8px 12px; border-bottom: 1px solid #E2E0DA; }
+  tr:nth-child(even) td { background: #F5F4F0; }
+  code { background: #F5F4F0; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+  .subtitle { font-size: 16px; color: #6B6B6B; margin-bottom: 32px; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .badge-fit { background: #EEEEF5; color: #1A1A2E; }
+  .badge-ace { background: #EAF4EF; color: #2D6A4F; }
+  .badge-tie { background: #FBEAEC; color: #9B2335; }
+  .badge-admin { background: #0A0A0A; color: #FFFFFF; }
+  .badge-hr { background: #FBEAEC; color: #9B2335; }
+  .badge-mgr { background: #EAF4EF; color: #2D6A4F; }
+  .badge-new { background: #EEEEF5; color: #1A1A2E; }
+  .callout { background: #F5F4F0; border-radius: 12px; padding: 16px 20px; margin: 16px 0; border-left: 4px solid #0A0A0A; }
+  .callout-research { border-left-color: #1A1A2E; background: #EEEEF5; }
+  .callout-warning { border-left-color: #B7791F; background: #FEF3E2; }
+  .screenshot { width: 100%; border: 1px solid #E2E0DA; border-radius: 12px; margin: 16px 0; }
+  .page-break { page-break-before: always; }
+  .logo { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: #1A1A2E; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 12px; }
+  .creds-table td:first-child { font-weight: 700; }
+  .dim-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 16px 0; }
+  .dim-card { border-radius: 12px; padding: 16px; text-align: center; }
+  .dim-card h4 { margin: 0; text-transform: none; letter-spacing: normal; }
+  .dim-card p { font-size: 12px; margin: 0; }
+  @media print {
+    body { padding: 20px; }
+    h2 { page-break-after: avoid; }
+    .screenshot { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div style="text-align: center; padding: 60px 0 40px;">
+  <div class="logo" style="justify-content: center; margin-bottom: 20px;">
+    <div class="logo-icon">ob</div>
+    <span style="font-weight: 800; font-size: 24px; letter-spacing: -0.5px;">onboard</span>
+  </div>
+  <h1 style="font-size: 32px; border: none;">Newcomer Socialization Platform</h1>
+  <p class="subtitle" style="font-size: 18px;">Complete Platform Guide</p>
+  <p style="color: #AEABA3; font-size: 13px;">Prepared for David Allen, TCU<br>April 2026</p>
+</div>
+
+<div class="callout">
+  <strong>Platform URL:</strong> <a href="https://socialization-app.vercel.app/login">https://socialization-app.vercel.app/login</a><br>
+  <strong>Demo credentials are provided in Section 3 below.</strong>
+</div>
+
+<!-- 1. OVERVIEW -->
+<h2>1. What Is This?</h2>
+
+<p>Onboard is a fully functional web platform that operationalizes a <strong>12-month newcomer socialization framework</strong> built around three dimensions:</p>
+
+<div class="dim-grid">
+  <div class="dim-card" style="background: #EEEEF5;">
+    <h4 style="color: #1A1A2E;">FIT</h4>
+    <p style="font-weight: 700; color: #1A1A2E;">Role Clarity</p>
+    <p style="color: #6B6B6B; margin-top: 4px;">Role, KPIs, org chart, responsibilities</p>
+  </div>
+  <div class="dim-card" style="background: #EAF4EF;">
+    <h4 style="color: #2D6A4F;">ACE</h4>
+    <p style="font-weight: 700; color: #2D6A4F;">Task Mastery</p>
+    <p style="color: #6B6B6B; margin-top: 4px;">Tools, processes, training, competence</p>
+  </div>
+  <div class="dim-card" style="background: #FBEAEC;">
+    <h4 style="color: #9B2335;">TIE</h4>
+    <p style="font-weight: 700; color: #9B2335;">Social Acceptance</p>
+    <p style="color: #6B6B6B; margin-top: 4px;">Team, relationships, belonging</p>
+  </div>
+</div>
+
+<p>The platform tracks newcomers across <strong>5 phases</strong>:</p>
+<ol>
+  <li><strong>Arrival</strong> (Days 1&ndash;30) &mdash; Learn the basics, meet the team, get oriented</li>
+  <li><strong>Integration</strong> (Days 31&ndash;90) &mdash; Deepen understanding, take ownership, first results</li>
+  <li><strong>Adjustment</strong> (Months 4&ndash;6) &mdash; Work independently, expand network, find your voice</li>
+  <li><strong>Stabilization</strong> (Months 7&ndash;9) &mdash; Consolidate, refine, grow</li>
+  <li><strong>Embedding</strong> (Months 10&ndash;12) &mdash; No longer new. Part of the fabric.</li>
+</ol>
+
+<p>It is designed as a <strong>consultant-led SaaS tool</strong>: the consultant (Admin) sets up each client company, uploads customized activity calendars and check-in schedules, and the client's HR team manages day-to-day onboarding with minimal effort.</p>
+
+<!-- 2. ROLES -->
+<h2>2. The Four Roles</h2>
+
+<table>
+  <tr><th>Role</th><th>Who</th><th>What They Do</th></tr>
+  <tr><td><span class="badge badge-admin">Admin</span></td><td>Consultant</td><td>Creates companies, uploads templates, configures everything</td></tr>
+  <tr><td><span class="badge badge-hr">HR Admin</span></td><td>Client's HR</td><td>Assigns activities to newcomers, monitors progress</td></tr>
+  <tr><td><span class="badge badge-mgr">Manager</span></td><td>Direct manager</td><td>Sees newcomers' progress, completes manager check-ins</td></tr>
+  <tr><td><span class="badge badge-new">Newcomer</span></td><td>New employee</td><td>Completes activities, does check-ins, tracks their journey</td></tr>
+</table>
+
+<!-- 3. CREDENTIALS -->
+<h2>3. Login Credentials (Demo)</h2>
+
+<table class="creds-table">
+  <tr><th>Role</th><th>Email</th><th>Password</th></tr>
+  <tr><td><span class="badge badge-admin">Admin</span></td><td><code>admin@onboard.app</code></td><td><code>admin123</code></td></tr>
+  <tr><td><span class="badge badge-hr">HR Admin</span></td><td><code>hr@meridian.demo</code></td><td><code>demo123</code></td></tr>
+  <tr><td><span class="badge badge-mgr">Manager</span></td><td><code>claire@meridian.demo</code></td><td><code>demo123</code></td></tr>
+  <tr><td><span class="badge badge-new">Newcomer</span></td><td><code>sofia@meridian.demo</code></td><td><code>demo123</code></td></tr>
+</table>
+
+<p>The demo company is <strong>Meridian Group</strong> (Financial Services). Sofia Martinez is a Senior Marketing Manager who started March 3, 2026. Her manager is Claire Bennett (VP Marketing) and her buddy is James Okafor.</p>
+
+<img src="/guide/screenshots/01_login.png" class="screenshot" style="min-height:0" />
+
+<!-- 4. ADMIN -->
+<h2 class="page-break">4. Admin Role &mdash; The Consultant's Control Panel</h2>
+
+<p>Login as <code>admin@onboard.app</code> / <code>admin123</code></p>
+
+<h3>4.1 Admin Dashboard</h3>
+<p>Shows all companies you manage. Click <strong>"+ New Company"</strong> to create a new client. Click any company to enter its setup page.</p>
+
+<img src="/guide/screenshots/11_admin_dashboard.png" class="screenshot" style="min-height:0" />
+
+<h3>4.2 Company Setup &mdash; 5 Tabs</h3>
+
+<h4>Tab 1: Activities</h4>
+<p>The master activity calendar &mdash; 105 onboarding activities across all 6 phases and 3 dimensions. Each activity has phase, dimension, description, who participates, estimated time, and expected output.</p>
+<ul>
+  <li><strong>"Download Template"</strong> &mdash; get a sample Excel with the correct format</li>
+  <li><strong>"Upload Excel"</strong> &mdash; replace all activities with your customized calendar</li>
+</ul>
+
+<img src="/guide/screenshots/12_admin_company_activities.png" class="screenshot" style="min-height:0" />
+
+<h4>Tab 2: Check-ins</h4>
+<p>41 check-in touchpoints across 12 months &mdash; structured evaluation moments, each with its own form type:</p>
+<ul>
+  <li><strong>Self Likert surveys</strong> (15 questions across FIT/ACE/TIE)</li>
+  <li><strong>Self Likert + AI interview</strong> (survey + qualitative AI conversation)</li>
+  <li><strong>Manager 1:1s</strong> (structured meeting with agenda)</li>
+  <li><strong>Manager assessments</strong> (manager rates newcomer on same 15 questions)</li>
+  <li><strong>Buddy informal check-ins</strong> (quick social integration log)</li>
+  <li><strong>HR formal reviews</strong> (90-day, 6-month, 12-month reviews)</li>
+</ul>
+
+<img src="/guide/screenshots/12b_admin_company_checkins.png" class="screenshot" style="min-height:0" />
+
+<h4>Tab 3: Import People</h4>
+<p>Bulk import ALL employees from a single Excel file. The system auto-creates user accounts, newcomer records, org chart relationships, and assigns all templates.</p>
+
+<table>
+  <tr><th>Column</th><th>Required</th><th>Example</th></tr>
+  <tr><td>Name</td><td>Yes</td><td>Sofia Martinez</td></tr>
+  <tr><td>Email</td><td>Yes</td><td>sofia@company.com</td></tr>
+  <tr><td>Role/Position</td><td>No</td><td>Sr. Marketing Manager</td></tr>
+  <tr><td>Department</td><td>No</td><td>Marketing</td></tr>
+  <tr><td>Reports To</td><td>No</td><td>claire@company.com</td></tr>
+  <tr><td>Is Newcomer</td><td>Yes</td><td>Yes / No</td></tr>
+  <tr><td>Start Date</td><td>If newcomer</td><td>2026-03-03</td></tr>
+  <tr><td>Buddy Email</td><td>No</td><td>james@company.com</td></tr>
+</table>
+
+<img src="/guide/screenshots/12c_admin_company_people.png" class="screenshot" style="min-height:0" />
+
+<h4>Tab 4: Newcomers</h4>
+<p>Lists all newcomers with action buttons:</p>
+<ul>
+  <li><strong>"Transcript"</strong> &mdash; download pre-arrival interview as text file</li>
+  <li><strong>"Code Interview"</strong> &mdash; run AI analysis on the transcript (see Section 8)</li>
+  <li><strong>"Assign All"</strong> &mdash; assign all templates to this newcomer</li>
+</ul>
+
+<h4>Tab 5: Config</h4>
+<ul>
+  <li><strong>Buddy System</strong> &mdash; on/off (when off, buddy check-ins are excluded)</li>
+  <li><strong>Check-in Frequency</strong> &mdash; biweekly, monthly, or quarterly</li>
+  <li><strong>Visible Pages</strong> &mdash; toggle which pages newcomers see (e.g., hide Org Chart if no data)</li>
+</ul>
+
+<img src="/guide/screenshots/13_admin_company_config.png" class="screenshot" style="min-height:0" />
+
+<!-- 5. NEWCOMER -->
+<h2 class="page-break">5. Newcomer Role &mdash; The Onboarding Experience</h2>
+
+<p>Login as <code>sofia@meridian.demo</code> / <code>demo123</code></p>
+
+<h3>5.1 Home</h3>
+<p>Dashboard showing overall completion, next activities to do, FIT/ACE/TIE progress bars, and quick links.</p>
+
+<img src="/guide/screenshots/02_newcomer_home.png" class="screenshot" style="min-height:0" />
+
+<h3>5.2 Activities (Main Working Page)</h3>
+<p>ALL assigned activities and check-ins organized by phase. Phase tabs at top with completion percentage. Activities grouped by dimension (FIT, ACE, TIE) within each phase.</p>
+
+<p>For <strong>regular activities</strong>: checkbox to mark done, description, time estimate, who, when, expected output.</p>
+<p>For <strong>check-ins</strong>: yellow "Check-in" badge + "Open" button that opens the right form.</p>
+
+<img src="/guide/screenshots/03_newcomer_activities.png" class="screenshot" style="min-height:0" />
+
+<h3>5.3 Timeline</h3>
+<p>Visual 12-month journey overview: phase ribbon, overall dimension progress bars, 3-column phase detail grid. Read-only &mdash; work happens on the Activities page.</p>
+
+<img src="/guide/screenshots/04_newcomer_timeline.png" class="screenshot" style="min-height:0" />
+
+<h3>5.4 My Journey</h3>
+<p>Dimension-focused view: each dimension gets its own card with score ring, progress breakdown by phase, and tips.</p>
+
+<h3>5.5 Progress</h3>
+<p>Real-time completion statistics: overall %, dimension breakdown with per-phase mini-bars, phase progress, activities vs. check-ins split, and a dynamic insight based on strongest/weakest dimension.</p>
+
+<img src="/guide/screenshots/05_newcomer_progress.png" class="screenshot" style="min-height:0" />
+
+<h3>5.6 Org Chart</h3>
+<p>The newcomer's <strong>local network</strong> (not the full company org chart): manager above, you in the center, buddy + peers + key contacts below. Built automatically from the People import data.</p>
+
+<h3>5.7 My People</h3>
+<p>Team members list with relationship tags (manager, buddy, peer, key contact) and visual relationship map.</p>
+
+<!-- 6. CHECK-IN FORMS -->
+<h2 class="page-break">6. Check-in Forms &mdash; 7 Different Types</h2>
+
+<p>When a newcomer clicks <strong>"Open"</strong> on a check-in task, the platform detects the type and opens the appropriate form:</p>
+
+<table>
+  <tr><th>Form Type</th><th>Triggered By</th><th>What It Shows</th></tr>
+  <tr><td><strong>Self Likert</strong></td><td>"self check-in"</td><td>15 questions (5 per dimension), 5-point scale. ~5 min.</td></tr>
+  <tr><td><strong>Self Likert + AI Interview</strong></td><td>"formal check-in (Self)"</td><td>Same survey + qualitative AI-guided conversation</td></tr>
+  <tr><td><strong>Manager Assessment</strong></td><td>"formal check-in (Manager)"</td><td>Manager rates newcomer on same 15 questions</td></tr>
+  <tr><td><strong>Manager 1:1</strong></td><td>"Manager 1:1"</td><td>Key focus areas + notes field for discussion</td></tr>
+  <tr><td><strong>Buddy Log</strong></td><td>"Buddy check-in"</td><td>Topics to cover + quick notes on social integration</td></tr>
+  <tr><td><strong>HR Review</strong></td><td>"HR review"</td><td>Structured review: progress, blockers, development plan</td></tr>
+  <tr><td><strong>Pre-Arrival Interview</strong></td><td>"Welcome call"</td><td>Deep AI interview (see Section 7)</td></tr>
+</table>
+
+<img src="/guide/screenshots/10_newcomer_checkin.png" class="screenshot" style="min-height:0" />
+
+<!-- 7. PRE-ARRIVAL INTERVIEW -->
+<h2 class="page-break">7. Pre-Arrival AI Interview &mdash; The Research Baseline</h2>
+
+<div class="callout callout-research">
+  <strong>Research significance:</strong> This interview captures the T0 baseline BEFORE day one. Every construct measured here can be tracked longitudinally against monthly check-in data for 12 months.
+</div>
+
+<p>A deep qualitative interview (12&ndash;15 questions) conducted by Claude AI. The conversation flows naturally &mdash; not a rigid questionnaire.</p>
+
+<h3>What It Explores (6 Research Constructs):</h3>
+
+<ol>
+  <li><strong>Expectations</strong> (Met Expectations Theory &mdash; Wanous)<br>
+    <em>What they imagine the job, team, and culture will be like. Creates the baseline for measuring expectation-reality gaps at each check-in.</em></li>
+
+  <li><strong>Career Fit</strong> (Person-Job / Person-Organization Fit)<br>
+    <em>How this role fits their trajectory. Why they chose this company. What they hope to learn.</em></li>
+
+  <li><strong>Anticipated Embeddedness</strong> (Mitchell, Lee &amp; Holtom)
+    <ul>
+      <li><strong>Links</strong> &mdash; Pre-existing connections, network plans</li>
+      <li><strong>Fit</strong> &mdash; Perceived compatibility with role/org/lifestyle</li>
+      <li><strong>Sacrifice</strong> &mdash; What they gave up, switching costs</li>
+    </ul></li>
+
+  <li><strong>Psychological Contract</strong> (Rousseau)<br>
+    <em>What they expect beyond salary. What they feel they owe. Deal-breakers.</em></li>
+
+  <li><strong>Social Orientation</strong> (Allen &amp; Shanock &mdash; Socialization Tactics)<br>
+    <em>Proactive vs. passive style. How important work relationships are. Social anxieties.</em></li>
+
+  <li><strong>Prior Experience &amp; Anxiety</strong><br>
+    <em>Concrete incidents from past onboardings. Coping strategies. What excites/worries them.</em></li>
+</ol>
+
+<h3>How It Works:</h3>
+<ul>
+  <li>Newcomer clicks <strong>"Start conversation"</strong></li>
+  <li>Claude AI conducts a warm, natural conversation (NOT a rigid Q&A)</li>
+  <li>AI probes for <strong>concrete incidents</strong> and <strong>emotions</strong></li>
+  <li>Full transcript saved to database</li>
+  <li>Takes about 10&ndash;15 minutes</li>
+</ul>
+
+<img src="/guide/screenshots/09_newcomer_pre_arrival.png" class="screenshot" style="min-height:0" />
+
+<!-- 8. CODING -->
+<h2 class="page-break">8. Transcript Coding &amp; Analysis</h2>
+
+<p>Admin &rarr; Company &rarr; Newcomers tab &rarr; <strong>"Code Interview"</strong> button</p>
+
+<p>Adapted from the Critical Incident Technique coding engine used in the 360-degree evaluation platform.</p>
+
+<h3>What the AI Codes:</h3>
+
+<p>Every meaningful passage is coded into one of <strong>7 categories</strong>:</p>
+
+<table>
+  <tr><th>Category</th><th>What It Captures</th></tr>
+  <tr><td>Expectations</td><td>What they expect about daily work, culture, management style</td></tr>
+  <tr><td>Career Fit</td><td>Career trajectory alignment, growth expectations</td></tr>
+  <tr><td>Embeddedness: Links</td><td>Pre-existing connections, network plans</td></tr>
+  <tr><td>Embeddedness: Fit</td><td>Perceived compatibility with role/org</td></tr>
+  <tr><td>Embeddedness: Sacrifice</td><td>What they gave up, switching costs</td></tr>
+  <tr><td>Psychological Contract</td><td>Mutual obligations, deal-breakers</td></tr>
+  <tr><td>Social Orientation</td><td>Proactive/passive style, social needs</td></tr>
+  <tr><td>Prior Experience</td><td>Past onboarding incidents, lessons learned</td></tr>
+  <tr><td>Anxiety &amp; Excitement</td><td>Worries, motivations, emotional readiness</td></tr>
+</table>
+
+<h3>For Each Coded Passage:</h3>
+<ul>
+  <li><strong>Exact quote</strong> from the transcript</li>
+  <li><strong>What it reveals</strong> (1 sentence interpretation)</li>
+  <li><strong>Emotional valence</strong>: positive, negative, or neutral</li>
+  <li><strong>Intensity</strong>: low, moderate, or high</li>
+  <li><strong>Incident type</strong>: concrete incident, projection (future), or reflection</li>
+</ul>
+
+<h3>Summary Report Generated:</h3>
+<ul>
+  <li>Expectations profile</li>
+  <li>Career fit assessment</li>
+  <li>Embeddedness baseline (links, fit, sacrifice)</li>
+  <li>Psychological contract analysis</li>
+  <li>Social readiness assessment</li>
+  <li><strong>Risk factors</strong> for early turnover</li>
+  <li><strong>Protective factors</strong> for retention</li>
+  <li><strong>Recommended onboarding actions</strong> (3&ndash;5 specific)</li>
+  <li><strong>Flight risk assessment</strong> (low / moderate / high) with justification</li>
+</ul>
+
+<!-- 9. HR -->
+<h2 class="page-break">9. HR Admin Role</h2>
+
+<p>Login as <code>hr@meridian.demo</code> / <code>demo123</code></p>
+
+<p>Deliberately simple &mdash; the Admin has already done the heavy lifting.</p>
+
+<ul>
+  <li><strong>Overview</strong> &mdash; health summary (green/yellow/red), one-click assign, phase distribution</li>
+  <li><strong>All Newcomers</strong> &mdash; sorted by risk level, click for detail</li>
+  <li><strong>Newcomer Detail</strong> &mdash; FIT/ACE/TIE scores, activity list, check-in list, HR action recommendations</li>
+</ul>
+
+<img src="/guide/screenshots/14_hr_dashboard.png" class="screenshot" style="min-height:0" />
+
+<!-- 10. MANAGER -->
+<h2>10. Manager Role</h2>
+
+<p>Login as <code>claire@meridian.demo</code> / <code>demo123</code></p>
+
+<ul>
+  <li><strong>My Team</strong> &mdash; list of assigned newcomers with status, day count, upcoming check-ins</li>
+  <li><strong>Newcomer Detail</strong> &mdash; completion %, dimension progress, full activity/check-in list</li>
+</ul>
+
+<img src="/guide/screenshots/16_manager_team.png" class="screenshot" style="min-height:0" />
+
+<!-- 11. DATA -->
+<h2 class="page-break">11. Data Architecture</h2>
+
+<h3>Quantitative:</h3>
+<ul>
+  <li>Likert scores (1&ndash;5) on 15 items &times; FIT/ACE/TIE at each monthly check-in</li>
+  <li>Self scores vs. Manager scores (divergence analysis)</li>
+  <li>Activity completion rates by dimension, phase, and time</li>
+</ul>
+
+<h3>Qualitative:</h3>
+<ul>
+  <li>Pre-arrival interview transcript (T0 baseline)</li>
+  <li>Monthly AI interview transcripts (T1&ndash;T12)</li>
+  <li>Manager 1:1 notes, buddy logs, HR review notes</li>
+</ul>
+
+<h3>Coded:</h3>
+<ul>
+  <li>Pre-arrival coding &mdash; 7 constructs with valence, intensity, incident type</li>
+  <li>Monthly analysis &mdash; FIT/ACE/TIE assessment with quotes, flight risk</li>
+</ul>
+
+<h3>Longitudinal tracking:</h3>
+<ul>
+  <li>Dimension scores over time (self + manager)</li>
+  <li>Activity completion curves</li>
+  <li>Expectation-reality gap evolution</li>
+  <li>Embeddedness growth</li>
+</ul>
+
+<!-- 12. RESEARCH -->
+<h2>12. Research Potential</h2>
+
+<div class="callout callout-research">
+  This platform generates publication-ready longitudinal data. Below are paper ideas that leverage the data architecture.
+</div>
+
+<ol>
+  <li><strong>Pre-arrival predictors of socialization outcomes</strong> &mdash; Do T0 expectations, embeddedness, and psychological contract predict T3/T6/T12 adjustment?</li>
+  <li><strong>Expectation-reality gaps and turnover</strong> &mdash; How big does the gap need to be before turnover intention rises?</li>
+  <li><strong>Embeddedness growth curves</strong> &mdash; When does embeddedness "lock in"? Is there a critical window?</li>
+  <li><strong>AI vs. human coding of socialization interviews</strong> &mdash; Compare AI-coded data against manual coding by trained researchers</li>
+  <li><strong>Proactive socialization and adjustment speed</strong> &mdash; Use T0 social orientation to predict TIE score trajectories</li>
+  <li><strong>The role of buddies</strong> &mdash; Compare companies with vs. without buddy systems on TIE scores</li>
+</ol>
+
+<!-- 13. WALKTHROUGH -->
+<h2 class="page-break">13. Try It Yourself</h2>
+
+<ol>
+  <li>Go to <a href="https://socialization-app.vercel.app/login">https://socialization-app.vercel.app/login</a></li>
+  <li>Login as <strong>Sofia</strong> (<code>sofia@meridian.demo</code> / <code>demo123</code>)</li>
+  <li>Click <strong>Activities</strong> &mdash; see the activity calendar with check-in badges</li>
+  <li>Click <strong>"Open"</strong> on any check-in to see its form</li>
+  <li>Navigate to <strong>Timeline</strong>, <strong>Progress</strong>, <strong>My Journey</strong></li>
+  <li>Clear cookies or use incognito window</li>
+  <li>Login as <strong>Admin</strong> (<code>admin@onboard.app</code> / <code>admin123</code>)</li>
+  <li>Click <strong>Meridian Group</strong> &rarr; explore the 5 tabs</li>
+  <li>Try <strong>"Download Template"</strong> on Activities, Check-ins, and People tabs</li>
+  <li>Go to <strong>Newcomers</strong> tab &rarr; click <strong>"Transcript"</strong> or <strong>"Code Interview"</strong></li>
+</ol>
+
+<div class="callout callout-warning">
+  <strong>Note:</strong> To switch between roles, clear your browser cookies first (Settings &rarr; Privacy &rarr; Clear browsing data &rarr; Cookies) or use a different browser/incognito window for each role.
+</div>
+
+<br><br>
+<hr>
+<p style="text-align: center; color: #AEABA3; font-size: 12px; margin-top: 24px;">
+  Built by Bea Olvera-Arias with Claude AI<br>
+  Platform designed to support longitudinal socialization research and commercial consulting delivery
+</p>
+
+</body>
+</html>
