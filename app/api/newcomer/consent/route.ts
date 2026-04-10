@@ -12,14 +12,16 @@ export async function POST(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
   const userAgent = request.headers.get('user-agent') || 'unknown'
 
+  const body = await request.json()
+
   const { data, error } = await supabaseAdmin
     .from('privacy_consents')
     .insert({
       person_type: 'newcomer',
       person_id: session.userId,
-      consent_type: 'interview_participation',
-      consent_text: 'I agree to participate in this AI-guided interview and consent to the processing of my responses.',
-      accepted: true,
+      consent_type: body.consent_type || 'interview_participation',
+      consent_text: body.consent_text || 'I agree to participate in this AI-guided interview and consent to the processing of my responses.',
+      accepted: body.accepted !== false,
       accepted_at: new Date().toISOString(),
       ip_address: ip,
       user_agent: userAgent,
