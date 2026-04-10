@@ -161,9 +161,90 @@ export default function ActivitiesPage() {
         </span>
       </div>
 
+      {/* Check-ins first (prominent) */}
+      {(() => {
+        const checkinTasks = phaseTasks.filter(t => (t.type || "activity") === "checkin");
+        if (checkinTasks.length === 0) return null;
+        return (
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 20, background: "#FEF3E2", color: "#B7791F" }}>Check-ins</span>
+              <SectionLabel>Scheduled touchpoints</SectionLabel>
+              <span style={{ fontSize: 11, color: "#AEABA3", marginBottom: 12 }}>
+                {checkinTasks.filter(t => t.done).length}/{checkinTasks.length}
+              </span>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {checkinTasks.map(task => {
+                const colors = DIM_COLORS[task.dimension] || DIM_COLORS.fit;
+                return (
+                  <Card key={task.id} style={{
+                    borderLeft: "4px solid #B7791F",
+                    background: task.done ? "#F5F4F0" : "#FFFCF5",
+                    opacity: task.done ? 0.6 : 1,
+                  }}>
+                    <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                      <button
+                        onClick={() => toggleTask(task.id, !task.done)}
+                        disabled={toggling === task.id}
+                        style={{
+                          width: 22, height: 22, borderRadius: 6,
+                          border: task.done ? "none" : "2px solid #B7791F",
+                          background: task.done ? "#B7791F" : "transparent",
+                          cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                          flexShrink: 0, marginTop: 2,
+                        }}
+                      >
+                        {task.done && (
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                            <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                      </button>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                          <p onClick={() => { if (!task.done) router.push(`/newcomer/checkin/${task.id}`); }}
+                            style={{
+                              fontSize: 15, fontWeight: 700, color: "#0A0A0A",
+                              textDecoration: task.done ? "line-through" : "none",
+                              cursor: !task.done ? "pointer" : "default",
+                            }}>
+                            {task.activity}
+                          </p>
+                          {!task.done && (
+                            <button onClick={() => router.push(`/newcomer/checkin/${task.id}`)}
+                              style={{
+                                fontSize: 11, fontWeight: 600, padding: "4px 14px", borderRadius: 8,
+                                background: "#B7791F", color: "#FFF", border: "none", cursor: "pointer",
+                                flexShrink: 0, marginLeft: "auto",
+                              }}>
+                              Open
+                            </button>
+                          )}
+                        </div>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, fontSize: 12, color: "#6B6B6B" }}>
+                          {task.estimated_time && <span><span style={{ color: "#AEABA3" }}>Time:</span> {task.estimated_time}</span>}
+                          {task.who && <span><span style={{ color: "#AEABA3" }}>With:</span> {task.who}</span>}
+                          {task.due_date && <span><span style={{ color: "#AEABA3" }}>Due:</span> {task.due_date}</span>}
+                        </div>
+                        {task.output && (
+                          <div style={{ marginTop: 8, padding: "8px 12px", background: "#FEF3E2", borderRadius: 8, fontSize: 12, color: "#B7791F" }}>
+                            <span style={{ fontWeight: 600 }}>Output:</span> {task.output}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Activities by dimension */}
       {dimensions.map(dim => {
-        const dimTasks = phaseTasks.filter(t => t.dimension === dim);
+        const dimTasks = phaseTasks.filter(t => t.dimension === dim && (t.type || "activity") !== "checkin");
         if (dimTasks.length === 0) return null;
         const dimInfo = DIMENSIONS[dim];
         const colors = DIM_COLORS[dim];
