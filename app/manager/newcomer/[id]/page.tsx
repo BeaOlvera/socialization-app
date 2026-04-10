@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { NavBar, PageShell, Card, StatusDot, SectionLabel, BucketTag } from "@/components/ui";
+import { PreArrivalReport } from "@/components/PreArrivalReport";
 import { DIMENSIONS, PHASES } from "@/lib/framework";
 
 type Dim = keyof typeof DIMENSIONS;
@@ -34,15 +35,18 @@ export default function NewcomerDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [newcomer, setNewcomer] = useState<NewcomerInfo | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [preSummary, setPreSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       fetch(`/api/manager/newcomers/${id}`).then(r => r.ok ? r.json() : null),
       fetch(`/api/manager/newcomers/${id}/tasks`).then(r => r.ok ? r.json() : []),
-    ]).then(([nData, tData]) => {
-      setNewcomer(nData);
+      fetch(`/api/manager/newcomers/${id}/pre-arrival-summary`).then(r => r.ok ? r.json() : { available: false }),
+    ]).then(([nData, tData, sData]) => {
+      if (nData) setNewcomer(nData);
       if (Array.isArray(tData)) setTasks(tData);
+      setPreSummary(sData);
     }).finally(() => setLoading(false));
   }, [id]);
 
@@ -106,6 +110,11 @@ export default function NewcomerDetailPage() {
           );
         })}
       </div>
+
+      {/* Pre-arrival report */}
+      {preSummary?.available && (
+        <PreArrivalReport summary={preSummary} showFlightRisk={true} newcomerName={newcomer?.user?.name?.split(" ")[0]} />
+      )}
 
       {/* Activity list */}
       <Card>

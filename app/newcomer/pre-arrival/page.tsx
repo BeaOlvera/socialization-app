@@ -161,13 +161,21 @@ export default function PreArrivalInterview() {
             </form>
           ) : (
             <div style={{ padding: "16px 20px", borderTop: "1px solid #E2E0DA", textAlign: "center" }}>
-              <p style={{ fontSize: 13, color: "#6B6B6B", marginBottom: 12 }}>Your responses have been saved.</p>
-              <a href="/newcomer/activities" style={{
-                padding: "10px 24px", borderRadius: 10, background: "#0A0A0A", color: "#FFF",
-                fontSize: 13, fontWeight: 600, textDecoration: "none", display: "inline-block",
-              }}>
-                Back to activities
-              </a>
+              <p style={{ fontSize: 13, color: "#6B6B6B", marginBottom: 12 }}>Your responses have been saved. Once analyzed, you'll be able to see your onboarding profile.</p>
+              <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+                <a href="/newcomer/pre-arrival-report" style={{
+                  padding: "10px 24px", borderRadius: 10, background: "#EEEEF5", color: "#1A1A2E",
+                  fontSize: 13, fontWeight: 600, textDecoration: "none", display: "inline-block",
+                }}>
+                  View my profile
+                </a>
+                <a href="/newcomer/activities" style={{
+                  padding: "10px 24px", borderRadius: 10, background: "#0A0A0A", color: "#FFF",
+                  fontSize: 13, fontWeight: 600, textDecoration: "none", display: "inline-block",
+                }}>
+                  Back to activities
+                </a>
+              </div>
             </div>
           )}
         </div>

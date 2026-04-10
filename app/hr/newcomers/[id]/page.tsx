@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { NavBar, PageShell, Card, SectionLabel, StatusDot, Avatar, ScoreRing } from "@/components/ui";
+import { PreArrivalReport } from "@/components/PreArrivalReport";
 import { DIMENSIONS } from "@/lib/framework";
 
 type Dim = keyof typeof DIMENSIONS;
@@ -38,15 +39,18 @@ export default function HRNewcomerDetail() {
   const { id } = useParams<{ id: string }>();
   const [newcomer, setNewcomer] = useState<NewcomerInfo | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [preSummary, setPreSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       fetch(`/api/hr/newcomers/${id}`).then(r => r.ok ? r.json() : null),
       fetch(`/api/manager/newcomers/${id}/tasks`).then(r => r.ok ? r.json() : []),
-    ]).then(([nData, tData]) => {
+      fetch(`/api/hr/newcomers/${id}/pre-arrival-summary`).then(r => r.ok ? r.json() : { available: false }),
+    ]).then(([nData, tData, sData]) => {
       if (nData) setNewcomer(nData);
       if (Array.isArray(tData)) setTasks(tData);
+      setPreSummary(sData);
     }).finally(() => setLoading(false));
   }, [id]);
 
@@ -107,6 +111,11 @@ export default function HRNewcomerDetail() {
           </div>
         </div>
       </Card>
+
+      {/* Pre-arrival report */}
+      {preSummary?.available && (
+        <PreArrivalReport summary={preSummary} showFlightRisk={true} newcomerName={newcomer?.user?.name?.split(" ")[0]} />
+      )}
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
         {/* Left */}
