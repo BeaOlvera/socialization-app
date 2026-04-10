@@ -7,16 +7,12 @@ interface Message {
   content: string;
 }
 
-const RESEARCH_CONSENT_TEXT = "I understand that my anonymized responses may be used for academic research purposes. All identifying information (name, company, specific role) will be removed before any research use. No individual will be identifiable in any published research. My participation is voluntary and I may withdraw at any time without affecting my onboarding experience.";
-
 export default function PreArrivalInterview() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [complete, setComplete] = useState(false);
   const [started, setStarted] = useState(false);
-  const [consented, setConsented] = useState(false);
-  const [consentChecks, setConsentChecks] = useState({ data: false, research: false });
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -69,104 +65,25 @@ export default function PreArrivalInterview() {
     setInput("");
   }
 
-  async function handleConsent() {
-    // Record consent via API
-    await fetch("/api/newcomer/consent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        consent_type: "research_participation",
-        consent_text: RESEARCH_CONSENT_TEXT,
-        accepted: true,
-      }),
-    });
-    setConsented(true);
-  }
-
   if (!started) {
     return (
       <PageShell nav={<NavBar role="newcomer" active="Activities" />}>
-        <Card style={{ padding: "40px 24px" }}>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 40, marginBottom: 16 }}>&#128172;</div>
-            <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0A0A0A", marginBottom: 8 }}>Pre-Arrival Interview</h2>
-            <p style={{ fontSize: 14, color: "#6B6B6B", lineHeight: 1.7, maxWidth: 520, margin: "0 auto 8px" }}>
-              Before your first day, we'd like to get to know you better. This is a relaxed conversation about
-              your expectations, what matters to you at work, and how you like to settle into new environments.
-            </p>
-            <p style={{ fontSize: 13, color: "#AEABA3", marginBottom: 24 }}>
-              Takes about 10–15 minutes. There are no right or wrong answers.
-            </p>
-          </div>
-
-          {!consented ? (
-            <div style={{ maxWidth: 560, margin: "0 auto" }}>
-              {/* Data protection consent */}
-              <div style={{ background: "#F5F4F0", borderRadius: 12, padding: "16px 20px", marginBottom: 12 }}>
-                <label style={{ display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer" }}>
-                  <input type="checkbox" checked={consentChecks.data}
-                    onChange={e => setConsentChecks(p => ({ ...p, data: e.target.checked }))}
-                    style={{ width: 18, height: 18, marginTop: 3, flexShrink: 0 }} />
-                  <div>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: "#0A0A0A", marginBottom: 4 }}>Data Protection</p>
-                    <p style={{ fontSize: 12, color: "#6B6B6B", lineHeight: 1.6 }}>
-                      I understand that my responses will be stored securely and processed in accordance with GDPR.
-                      My data will be used to support my onboarding experience. I can request access to, correction of,
-                      or deletion of my personal data at any time by contacting HR or the platform administrator.
-                    </p>
-                  </div>
-                </label>
-              </div>
-
-              {/* Research consent */}
-              <div style={{ background: "#EEEEF5", borderRadius: 12, padding: "16px 20px", marginBottom: 20 }}>
-                <label style={{ display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer" }}>
-                  <input type="checkbox" checked={consentChecks.research}
-                    onChange={e => setConsentChecks(p => ({ ...p, research: e.target.checked }))}
-                    style={{ width: 18, height: 18, marginTop: 3, flexShrink: 0 }} />
-                  <div>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: "#1A1A2E", marginBottom: 4 }}>Research Participation</p>
-                    <p style={{ fontSize: 12, color: "#6B6B6B", lineHeight: 1.6 }}>
-                      I understand that my anonymized responses may be used for academic research purposes.
-                      All identifying information (name, company, specific role) will be removed before any
-                      research use. No individual will be identifiable in any published research.
-                      My participation is voluntary and I may withdraw at any time without affecting my
-                      onboarding experience. The research aims to improve newcomer socialization practices
-                      and contribute to academic knowledge in organizational psychology.
-                    </p>
-                  </div>
-                </label>
-              </div>
-
-              <div style={{ textAlign: "center" }}>
-                <button
-                  onClick={handleConsent}
-                  disabled={!consentChecks.data || !consentChecks.research}
-                  style={{
-                    padding: "12px 32px", borderRadius: 12, border: "none", cursor: consentChecks.data && consentChecks.research ? "pointer" : "not-allowed",
-                    background: consentChecks.data && consentChecks.research ? "#0A0A0A" : "#E2E0DA",
-                    color: consentChecks.data && consentChecks.research ? "#FFFFFF" : "#AEABA3",
-                    fontSize: 15, fontWeight: 700, transition: "all 0.15s",
-                  }}
-                >
-                  I agree — continue
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div style={{ textAlign: "center" }}>
-              <div style={{ background: "#EAF4EF", borderRadius: 10, padding: "10px 16px", display: "inline-block", marginBottom: 20 }}>
-                <p style={{ fontSize: 12, color: "#2D6A4F", fontWeight: 600 }}>Consent recorded. Thank you.</p>
-              </div>
-              <br />
-              <button onClick={handleStart} style={{
-                padding: "12px 32px", borderRadius: 12, border: "none", cursor: "pointer",
-                background: "#0A0A0A", color: "#FFFFFF", fontSize: 15, fontWeight: 700,
-              }}>
-                Start conversation
-              </button>
-            </div>
-          )}
+        <Card style={{ textAlign: "center", padding: "40px 24px" }}>
+          <div style={{ fontSize: 40, marginBottom: 16 }}>&#128172;</div>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0A0A0A", marginBottom: 8 }}>Pre-Arrival Interview</h2>
+          <p style={{ fontSize: 14, color: "#6B6B6B", lineHeight: 1.7, maxWidth: 480, margin: "0 auto 8px" }}>
+            Before your first day, we'd like to get to know you better. This is a relaxed conversation about
+            your expectations, what matters to you at work, and how you like to settle into new environments.
+          </p>
+          <p style={{ fontSize: 13, color: "#AEABA3", marginBottom: 24 }}>
+            Takes about 10-15 minutes. There are no right or wrong answers.
+          </p>
+          <button onClick={handleStart} style={{
+            padding: "12px 32px", borderRadius: 12, border: "none", cursor: "pointer",
+            background: "#0A0A0A", color: "#FFFFFF", fontSize: 15, fontWeight: 700,
+          }}>
+            Start conversation
+          </button>
         </Card>
       </PageShell>
     );

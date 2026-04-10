@@ -36,7 +36,22 @@ export default function LoginPage() {
       }
 
       const { user } = await res.json();
-      router.push(roleRedirects[user.role] || "/");
+
+      // Admin skips consent check
+      if (user.role === "admin") {
+        router.push("/admin");
+        return;
+      }
+
+      // Check if user has accepted platform consent
+      const consentRes = await fetch("/api/auth/consent");
+      const { consented } = await consentRes.json();
+
+      if (consented) {
+        router.push(roleRedirects[user.role] || "/");
+      } else {
+        router.push("/consent");
+      }
     } catch {
       setError("Something went wrong. Please try again.");
       setLoading(false);

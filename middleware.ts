@@ -17,7 +17,7 @@ const ROLE_ROUTES: [string, UserRole[]][] = [
 ]
 
 // Public paths that don't need authentication
-const PUBLIC_PATHS = ['/', '/login', '/invite', '/api/auth']
+const PUBLIC_PATHS = ['/', '/login', '/invite', '/consent', '/api/auth']
 
 function isPublic(pathname: string): boolean {
   return PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'))
