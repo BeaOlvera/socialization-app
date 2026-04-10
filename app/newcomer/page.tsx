@@ -51,7 +51,16 @@ export default function NewcomerHome() {
 }
 
 // ─── PRE-ARRIVAL HOME ──────────────────────────────────────
-function PreArrivalHome({ tasks, allTasks }: { tasks: Task[]; allTasks: Task[] }) {
+function PreArrivalHome({ tasks: rawTasks, allTasks }: { tasks: Task[]; allTasks: Task[] }) {
+  // Sort: interview first, then check-ins, then activities
+  const tasks = [...rawTasks].sort((a, b) => {
+    const aIsInterview = a.activity?.toLowerCase().includes("interview") ? 0 : 1;
+    const bIsInterview = b.activity?.toLowerCase().includes("interview") ? 0 : 1;
+    if (aIsInterview !== bIsInterview) return aIsInterview - bIsInterview;
+    const aIsCheckin = (a.type || "activity") === "checkin" ? 0 : 1;
+    const bIsCheckin = (b.type || "activity") === "checkin" ? 0 : 1;
+    return aIsCheckin - bIsCheckin;
+  });
   const done = tasks.filter(t => t.done).length;
   const total = tasks.length;
 
