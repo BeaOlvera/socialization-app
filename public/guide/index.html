@@ -125,6 +125,36 @@
 
 <img src="/guide/screenshots/01_login.png" class="screenshot" style="min-height:0" />
 
+<!-- 3.5 CONSENT -->
+<h2>3.5 Platform Consent</h2>
+
+<p>On <strong>first login</strong>, every user (newcomer, manager, HR) is shown a consent screen before they can access the platform. They must accept two things:</p>
+
+<ol>
+  <li><strong>Data Protection (GDPR)</strong> &mdash; Their data will be stored securely and processed in accordance with GDPR. They can request access, correction, or deletion at any time.</li>
+  <li><strong>Research Participation</strong> &mdash; Anonymized data may be used for academic research on newcomer socialization. All identifying information is removed. Participation is voluntary and they can withdraw at any time without affecting their onboarding or employment.</li>
+</ol>
+
+<p>Both must be accepted to proceed. The consent is recorded with timestamp and IP address for compliance. It's shown <strong>once per user</strong> &mdash; after accepting, they go straight to their dashboard on future logins.</p>
+
+<div class="callout callout-research">
+  <strong>Research ethics:</strong> This consent mechanism covers all data generated on the platform &mdash; survey scores, interview transcripts, manager notes, buddy logs, HR reviews. It satisfies IRB/ethics committee requirements for informed consent in longitudinal research. Admin (consultant) role is exempt as they are not research participants.
+</div>
+
+<h3>Privacy Model</h3>
+
+<table>
+  <tr><th>Data Type</th><th>Who Can See</th><th>Who Cannot See</th></tr>
+  <tr><td>Pre-arrival interview transcript</td><td>Admin (researcher) only</td><td>HR, Manager, Newcomer</td></tr>
+  <tr><td>Pre-arrival coded summary</td><td>Newcomer, HR, Manager</td><td>&mdash;</td></tr>
+  <tr><td>Flight risk assessment</td><td>HR, Manager</td><td>Newcomer</td></tr>
+  <tr><td>Likert self-scores</td><td>Newcomer, HR, Manager</td><td>&mdash;</td></tr>
+  <tr><td>Manager check-in notes</td><td>Manager, HR</td><td>Newcomer</td></tr>
+  <tr><td>Buddy check-in logs</td><td>Buddy, HR</td><td>Newcomer, Manager</td></tr>
+</table>
+
+<p>The newcomer always sees what HR and their manager see about them (except flight risk classification), ensuring <strong>full transparency</strong>.</p>
+
 <!-- 4. ADMIN -->
 <h2 class="page-break">4. Admin Role &mdash; The Consultant's Control Panel</h2>
 
@@ -288,11 +318,19 @@
   <li>Newcomer clicks <strong>"Start conversation"</strong></li>
   <li>Claude AI conducts a warm, natural conversation (NOT a rigid Q&A)</li>
   <li>AI probes for <strong>concrete incidents</strong> and <strong>emotions</strong></li>
-  <li>Full transcript saved to database</li>
+  <li>Full transcript saved to database (accessible only by Admin/researcher)</li>
   <li>Takes about 10&ndash;15 minutes</li>
 </ul>
 
 <img src="/guide/screenshots/09_newcomer_pre_arrival.png" class="screenshot" style="min-height:0" />
+
+<h3>Who Sees What After the Interview:</h3>
+<ul>
+  <li><strong>Admin</strong> (researcher): Full transcript + coded analysis with raw quotes</li>
+  <li><strong>Newcomer</strong>: Summary report &mdash; expectations profile, social readiness, strengths, areas to watch, recommended actions (NO raw quotes, NO flight risk)</li>
+  <li><strong>HR &amp; Manager</strong>: Same summary as newcomer PLUS flight risk assessment</li>
+</ul>
+<p>The newcomer sees exactly what HR and their manager see about them (minus flight risk), ensuring <strong>full transparency</strong>. No one except the researcher sees the raw transcript.</p>
 
 <!-- 8. CODING -->
 <h2 class="page-break">8. Transcript Coding &amp; Analysis</h2>
@@ -417,21 +455,39 @@
 <!-- 13. WALKTHROUGH -->
 <h2 class="page-break">13. Try It Yourself</h2>
 
+<h3>As a Newcomer (Sofia)</h3>
 <ol>
+  <li>Open an <strong>incognito window</strong> (Ctrl+Shift+N in Chrome)</li>
   <li>Go to <a href="https://socialization-app.vercel.app/login">https://socialization-app.vercel.app/login</a></li>
   <li>Login as <strong>Sofia</strong> (<code>sofia@meridian.demo</code> / <code>demo123</code>)</li>
-  <li>Click <strong>Activities</strong> &mdash; see the activity calendar with check-in badges</li>
-  <li>Click <strong>"Open"</strong> on any check-in to see its form</li>
-  <li>Navigate to <strong>Timeline</strong>, <strong>Progress</strong>, <strong>My Journey</strong></li>
-  <li>Clear cookies or use incognito window</li>
-  <li>Login as <strong>Admin</strong> (<code>admin@onboard.app</code> / <code>admin123</code>)</li>
+  <li>You'll see the <strong>Consent page</strong> &mdash; check both boxes (Data Protection + Research), click "I agree"</li>
+  <li>You land on the <strong>Home</strong> dashboard &mdash; see your progress and next activities</li>
+  <li>Click <strong>Activities</strong> &mdash; see the full activity calendar with check-in badges and "Open" buttons</li>
+  <li>Click <strong>"Open"</strong> on any check-in to see its specific form (Likert, 1:1, buddy log, etc.)</li>
+  <li>Find <strong>"Pre-arrival interview"</strong> in the Arrival tab &mdash; click Open to try the AI interview</li>
+  <li>Navigate to <strong>Timeline</strong>, <strong>Progress</strong>, <strong>My Journey</strong> to see different views of the same data</li>
+</ol>
+
+<h3>As Admin (Consultant)</h3>
+<ol>
+  <li>Open a <strong>new incognito window</strong></li>
+  <li>Login as <strong>Admin</strong> (<code>admin@onboard.app</code> / <code>admin123</code>) &mdash; admin skips consent</li>
   <li>Click <strong>Meridian Group</strong> &rarr; explore the 5 tabs</li>
   <li>Try <strong>"Download Template"</strong> on Activities, Check-ins, and People tabs</li>
-  <li>Go to <strong>Newcomers</strong> tab &rarr; click <strong>"Transcript"</strong> or <strong>"Code Interview"</strong></li>
+  <li>Go to <strong>Config</strong> tab &mdash; toggle pages on/off, configure buddy system</li>
+  <li>Go to <strong>Newcomers</strong> tab &rarr; click <strong>"Transcript"</strong> (downloads interview) or <strong>"Code Interview"</strong> (AI analysis)</li>
+</ol>
+
+<h3>As HR / Manager</h3>
+<ol>
+  <li>Open a <strong>new incognito window</strong></li>
+  <li>Login as <strong>HR</strong> (<code>hr@meridian.demo</code> / <code>demo123</code>) or <strong>Manager</strong> (<code>claire@meridian.demo</code> / <code>demo123</code>)</li>
+  <li>Accept consent (first time only)</li>
+  <li>See newcomer list, click any newcomer to see their progress + pre-arrival insights (no raw transcript)</li>
 </ol>
 
 <div class="callout callout-warning">
-  <strong>Note:</strong> To switch between roles, clear your browser cookies first (Settings &rarr; Privacy &rarr; Clear browsing data &rarr; Cookies) or use a different browser/incognito window for each role.
+  <strong>Tip:</strong> Use a separate incognito window for each role. Closing the window clears the session automatically.
 </div>
 
 <br><br>
