@@ -2,6 +2,7 @@
 import { NavBar, PageShell, Card, ScoreRing, SectionLabel, BucketTag, TwoCol } from "@/components/ui";
 import { DIMENSIONS } from "@/lib/framework";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 type Dim = keyof typeof DIMENSIONS;
@@ -20,15 +21,26 @@ interface Task {
 }
 
 export default function NewcomerHome() {
+  const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/newcomer/tasks")
-      .then(r => r.json())
-      .then(data => { if (Array.isArray(data)) setTasks(data); })
-      .finally(() => setLoading(false));
-  }, []);
+    // Check consent first — redirect if not accepted
+    fetch("/api/auth/consent")
+      .then(r => r.ok ? r.json() : { consented: false })
+      .then(data => {
+        if (!data.consented) {
+          router.push("/consent");
+          return;
+        }
+        // Only load tasks after consent is confirmed
+        fetch("/api/newcomer/tasks")
+          .then(r => r.json())
+          .then(d => { if (Array.isArray(d)) setTasks(d); })
+          .finally(() => setLoading(false));
+      });
+  }, [router]);
 
   // Check if there are undone pre-arrival tasks (phase=arrival tasks that came from pre_arrival templates)
   const preArrivalTasks = tasks.filter(t =>
