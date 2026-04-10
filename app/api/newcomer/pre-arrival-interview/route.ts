@@ -73,10 +73,21 @@ export async function POST(request: NextRequest) {
     .eq('checkin_id', checkin.id)
     .order('created_at', { ascending: true })
 
-  const chatHistory = (messages || []).map(m => ({
+  // Build chat history — ensure valid alternating roles for Anthropic API
+  const rawHistory = (messages || []).map(m => ({
     role: m.role as 'assistant' | 'user',
     content: m.content,
   }))
+
+  // Fix: remove consecutive same-role messages (keep last of each run)
+  const chatHistory: typeof rawHistory = []
+  for (const msg of rawHistory) {
+    if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === msg.role) {
+      chatHistory[chatHistory.length - 1] = msg // replace with latest
+    } else {
+      chatHistory.push(msg)
+    }
+  }
 
   // Mark in_progress
   if (checkin.interview_status === 'pending') {
