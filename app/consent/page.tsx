@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 const roleRedirects: Record<string, string> = {
   admin: "/admin",
-  newcomer: "/newcomer",
+  newcomer: "/newcomer/pre-arrival",
   manager: "/manager",
   hr_admin: "/hr",
 };
