@@ -93,7 +93,13 @@ export async function POST(request: NextRequest) {
     newcomer.start_date,
   )
 
-  const aiResponse = await getAIResponse(chatHistory, systemPrompt, 600)
+  let aiResponse: string
+  try {
+    aiResponse = await getAIResponse(chatHistory, systemPrompt, 600)
+  } catch (e: any) {
+    console.error('Pre-arrival interview AI error:', e.message)
+    return NextResponse.json({ error: `AI error: ${e.message}` }, { status: 500 })
+  }
 
   // Check completion
   const isComplete = aiResponse.includes('x7y8')

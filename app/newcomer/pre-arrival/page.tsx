@@ -44,10 +44,10 @@ export default function PreArrivalInterview() {
       setMessages(prev => [...prev, { role: "assistant", content: data.message }]);
 
       if (data.isComplete) setComplete(true);
-    } catch {
+    } catch (e: any) {
       setMessages(prev => [...prev, {
         role: "assistant",
-        content: "I'm having trouble connecting. Please try again in a moment.",
+        content: `I'm having trouble connecting: ${e.message || "unknown error"}. Please try again in a moment.`,
       }]);
     }
     setLoading(false);
