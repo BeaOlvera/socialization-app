@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const roleRedirects: Record<string, string> = {
@@ -13,6 +13,20 @@ export default function ConsentPage() {
   const router = useRouter();
   const [checks, setChecks] = useState({ data: false, research: false });
   const [submitting, setSubmitting] = useState(false);
+
+  // If already consented, redirect immediately
+  useEffect(() => {
+    fetch("/api/auth/consent")
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.consented) {
+          fetch("/api/auth/me").then(r => r.ok ? r.json() : null).then(session => {
+            const role = session?.role || "newcomer";
+            router.push(roleRedirects[role] || "/");
+          });
+        }
+      });
+  }, [router]);
 
   async function handleAccept() {
     setSubmitting(true);

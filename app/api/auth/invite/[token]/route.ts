@@ -79,12 +79,7 @@ export async function POST(
   }
   const token_jwt = createSessionToken(payload)
 
-  const redirectMap: Record<string, string> = {
-    newcomer: '/newcomer',
-    manager: '/manager',
-    hr_admin: '/hr',
-  }
-
-  const response = NextResponse.json({ redirect: redirectMap[user.role] || '/' })
+  // All users go through consent first (consent page redirects to role dashboard)
+  const response = NextResponse.json({ redirect: '/consent' })
   return setSessionCookie(response, token_jwt)
 }
