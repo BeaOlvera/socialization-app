@@ -26,7 +26,8 @@ export default function OrgPage() {
     fetch("/api/newcomer/me")
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (data?.team_members) setTeam(data.team_members);
+        if (data?.teamMembers) setTeam(data.teamMembers);
+        else if (data?.team_members) setTeam(data.team_members);
       })
       .finally(() => setLoading(false));
   }, []);

@@ -11,10 +11,12 @@ export async function GET(request: NextRequest) {
 
   const { data: docs } = await supabaseAdmin
     .from('company_documents')
-    .select('id, dimension, title, description, url')
+    .select('id, dimension, title, description, url, content')
     .eq('company_id', session.companyId)
     .eq('visible', true)
     .order('sort_order')
 
-  return NextResponse.json(docs || [])
+  // Only return docs that have content or a URL — empty placeholders are hidden
+  const filtered = (docs || []).filter(d => d.content || d.url)
+  return NextResponse.json(filtered)
 }

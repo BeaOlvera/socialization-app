@@ -32,7 +32,6 @@ const ALL_PAGES = [
   { key: "org", label: "Org Chart", description: "Newcomer's local org structure" },
   { key: "people", label: "My People", description: "Team members and connections" },
   { key: "docs", label: "Documents", description: "Onboarding documents and resources" },
-  { key: "evaluation", label: "Check-in", description: "Monthly self-assessment survey" },
 ];
 
 interface Config {
@@ -49,8 +48,10 @@ export default function CompanyDetail() {
   const defaultVisiblePages = ALL_PAGES.map(p => p.key);
   const [config, setConfig] = useState<Config>({ has_buddies: true, checkin_frequency: "monthly", visible_pages: defaultVisiblePages });
   const [docs, setDocs] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [orgNodes, setOrgNodes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"templates" | "checkins" | "people" | "newcomers" | "docs" | "config">("templates");
+  const [tab, setTab] = useState<"templates" | "checkins" | "people" | "employees" | "orgchart" | "newcomers" | "docs" | "config">("templates");
   const [uploading, setUploading] = useState(false);
   const [assigning, setAssigning] = useState<string | null>(null);
   const [message, setMessage] = useState("");
@@ -61,12 +62,16 @@ export default function CompanyDetail() {
       fetch(`/api/admin/companies/${id}/templates`).then(r => r.json()),
       fetch(`/api/admin/companies/${id}/config`).then(r => r.json()),
       fetch(`/api/admin/companies/${id}/documents`).then(r => r.json()),
+      fetch(`/api/admin/companies/${id}/employees`).then(r => r.ok ? r.json() : []),
+      fetch(`/api/admin/companies/${id}/orgchart`).then(r => r.ok ? r.json() : []),
       fetchNewcomers(),
-    ]).then(([companies, tmpl, cfg, docsData]) => {
+    ]).then(([companies, tmpl, cfg, docsData, empData, orgData]) => {
       setCompany(companies.find((c: any) => c.id === id));
       setTemplates(Array.isArray(tmpl) ? tmpl : []);
       setConfig(cfg);
       setDocs(Array.isArray(docsData) ? docsData : []);
+      setEmployees(Array.isArray(empData) ? empData : []);
+      setOrgNodes(Array.isArray(orgData) ? orgData : []);
     }).finally(() => setLoading(false));
   }, [id]);
 
@@ -216,7 +221,19 @@ export default function CompanyDetail() {
               {activities.length} activities · {checkins.length} check-ins · {newcomers.length} newcomers
             </p>
           </div>
-          <a href="/admin" style={{ fontSize: 13, color: "#6B6B6B", textDecoration: "none" }}>← All companies</a>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <a href="/admin" style={{ fontSize: 13, color: "#6B6B6B", textDecoration: "none" }}>← All companies</a>
+            <button onClick={async () => {
+              if (!confirm(`Delete ${company?.name}? This removes ALL data including employees, newcomers, activities, and documents. This cannot be undone.`)) return;
+              const res = await fetch("/api/admin/companies", {
+                method: "DELETE", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ companyId: id }),
+              });
+              if (res.ok) window.location.href = "/admin";
+            }} style={{ fontSize: 10, color: "#9B2335", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>
+              Delete company
+            </button>
+          </div>
         </div>
       </Card>
 
@@ -233,7 +250,7 @@ export default function CompanyDetail() {
 
       {/* Tabs */}
       <div style={{ display: "flex", gap: 6 }}>
-        {(["templates", "checkins", "people", "newcomers", "docs", "config"] as const).map(t => (
+        {(["templates", "checkins", "people", "employees", "orgchart", "newcomers", "docs", "config"] as const).map(t => (
           <button key={t} onClick={() => setTab(t)} style={{
             padding: "8px 18px", borderRadius: 10, border: tab === t ? "2px solid #0A0A0A" : "1px solid #E2E0DA",
             background: tab === t ? "#0A0A0A" : "#FFFFFF", color: tab === t ? "#FFFFFF" : "#6B6B6B",
@@ -242,6 +259,8 @@ export default function CompanyDetail() {
             {t === "templates" ? `Activities (${activities.length})` :
              t === "checkins" ? `Check-ins (${checkins.length})` :
              t === "people" ? "Import People" :
+             t === "employees" ? `Employees (${employees.length})` :
+             t === "orgchart" ? "Org Chart" :
              t === "newcomers" ? `Newcomers (${newcomers.length})` :
              t === "docs" ? `Documents (${docs.length})` : "Config"}
           </button>
@@ -422,6 +441,136 @@ export default function CompanyDetail() {
         </Card>
       )}
 
+      {/* Employees tab */}
+      {tab === "employees" && (
+        <Card>
+          <SectionLabel>All Employees</SectionLabel>
+          {employees.length === 0 ? (
+            <p style={{ color: "#6B6B6B", fontSize: 13 }}>No employees yet. Use Import People to add them.</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {employees.map(emp => (
+                <div key={emp.id} style={{
+                  display: "flex", alignItems: "center", gap: 12, padding: "10px 14px",
+                  background: emp.role === "newcomer" ? "#EEEEF5" : "#F5F4F0", borderRadius: 10,
+                }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "#0A0A0A" }}>
+                      {emp.name}
+                      <span style={{ fontSize: 10, fontWeight: 600, marginLeft: 8, padding: "2px 8px", borderRadius: 20,
+                        background: emp.role === "newcomer" ? "#1A1A2E" : emp.role === "hr_admin" ? "#9B2335" : "#2D6A4F",
+                        color: "#FFF" }}>{emp.role}</span>
+                    </p>
+                    <p style={{ fontSize: 11, color: "#6B6B6B", marginTop: 2 }}>
+                      {emp.email} {emp.department ? `· ${emp.department}` : ""} {emp.position ? `· ${emp.position}` : ""}
+                      {emp.manager_name ? ` · Reports to: ${emp.manager_name}` : ""}
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                    <button onClick={async () => {
+                      const name = prompt("Name:", emp.name);
+                      if (!name || name === emp.name) return;
+                      await fetch(`/api/admin/companies/${id}/employees`, {
+                        method: "PATCH", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ userId: emp.id, name }),
+                      });
+                      setEmployees(prev => prev.map(e => e.id === emp.id ? { ...e, name } : e));
+                    }} style={{ fontSize: 10, color: "#1A1A2E", background: "#EEEEF5", border: "none", cursor: "pointer", fontWeight: 600, padding: "3px 8px", borderRadius: 4 }}>
+                      Edit
+                    </button>
+                    <button onClick={async () => {
+                      if (!confirm(`Delete ${emp.name}? This removes all their data.`)) return;
+                      await fetch(`/api/admin/companies/${id}/employees`, {
+                        method: "DELETE", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ userId: emp.id }),
+                      });
+                      setEmployees(prev => prev.filter(e => e.id !== emp.id));
+                      setMessage(`${emp.name} deleted`);
+                    }} style={{ fontSize: 10, color: "#9B2335", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
+
+      {/* Org Chart tab */}
+      {tab === "orgchart" && (
+        <Card>
+          <SectionLabel>Company Org Chart</SectionLabel>
+          {orgNodes.length === 0 ? (
+            <p style={{ color: "#6B6B6B", fontSize: 13 }}>No employees yet.</p>
+          ) : (() => {
+            const withManager = orgNodes.filter(n => n.manager_id);
+            const topLevel = orgNodes.filter(n => !n.manager_id);
+            const nameMap: Record<string, any> = {};
+            orgNodes.forEach(n => { nameMap[n.id] = n; });
+
+            return (
+              <div>
+                {/* Top level (no manager) */}
+                {topLevel.length > 0 && (
+                  <div style={{ marginBottom: 20 }}>
+                    <p style={{ fontSize: 11, color: "#AEABA3", fontWeight: 600, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.1em" }}>No manager assigned</p>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                      {topLevel.map(n => (
+                        <div key={n.id} style={{
+                          padding: "8px 14px", borderRadius: 8,
+                          background: n.is_newcomer ? "#EEEEF5" : "#F5F4F0",
+                          border: n.is_newcomer ? "2px solid #1A1A2E" : "1px solid #E2E0DA",
+                        }}>
+                          <p style={{ fontSize: 12, fontWeight: 600 }}>{n.name}</p>
+                          <p style={{ fontSize: 10, color: "#6B6B6B" }}>{n.position} {n.department ? `· ${n.department}` : ""}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {/* Group by manager */}
+                {(() => {
+                  const managers = [...new Set(withManager.map(n => n.manager_id))];
+                  return managers.map(mgId => {
+                    const mgr = nameMap[mgId];
+                    const reports = withManager.filter(n => n.manager_id === mgId);
+                    return (
+                      <div key={mgId} style={{ marginBottom: 20 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                          <div style={{ width: 32, height: 32, borderRadius: 99, background: "#2D6A4F", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFF", fontWeight: 700, fontSize: 11 }}>
+                            {mgr?.name?.split(" ").map((w: string) => w[0]).join("") || "?"}
+                          </div>
+                          <div>
+                            <p style={{ fontSize: 13, fontWeight: 700 }}>{mgr?.name || "Unknown"}</p>
+                            <p style={{ fontSize: 10, color: "#6B6B6B" }}>{mgr?.position}</p>
+                          </div>
+                        </div>
+                        <div style={{ marginLeft: 16, borderLeft: "2px solid #E2E0DA", paddingLeft: 16, display: "flex", flexDirection: "column", gap: 6 }}>
+                          {reports.map(r => (
+                            <div key={r.id} style={{
+                              padding: "6px 12px", borderRadius: 6,
+                              background: r.is_newcomer ? "#EEEEF5" : "#F5F4F0",
+                              border: r.is_newcomer ? "2px solid #1A1A2E" : "1px solid #E2E0DA",
+                              display: "flex", alignItems: "center", gap: 8,
+                            }}>
+                              <p style={{ fontSize: 12, fontWeight: 600 }}>{r.name}</p>
+                              <p style={{ fontSize: 10, color: "#6B6B6B" }}>{r.position}</p>
+                              {r.is_newcomer && <span style={{ fontSize: 9, fontWeight: 700, padding: "1px 6px", borderRadius: 10, background: "#1A1A2E", color: "#FFF" }}>Newcomer</span>}
+                              {r.buddy_id && nameMap[r.buddy_id] && <span style={{ fontSize: 9, color: "#B7791F" }}>Buddy: {nameMap[r.buddy_id].name}</span>}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+            );
+          })()}
+        </Card>
+      )}
+
       {/* Newcomers tab */}
       {tab === "newcomers" && (
         <Card>
@@ -473,6 +622,13 @@ export default function CompanyDetail() {
         <Card>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <SectionLabel>Company Documents</SectionLabel>
+            <div style={{ display: "flex", gap: 8 }}>
+            <a href={`/admin/company/${id}/doc-builder`} style={{
+              padding: "8px 16px", borderRadius: 8, background: "#2D6A4F", color: "#FFFFFF",
+              fontSize: 12, fontWeight: 600, textDecoration: "none",
+            }}>
+              AI Document Builder
+            </a>
             <button onClick={async () => {
               const title = prompt("Document title:");
               if (!title) return;
@@ -493,6 +649,7 @@ export default function CompanyDetail() {
             }}>
               + Add Document
             </button>
+            </div>
           </div>
           <p style={{ fontSize: 12, color: "#6B6B6B", marginBottom: 16 }}>
             Toggle visibility to control which documents newcomers can see. Default documents are pre-defined but can be hidden.
@@ -532,23 +689,59 @@ export default function CompanyDetail() {
                         <p style={{ fontSize: 13, fontWeight: 600, color: "#0A0A0A" }}>
                           {doc.title}
                           {doc.is_default && <span style={{ fontSize: 9, color: "#AEABA3", marginLeft: 6 }}>(default)</span>}
+                          {doc.source === "ai_interview" && <span style={{ fontSize: 9, color: "#2D6A4F", marginLeft: 6 }}>(AI generated)</span>}
+                          {doc.source === "file_upload" && <span style={{ fontSize: 9, color: "#1A1A2E", marginLeft: 6 }}>(uploaded)</span>}
                         </p>
                         {doc.description && <p style={{ fontSize: 11, color: "#6B6B6B", marginTop: 2 }}>{doc.description}</p>}
+                        {doc.content && (
+                          <DocPreview content={doc.content} title={doc.title} />
+                        )}
                       </div>
-                      {!doc.is_default && (
-                        <button onClick={async () => {
-                          if (!confirm("Delete this document?")) return;
-                          await fetch(`/api/admin/companies/${id}/documents`, {
-                            method: "DELETE", headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ docId: doc.id }),
-                          });
-                          setDocs(prev => prev.filter(d => d.id !== doc.id));
-                        }} style={{
-                          fontSize: 10, color: "#9B2335", background: "none", border: "none", cursor: "pointer", fontWeight: 600,
+                      <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                        <label style={{
+                          fontSize: 10, color: "#6B6B6B", background: "#F5F4F0", border: "1px solid #E2E0DA",
+                          cursor: "pointer", fontWeight: 600, padding: "3px 8px", borderRadius: 4,
                         }}>
-                          Delete
-                        </button>
-                      )}
+                          Upload
+                          <input type="file" accept=".pdf,.txt,.doc,.docx,.md" hidden onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const formData = new FormData();
+                            formData.append("file", file);
+                            formData.append("docId", doc.id);
+                            const res = await fetch(`/api/admin/companies/${id}/documents`, {
+                              method: "PATCH",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ docId: doc.id, url: file.name, source: "file_upload" }),
+                            });
+                            if (res.ok) {
+                              setDocs(prev => prev.map(d => d.id === doc.id ? { ...d, url: file.name, source: "file_upload" } : d));
+                              setMessage(`"${doc.title}" — file linked`);
+                            }
+                            e.target.value = "";
+                          }} />
+                        </label>
+                        {doc.content && (
+                          <DocEditButton doc={doc} companyId={id} onSave={(newContent) => {
+                            setDocs(prev => prev.map(d => d.id === doc.id ? { ...d, content: newContent } : d));
+                            setMessage("Document updated");
+                          }} />
+                        )}
+                        {!doc.is_default && (
+                          <button onClick={async () => {
+                            if (!confirm("Delete this document?")) return;
+                            await fetch(`/api/admin/companies/${id}/documents`, {
+                              method: "DELETE", headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ docId: doc.id }),
+                            });
+                            setDocs(prev => prev.filter(d => d.id !== doc.id));
+                          }} style={{
+                            fontSize: 10, color: "#9B2335", background: "none", border: "none", cursor: "pointer", fontWeight: 600,
+                          }}>
+                            Delete
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -664,5 +857,75 @@ function CodeButton({ companyId, newcomerId, onResult }: { companyId: string; ne
     }}>
       {coding ? "Coding..." : "Code Interview"}
     </button>
+  );
+}
+
+function DocEditButton({ doc, companyId, onSave }: { doc: any; companyId: string; onSave: (content: string) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [content, setContent] = useState(doc.content || "");
+  const [saving, setSaving] = useState(false);
+
+  if (!editing) {
+    return (
+      <button onClick={() => setEditing(true)} style={{
+        fontSize: 10, color: "#1A1A2E", background: "#EEEEF5", border: "none", cursor: "pointer", fontWeight: 600,
+        padding: "3px 8px", borderRadius: 4,
+      }}>
+        Edit
+      </button>
+    );
+  }
+
+  return (
+    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 32 }}
+      onClick={e => { if (e.target === e.currentTarget) setEditing(false); }}>
+      <div style={{ background: "#FFF", borderRadius: 16, padding: 24, width: "100%", maxWidth: 700, maxHeight: "80vh", display: "flex", flexDirection: "column" }}>
+        <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>Edit: {doc.title}</h3>
+        <textarea value={content} onChange={e => setContent(e.target.value)}
+          style={{
+            flex: 1, minHeight: 300, padding: 14, borderRadius: 10, border: "1px solid #E2E0DA",
+            fontSize: 13, lineHeight: 1.7, resize: "vertical", fontFamily: "inherit",
+          }}
+        />
+        <div style={{ display: "flex", gap: 10, marginTop: 12, justifyContent: "flex-end" }}>
+          <button onClick={() => setEditing(false)} style={{
+            padding: "8px 20px", borderRadius: 8, border: "1px solid #E2E0DA", background: "#FFF", color: "#6B6B6B", fontSize: 13, cursor: "pointer",
+          }}>Cancel</button>
+          <button disabled={saving} onClick={async () => {
+            setSaving(true);
+            const res = await fetch(`/api/admin/companies/${companyId}/documents`, {
+              method: "PATCH", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ docId: doc.id, content }),
+            });
+            if (res.ok) { onSave(content); setEditing(false); }
+            setSaving(false);
+          }} style={{
+            padding: "8px 20px", borderRadius: 8, border: "none", background: "#0A0A0A", color: "#FFF", fontSize: 13, fontWeight: 600, cursor: "pointer",
+          }}>{saving ? "Saving..." : "Save"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DocPreview({ content, title }: { content: string; title: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button onClick={() => setOpen(!open)} style={{
+        fontSize: 10, color: "#2D6A4F", background: "none", border: "none", cursor: "pointer", fontWeight: 600, marginTop: 4,
+      }}>
+        {open ? "Hide preview" : "Preview"}
+      </button>
+      {open && (
+        <div style={{
+          marginTop: 8, padding: "16px 20px", background: "#FFFFFF", border: "1px solid #E2E0DA",
+          borderRadius: 8, fontSize: 13, color: "#0A0A0A", lineHeight: 1.7, whiteSpace: "pre-wrap",
+          maxHeight: 300, overflowY: "auto",
+        }}>
+          {content}
+        </div>
+      )}
+    </>
   );
 }

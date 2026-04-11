@@ -33,8 +33,8 @@ export default function HRHome() {
             start_date: n.start_date,
             status: n.status,
             current_phase: n.current_phase,
-            task_total: 0,
-            task_done: 0,
+            task_total: n.task_total || 0,
+            task_done: n.task_done || 0,
           })));
         }
       })

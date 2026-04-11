@@ -20,7 +20,7 @@ export async function GET(
   const defaults = {
     has_buddies: true,
     checkin_frequency: 'monthly',
-    visible_pages: ["home","activities","timeline","buckets","progress","org","people","docs","evaluation"],
+    visible_pages: ["home","activities","timeline","buckets","progress","org","people","docs"],
   }
   if (!config) return NextResponse.json(defaults)
   return NextResponse.json({

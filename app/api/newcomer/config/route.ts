@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
 
   // Admin has no company
   if (!session.companyId) {
-    return NextResponse.json({ visible_pages: ["home","activities","timeline","buckets","progress","org","people","docs","evaluation"], has_buddies: true })
+    return NextResponse.json({ visible_pages: ["home","activities","timeline","buckets","progress","org","people","docs"], has_buddies: true })
   }
 
   const { data: config } = await supabaseAdmin
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     .single()
 
   return NextResponse.json(config || {
-    visible_pages: ["home","activities","timeline","buckets","progress","org","people","docs","evaluation"],
+    visible_pages: ["home","activities","timeline","buckets","progress","org","people","docs"],
     has_buddies: true,
     checkin_frequency: "monthly",
   })

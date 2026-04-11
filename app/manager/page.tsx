@@ -57,17 +57,22 @@ export default function ManagerHome() {
         <SectionLabel>Your upcoming check-ins</SectionLabel>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {pendingTasks.slice(0, 5).map(t => (
-            <Card key={t.id}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: "#0A0A0A" }}>{t.activity}</p>
-                  <p style={{ fontSize: 12, color: "#6B6B6B" }}>
-                    {t.newcomer_name} {t.due_date ? `· Due: ${t.due_date}` : ""}
-                  </p>
+            <Link key={t.id} href={`/manager/checkin/${t.id}`} style={{ textDecoration: "none" }}>
+              <Card className="hover:border-[#2D6A4F] transition-colors cursor-pointer" style={{ borderLeft: "4px solid #2D6A4F" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <p style={{ fontSize: 14, fontWeight: 600, color: "#0A0A0A" }}>{t.activity}</p>
+                    <p style={{ fontSize: 12, color: "#6B6B6B" }}>
+                      {t.newcomer_name} {t.due_date ? `· Due: ${t.due_date}` : ""}
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <BucketTag bucket={t.dimension} />
+                    <span style={{ fontSize: 11, fontWeight: 600, padding: "4px 12px", borderRadius: 6, background: "#2D6A4F", color: "#FFF" }}>Open</span>
+                  </div>
                 </div>
-                <BucketTag bucket={t.dimension} />
-              </div>
-            </Card>
+              </Card>
+            </Link>
           ))}
         </div>
       </div>

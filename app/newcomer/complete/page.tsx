@@ -93,7 +93,7 @@ export default function CompletePage() {
           {/* Certificate */}
           <Card style={{ border: "2px solid #0A0A0A", textAlign: "center", padding: "28px 24px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center", marginBottom: 16 }}>
-              <div style={{ width: 28, height: 28, borderRadius: 8, background: "#1A1A2E", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ width: 28, height: 28, borderRadius: 8, background: "#0A0A0A", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width="14" height="14" viewBox="0 0 120 120" style={{display:"block"}}><polygon points="60,5 95,40 60,50 25,40" fill="#FFF"/><polygon points="25,40 60,50 60,115" fill="#CCC"/><polygon points="95,40 60,50 60,115" fill="#888"/></svg>
               </div>
               <span style={{ fontWeight: 700, fontSize: 15, color: "#0A0A0A" }}>FACET</span>

@@ -48,7 +48,9 @@ export default function HRNewcomerDetail() {
       fetch(`/api/manager/newcomers/${id}/tasks`).then(r => r.ok ? r.json() : []),
       fetch(`/api/hr/newcomers/${id}/pre-arrival-summary`).then(r => r.ok ? r.json() : { available: false }),
     ]).then(([nData, tData, sData]) => {
-      if (nData) setNewcomer(nData);
+      // API returns { newcomer, checkins, ... } — extract the newcomer object
+      if (nData?.newcomer) setNewcomer(nData.newcomer);
+      else if (nData) setNewcomer(nData);
       if (Array.isArray(tData)) setTasks(tData);
       setPreSummary(sData);
     }).finally(() => setLoading(false));

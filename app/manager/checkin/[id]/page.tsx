@@ -1,111 +1,94 @@
 "use client";
-import { useState } from "react";
-import { useParams } from "next/navigation";
-import { NavBar, PageShell, Card, SectionLabel } from "@/components/ui";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { NavBar, PageShell, Card, SectionLabel, BucketTag } from "@/components/ui";
+import { EVAL_QUESTIONS } from "@/lib/framework";
 
-const buckets = [
-  {
-    id: "fit", label: "FIT · Role Clarity", num: "01", color: "#1A1A2E", bg: "#EEEEF5",
-    questions: [
-      "Sofia clearly understands her role, responsibilities and reporting line",
-      "She knows where her role fits in the org structure",
-      "She understands her KPIs and how success is measured",
-      "She is clear on decision rights and RACI boundaries",
-      "She sees how her work connects to the company strategy",
-    ],
-  },
-  {
-    id: "ace", label: "ACE · Task Mastery", num: "02", color: "#2D6A4F", bg: "#EAF4EF",
-    questions: [
-      "She is following her onboarding plan and hitting milestones",
-      "She navigates the tools and systems she needs with confidence",
-      "She knows where to find SOPs and follows documented processes",
-      "She understands how her performance will be appraised",
-      "She is actively closing her skill gaps",
-    ],
-  },
-  {
-    id: "tie", label: "TIE · Social Acceptance", num: "03", color: "#9B2335", bg: "#FBEAEC",
-    questions: [
-      "She has a good relationship with her buddy/mentor",
-      "She participates in team rituals and informal gatherings",
-      "She is aligning with the company values in her behaviour",
-      "She is connecting with people beyond her immediate team",
-      "She seems to feel a sense of belonging",
-    ],
-  },
-];
+const LIKERT_LABELS = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"];
 
-const sofiaScores = { fit: 62, ace: 48, tie: 35 };
+interface Task {
+  id: string;
+  activity: string;
+  newcomer_name: string;
+  dimension: string;
+  due_date: string | null;
+  builds_on: string | null;
+  output: string | null;
+  who: string | null;
+  format: string | null;
+  duration: string | null;
+  done: boolean;
+}
 
 export default function ManagerCheckinPage() {
-  const params = useParams();
-  const newcomerId = params.id as string;
-  const [tab, setTab] = useState("fit");
-  const [ratings, setRatings] = useState<Record<string, number[]>>({
-    fit:  [0, 0, 0, 0, 0],
-    ace:  [0, 0, 0, 0, 0],
-    tie:  [0, 0, 0, 0, 0],
-  });
-  const [notes, setNotes] = useState<Record<string, string>>({ fit: "", ace: "", tie: "" });
+  const { id: taskId } = useParams<{ id: string }>();
+  const router = useRouter();
+  const [task, setTask] = useState<Task | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [notes, setNotes] = useState("");
+  const [scores, setScores] = useState<Record<string, number[]>>({ fit: [0,0,0,0,0], ace: [0,0,0,0,0], tie: [0,0,0,0,0] });
 
-  const activeBucket = buckets.find(b => b.id === tab)!;
+  useEffect(() => {
+    fetch("/api/manager/my-tasks")
+      .then(r => r.ok ? r.json() : [])
+      .then(data => {
+        if (Array.isArray(data)) {
+          const found = data.find((t: Task) => t.id === taskId);
+          if (found) setTask(found);
+        }
+      })
+      .finally(() => setLoading(false));
+  }, [taskId]);
 
-  function setRating(bucketId: string, idx: number, val: number) {
-    setRatings(prev => ({
-      ...prev,
-      [bucketId]: prev[bucketId].map((v, i) => i === idx ? val : v),
-    }));
-  }
+  const isLikert = task?.activity?.toLowerCase().includes("formal check-in");
+  const is1on1 = task?.activity?.toLowerCase().includes("1:1") || task?.activity?.toLowerCase().includes("1-1");
 
-  function bucketScore(id: string) {
-    const vals = ratings[id].filter(v => v > 0);
-    if (!vals.length) return null;
-    return Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 20);
-  }
-
-  const allFilled = buckets.every(b => ratings[b.id].every(v => v > 0));
-
-  async function handleSubmit() {
-    if (!allFilled) return;
-    try {
-      await fetch("/api/manager/checkin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          newcomer_id: newcomerId,
-          scores_fit: ratings.fit,
-          scores_ace: ratings.ace,
-          scores_tie: ratings.tie,
-          month_number: new Date().getMonth() + 1,
-          notes: Object.values(notes).filter(Boolean).join("\n"),
-        }),
-      });
-    } catch { /* API may not be available in dev */ }
+  async function handleComplete() {
+    setSubmitting(true);
+    // Mark task as done via manager API
+    await fetch("/api/manager/my-tasks", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ taskId, done: true }),
+    });
     setSubmitted(true);
+    setSubmitting(false);
+  }
+
+  if (loading) {
+    return (
+      <PageShell nav={<NavBar role="manager" active="My Team" />}>
+        <div style={{ textAlign: "center", padding: 60, color: "#6B6B6B" }}>Loading...</div>
+      </PageShell>
+    );
+  }
+
+  if (!task) {
+    return (
+      <PageShell nav={<NavBar role="manager" active="My Team" />}>
+        <div style={{ textAlign: "center", padding: 60 }}>
+          <p style={{ fontSize: 16, color: "#6B6B6B" }}>Check-in not found.</p>
+          <a href="/manager" style={{ fontSize: 13, color: "#2D6A4F" }}>Back to My Team</a>
+        </div>
+      </PageShell>
+    );
   }
 
   if (submitted) {
     return (
       <PageShell nav={<NavBar role="manager" active="My Team" />}>
-        <Card style={{ textAlign: "center", padding: "48px 32px" }}>
-          <div style={{ width: 56, height: 56, borderRadius: 99, background: "#EAF4EF", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-            <span style={{ fontSize: 24 }}>✓</span>
-          </div>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0A0A0A", marginBottom: 8 }}>Check-in submitted</h2>
-          <p style={{ fontSize: 13, color: "#6B6B6B", marginBottom: 24 }}>Sofia's evaluation for March 2026 has been recorded. She will be notified.</p>
-          <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-            {buckets.map(b => {
-              const score = bucketScore(b.id);
-              return (
-                <div key={b.id} style={{ background: b.bg, borderRadius: 12, padding: "14px 20px", textAlign: "center" }}>
-                  <p style={{ fontSize: 22, fontWeight: 700, color: b.color }}>{score ?? "—"}%</p>
-                  <p style={{ fontSize: 11, color: "#6B6B6B", marginTop: 2 }}>{b.label}</p>
-                </div>
-              );
-            })}
-          </div>
+        <Card className="text-center py-10">
+          <div style={{ fontSize: 40, marginBottom: 16 }}>&#10003;</div>
+          <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Check-in complete</h3>
+          <p style={{ fontSize: 13, color: "#6B6B6B" }}>Your responses have been recorded.</p>
+          <button onClick={() => router.push("/manager")} style={{
+            marginTop: 20, padding: "10px 24px", borderRadius: 10, border: "none",
+            background: "#0A0A0A", color: "#FFF", fontSize: 13, fontWeight: 600, cursor: "pointer",
+          }}>
+            Back to My Team
+          </button>
         </Card>
       </PageShell>
     );
@@ -113,155 +96,89 @@ export default function ManagerCheckinPage() {
 
   return (
     <PageShell nav={<NavBar role="manager" active="My Team" />}>
-      <div>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0A0A0A", marginBottom: 4 }}>Manager check-in</h2>
-        <p style={{ fontSize: 13, color: "#6B6B6B" }}>Sofia Martínez · March 2026 · Day 18</p>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 280px", gap: 16, alignItems: "start" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-          {/* Bucket tabs */}
-          <div style={{ display: "flex", gap: 6 }}>
-            {buckets.map(b => {
-              const score = bucketScore(b.id);
-              const filled = ratings[b.id].every(v => v > 0);
-              return (
-                <button
-                  key={b.id}
-                  onClick={() => setTab(b.id)}
-                  style={{
-                    flex: 1, padding: "10px 12px", borderRadius: 12, border: "none", cursor: "pointer",
-                    background: tab === b.id ? b.color : "#F5F4F0",
-                    textAlign: "left", transition: "all 0.15s",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
-                    <div style={{ width: 18, height: 18, borderRadius: 5, background: tab === b.id ? "#FFFFFF22" : b.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <span style={{ fontSize: 8, fontWeight: 800, color: tab === b.id ? "#FFFFFF" : b.color }}>{b.num}</span>
-                    </div>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: tab === b.id ? "#FFFFFF" : "#0A0A0A" }}>{b.label}</span>
-                  </div>
-                  {filled && score !== null
-                    ? <p style={{ fontSize: 11, color: tab === b.id ? "#FFFFFF99" : "#6B6B6B" }}>{score}% rated</p>
-                    : <p style={{ fontSize: 11, color: tab === b.id ? "#FFFFFF66" : "#AEABA3" }}>Not rated yet</p>
-                  }
-                </button>
-              );
-            })}
+      <div style={{ maxWidth: 700, margin: "0 auto" }}>
+        {/* Header */}
+        <Card style={{ background: "#EAF4EF", borderLeft: "4px solid #2D6A4F" }}>
+          <span style={{ fontSize: 10, fontWeight: 700, color: "#2D6A4F", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            Manager Check-in
+          </span>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0A0A0A", marginTop: 4 }}>{task.activity}</h2>
+          <p style={{ fontSize: 13, color: "#6B6B6B", marginTop: 4 }}>{task.newcomer_name}</p>
+          <div style={{ display: "flex", gap: 16, marginTop: 10, fontSize: 12, color: "#AEABA3" }}>
+            {task.due_date && <span>Due: {task.due_date}</span>}
+            {task.duration && <span>Duration: {task.duration}</span>}
+            {task.format && <span>Format: {task.format}</span>}
           </div>
+        </Card>
 
-          {/* Questions */}
+        {/* Likert form for formal assessments */}
+        {isLikert && (
           <Card>
-            <SectionLabel>{activeBucket.label} — Rate each statement (1–5)</SectionLabel>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              {activeBucket.questions.map((q, i) => (
-                <div key={i}>
-                  <p style={{ fontSize: 13, color: "#0A0A0A", marginBottom: 8, lineHeight: 1.5 }}>{q}</p>
-                  <div style={{ display: "flex", gap: 6 }}>
-                    {[1, 2, 3, 4, 5].map(val => {
-                      const selected = ratings[activeBucket.id][i] === val;
-                      return (
-                        <button
-                          key={val}
-                          onClick={() => setRating(activeBucket.id, i, val)}
+            <SectionLabel>Rate the newcomer on each statement (1-5)</SectionLabel>
+            {(["fit", "ace", "tie"] as const).map(dim => (
+              <div key={dim} style={{ marginBottom: 20 }}>
+                <p style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>
+                  {dim === "fit" ? "FIT - Role Clarity" : dim === "ace" ? "ACE - Task Mastery" : "TIE - Social Acceptance"}
+                </p>
+                {EVAL_QUESTIONS[dim].map((q, qi) => (
+                  <div key={qi} style={{ marginBottom: 12, padding: "10px 12px", background: "#F5F4F0", borderRadius: 8 }}>
+                    <p style={{ fontSize: 12, color: "#0A0A0A", marginBottom: 8 }}>{q}</p>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      {LIKERT_LABELS.map((label, li) => (
+                        <button key={li}
+                          onClick={() => setScores(prev => ({ ...prev, [dim]: prev[dim].map((s, i) => i === qi ? li + 1 : s) }))}
                           style={{
-                            width: 44, height: 44, borderRadius: 10, border: "none", cursor: "pointer",
-                            fontWeight: 700, fontSize: 14,
-                            background: selected ? activeBucket.color : "#F5F4F0",
-                            color: selected ? "#FFFFFF" : "#6B6B6B",
-                            transition: "all 0.12s",
-                          }}
-                        >
-                          {val}
+                            flex: 1, padding: "6px 4px", borderRadius: 6, border: "none", cursor: "pointer",
+                            fontSize: 10, fontWeight: 600,
+                            background: scores[dim][qi] === li + 1 ? "#0A0A0A" : "#FFFFFF",
+                            color: scores[dim][qi] === li + 1 ? "#FFFFFF" : "#6B6B6B",
+                          }}>
+                          {label}
                         </button>
-                      );
-                    })}
-                    <div style={{ marginLeft: 8, display: "flex", alignItems: "center", gap: 12 }}>
-                      <span style={{ fontSize: 10, color: "#AEABA3" }}>1 = Not at all</span>
-                      <span style={{ fontSize: 10, color: "#AEABA3" }}>5 = Fully</span>
+                      ))}
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-
-            <div style={{ marginTop: 20 }}>
-              <p style={{ fontSize: 12, fontWeight: 600, color: "#0A0A0A", marginBottom: 6 }}>Additional notes (optional)</p>
-              <textarea
-                value={notes[activeBucket.id]}
-                onChange={e => setNotes(prev => ({ ...prev, [activeBucket.id]: e.target.value }))}
-                placeholder="Any observations about Sofia's progress in this area..."
-                style={{
-                  width: "100%", minHeight: 80, borderRadius: 10, border: "1px solid #E2E0DA",
-                  padding: "10px 12px", fontSize: 12, color: "#0A0A0A", resize: "vertical",
-                  fontFamily: "inherit", background: "#FAFAF8", outline: "none",
-                  boxSizing: "border-box",
-                }}
-              />
-            </div>
+                ))}
+              </div>
+            ))}
           </Card>
+        )}
 
-          <button
-            onClick={handleSubmit}
+        {/* Notes form for 1:1s and other check-ins */}
+        <Card>
+          {task.builds_on && (
+            <div style={{ background: "#EAF4EF", borderRadius: 8, padding: 12, marginBottom: 16 }}>
+              <p style={{ fontSize: 11, fontWeight: 600, color: "#2D6A4F", marginBottom: 4 }}>Key focus areas</p>
+              <p style={{ fontSize: 12, color: "#2D6A4F", lineHeight: 1.6 }}>{task.builds_on}</p>
+            </div>
+          )}
+          <SectionLabel>{isLikert ? "Additional notes (optional)" : "Check-in notes"}</SectionLabel>
+          <textarea
+            value={notes}
+            onChange={e => setNotes(e.target.value)}
+            placeholder="Key discussion points, observations, action items..."
+            rows={6}
             style={{
-              width: "100%", padding: "14px", borderRadius: 12, border: "none", cursor: allFilled ? "pointer" : "not-allowed",
-              background: allFilled ? "#0A0A0A" : "#E2E0DA",
-              color: allFilled ? "#FFFFFF" : "#AEABA3",
-              fontSize: 14, fontWeight: 700, transition: "all 0.15s",
+              width: "100%", padding: 12, borderRadius: 10, border: "1px solid #E2E0DA",
+              fontSize: 13, resize: "vertical", boxSizing: "border-box", fontFamily: "inherit",
             }}
-          >
-            {allFilled ? "Submit evaluation" : "Complete all sections to submit"}
-          </button>
-        </div>
+          />
+          {task.output && (
+            <p style={{ fontSize: 11, color: "#AEABA3", marginTop: 8 }}>Expected output: {task.output}</p>
+          )}
+        </Card>
 
-        {/* Right — comparison */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <Card>
-            <SectionLabel>Your rating vs. Sofia's self-score</SectionLabel>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {buckets.map(b => {
-                const managerScore = bucketScore(b.id);
-                const selfScore = sofiaScores[b.id as keyof typeof sofiaScores];
-                const gap = managerScore !== null ? managerScore - selfScore : null;
-                return (
-                  <div key={b.id} style={{ background: "#F5F4F0", borderRadius: 10, padding: "10px 12px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                      <div style={{ width: 16, height: 16, borderRadius: 4, background: b.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <span style={{ fontSize: 7, fontWeight: 800, color: b.color }}>{b.num}</span>
-                      </div>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: "#0A0A0A" }}>{b.label}</span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                      <span style={{ fontSize: 11, color: "#6B6B6B" }}>Sofia's self</span>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: "#0A0A0A" }}>{selfScore}%</span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                      <span style={{ fontSize: 11, color: "#6B6B6B" }}>Your rating</span>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: b.color }}>{managerScore !== null ? `${managerScore}%` : "—"}</span>
-                    </div>
-                    {gap !== null && (
-                      <div style={{
-                        background: Math.abs(gap) > 15 ? "#FEF3E2" : "#EAF4EF",
-                        borderRadius: 8, padding: "5px 8px", textAlign: "center",
-                      }}>
-                        <span style={{ fontSize: 11, fontWeight: 600, color: Math.abs(gap) > 15 ? "#B7791F" : "#2D6A4F" }}>
-                          {gap > 0 ? "+" : ""}{gap} pts divergence
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </Card>
+        <button onClick={handleComplete} disabled={submitting}
+          style={{
+            width: "100%", padding: "14px", borderRadius: 12, border: "none", cursor: "pointer",
+            background: submitting ? "#E2E0DA" : "#2D6A4F", color: "#FFFFFF",
+            fontSize: 14, fontWeight: 700,
+          }}>
+          {submitting ? "Saving..." : "Complete Check-in"}
+        </button>
 
-          <Card style={{ background: "#ECECEA", border: "1px solid #DDDBD5" }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: "#AEABA3", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>Tip</p>
-            <p style={{ fontSize: 12, color: "#0A0A0A", lineHeight: 1.6 }}>
-              A gap of more than 15 points between your rating and Sofia's self-score warrants a 1:1 conversation to align expectations.
-            </p>
-          </Card>
+        <div style={{ textAlign: "center", marginTop: 12 }}>
+          <a href="/manager" style={{ fontSize: 13, color: "#6B6B6B", textDecoration: "none" }}>Cancel</a>
         </div>
       </div>
     </PageShell>

@@ -17,6 +17,7 @@ interface Task {
   output: string | null;
   who: string | null;
   type: string;
+  assigned_to: string;
   done: boolean;
   due_date: string | null;
 }
@@ -118,12 +119,19 @@ export default function NewcomerDetailPage() {
 
       {/* Activity list */}
       <Card>
-        <SectionLabel>All Activities & Check-ins</SectionLabel>
-        {tasks.length === 0 ? (
+        <SectionLabel>Activities & Your Check-ins</SectionLabel>
+        {(() => {
+          // Filter: show activities + only manager-assigned check-ins
+          const filtered = tasks.filter(t => {
+            if ((t.type || "activity") !== "checkin") return true;
+            return t.assigned_to === "manager";
+          });
+          return filtered;
+        })().length === 0 ? (
           <p style={{ fontSize: 13, color: "#6B6B6B" }}>No activities assigned yet.</p>
         ) : (
           <div style={{ maxHeight: 500, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
-            {tasks.map(t => (
+            {tasks.filter(t => (t.type || "activity") !== "checkin" || t.assigned_to === "manager").map(t => (
               <div key={t.id} style={{
                 display: "flex", alignItems: "center", gap: 10, padding: "8px 10px",
                 background: t.done ? "#F5F4F0" : "#FFFFFF", borderRadius: 8,

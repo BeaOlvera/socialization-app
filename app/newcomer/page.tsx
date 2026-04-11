@@ -130,7 +130,7 @@ function PreArrivalHome({ tasks: rawTasks, allTasks }: { tasks: Task[]; allTasks
           After you complete these
         </p>
         <p style={{ fontSize: 14, color: "#6B6B6B", lineHeight: 1.7 }}>
-          Your full onboarding journey begins with {allTasks.length} activities and check-ins across 12 months,
+          Your full onboarding journey spans 12 months with activities and check-ins
           organized around the FACET model: <strong>FIT</strong> (Role Clarity), <strong>ACE</strong> (Task Mastery), and <strong>TIE</strong> (Social Acceptance).
         </p>
       </Card>
@@ -275,15 +275,16 @@ function PreArrivalTaskCard({ task, isInterview, onToggle, toggling }: {
   task: Task; isInterview: boolean; onToggle: (id: string, done: boolean) => void; toggling: string | null;
 }) {
   if (isInterview) {
-    // Interview: clickable card with "Start" button
+    // Interview: prominent card with "Start" button
     return (
       <Link href="/newcomer/pre-arrival" style={{ textDecoration: "none" }}>
         <Card
           className="hover:border-[#1A1A2E] transition-colors cursor-pointer"
           style={{
             borderLeft: "4px solid #1A1A2E",
-            background: task.done ? "#F5F4F0" : "#FFFFFF",
+            background: task.done ? "#F5F4F0" : "#EEEEF5",
             opacity: task.done ? 0.5 : 1,
+            border: task.done ? undefined : "2px solid #1A1A2E",
           }}
         >
           <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>

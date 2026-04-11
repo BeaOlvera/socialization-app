@@ -214,7 +214,38 @@
   <li><strong>"Assign All"</strong> &mdash; assign all templates to this newcomer</li>
 </ul>
 
-<h4>Tab 5: Config</h4>
+<h4>Tab 5: Documents</h4>
+<p>Manage the onboarding documents newcomers can access, organized by FACET dimension (FIT, ACE, TIE).</p>
+<ul>
+  <li><strong>12 default documents</strong> pre-seeded (4 per dimension): Job Description, Org Chart, Strategic Plan, RACI Matrix, 30-60-90 Plan, Performance Appraisal Template, SOPs, Tools Guide, Values &amp; Culture Guide, Team Rituals, ERGs, Welcome Pack</li>
+  <li><strong>Toggle visibility</strong> per document &mdash; hidden docs don't appear for newcomers</li>
+  <li><strong>"+ Add Document"</strong> for custom documents with title, description, and dimension</li>
+</ul>
+
+<h4>AI Document Builder</h4>
+<p>The green <strong>"AI Document Builder"</strong> button opens a powerful tool that generates onboarding documents automatically through two methods:</p>
+
+<p><strong>Method 1: AI Interview</strong> &mdash; Claude interviews the HR person or manager (6-8 questions), then generates a polished, newcomer-friendly document from the conversation. Available for 10 document types:</p>
+
+<table>
+  <tr><th>Document</th><th>Dimension</th><th>Interview</th><th>Can Upload?</th></tr>
+  <tr><td>Company Values &amp; Culture Guide</td><td>TIE</td><td>HR</td><td>Yes</td></tr>
+  <tr><td>Team Rituals &amp; Meetings</td><td>TIE</td><td>Manager</td><td>No</td></tr>
+  <tr><td>Welcome Pack</td><td>TIE</td><td>HR</td><td>Yes</td></tr>
+  <tr><td>Unwritten Rules &amp; Culture Tips</td><td>TIE</td><td>Manager</td><td>No</td></tr>
+  <tr><td>30-60-90 Day Plan</td><td>ACE</td><td>Manager</td><td>Yes</td></tr>
+  <tr><td>Performance Appraisal Guide</td><td>ACE</td><td>HR</td><td>Yes</td></tr>
+  <tr><td>Key Processes &amp; SOPs</td><td>ACE</td><td>Manager</td><td>Yes</td></tr>
+  <tr><td>Stakeholder Map</td><td>FIT</td><td>Manager</td><td>No</td></tr>
+  <tr><td>Team Communication Norms</td><td>TIE</td><td>Manager</td><td>No</td></tr>
+  <tr><td>Job Description</td><td>FIT</td><td>HR</td><td>Yes</td></tr>
+</table>
+
+<p><strong>Method 2: File Upload</strong> &mdash; Upload an existing document (job offer, strategic plan, etc.) and Claude reformats it into a clear, newcomer-friendly version. The original content is preserved but restructured for readability.</p>
+
+<p>Generated documents are saved to the company and appear in the newcomer's Documents page with a "Read" button that expands the full content inline.</p>
+
+<h4>Tab 6: Config</h4>
 <ul>
   <li><strong>Buddy System</strong> &mdash; on/off (when off, buddy check-ins are excluded)</li>
   <li><strong>Check-in Frequency</strong> &mdash; biweekly, monthly, or quarterly</li>
@@ -259,6 +290,9 @@
 
 <h3>5.7 My People</h3>
 <p>Team members list with relationship tags (manager, buddy, peer, key contact) and visual relationship map.</p>
+
+<h3>5.8 Documents</h3>
+<p>Key onboarding resources organized by FACET dimension (FIT, ACE, TIE). Only documents the admin has made visible appear here. AI-generated documents show a <strong>"Read"</strong> button that expands the full content inline. Documents with external URLs show an <strong>"Open"</strong> button.</p>
 
 <!-- 6. CHECK-IN FORMS -->
 <h2 class="page-break">6. Check-in Forms &mdash; 7 Different Types</h2>

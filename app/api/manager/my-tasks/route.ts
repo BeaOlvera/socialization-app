@@ -82,3 +82,44 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json(result)
 }
+
+// PATCH — mark a manager check-in task as done
+export async function PATCH(request: NextRequest) {
+  const authError = checkRole(request, ['manager'])
+  if (authError) return authError
+
+  const session = getSessionFromRequest(request)!
+  const { taskId, done } = await request.json()
+
+  if (!taskId || typeof done !== 'boolean') {
+    return NextResponse.json({ error: 'taskId and done required' }, { status: 400 })
+  }
+
+  // Verify this task belongs to a newcomer managed by this user
+  const { data: task } = await supabaseAdmin
+    .from('phase_tasks')
+    .select('id, newcomer_id, assigned_to')
+    .eq('id', taskId)
+    .single()
+
+  if (!task) return NextResponse.json({ error: 'Task not found' }, { status: 404 })
+
+  const { data: newcomer } = await supabaseAdmin
+    .from('newcomers')
+    .select('id')
+    .eq('id', task.newcomer_id)
+    .eq('manager_id', session.userId)
+    .single()
+
+  if (!newcomer) return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
+
+  const { data: updated, error } = await supabaseAdmin
+    .from('phase_tasks')
+    .update({ done, completed_at: done ? new Date().toISOString() : null })
+    .eq('id', taskId)
+    .select()
+    .single()
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json(updated)
+}

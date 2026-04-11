@@ -32,7 +32,29 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await query.order('created_at', { ascending: false })
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data)
+  if (!data || data.length === 0) return NextResponse.json(data || [])
+
+  // Add task counts per newcomer
+  const newcomerIds = data.map(n => n.id)
+  const { data: tasks } = await supabaseAdmin
+    .from('phase_tasks')
+    .select('newcomer_id, done')
+    .in('newcomer_id', newcomerIds)
+
+  const taskCounts: Record<string, { total: number; done: number }> = {}
+  tasks?.forEach(t => {
+    if (!taskCounts[t.newcomer_id]) taskCounts[t.newcomer_id] = { total: 0, done: 0 }
+    taskCounts[t.newcomer_id].total++
+    if (t.done) taskCounts[t.newcomer_id].done++
+  })
+
+  const enriched = data.map(n => ({
+    ...n,
+    task_total: taskCounts[n.id]?.total || 0,
+    task_done: taskCounts[n.id]?.done || 0,
+  }))
+
+  return NextResponse.json(enriched)
 }
 
 // POST — create a newcomer (creates user + newcomer + phase tasks)

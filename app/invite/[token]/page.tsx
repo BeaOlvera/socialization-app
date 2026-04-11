@@ -76,7 +76,7 @@ export default function InvitePage() {
     <div style={{ minHeight: "100vh", background: "#F5F4F0", display: "flex", alignItems: "center", justifyContent: "center", padding: 32 }}>
       <div style={{ width: "100%", maxWidth: 400 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
-          <div style={{ width: 34, height: 34, borderRadius: 10, background: "#1A1A2E", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: 34, height: 34, borderRadius: 10, background: "#0A0A0A", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <svg width="20" height="20" viewBox="0 0 120 120" style={{display:"block"}}><polygon points="60,5 95,40 60,50 25,40" fill="#FFF"/><polygon points="25,40 60,50 60,115" fill="#CCC"/><polygon points="95,40 60,50 60,115" fill="#888"/></svg>
           </div>
           <span style={{ fontWeight: 700, fontSize: 19, color: "#0A0A0A" }}>onboard</span>

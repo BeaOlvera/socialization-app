@@ -90,7 +90,7 @@ export function InterviewChat({ checkinId, onComplete }: { checkinId: string; on
     <div style={{ background: "#F5F4F0", borderRadius: 16, overflow: "hidden" }}>
       {/* Header */}
       <div style={{ background: "#0A0A0A", padding: "12px 18px", display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ width: 28, height: 28, borderRadius: 99, background: "#1A1A2E", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ width: 28, height: 28, borderRadius: 99, background: "#0A0A0A", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <svg width="14" height="14" viewBox="0 0 120 120" style={{display:"block"}}><polygon points="60,5 95,40 60,50 25,40" fill="#FFF"/><polygon points="25,40 60,50 60,115" fill="#CCC"/><polygon points="95,40 60,50 60,115" fill="#888"/></svg>
         </div>
         <div>

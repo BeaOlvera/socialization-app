@@ -81,3 +81,19 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ company, hr_user: { id: hrUser.id, email: hrUser.email } }, { status: 201 })
 }
+
+// DELETE — delete a company and all its data
+export async function DELETE(request: NextRequest) {
+  const authError = checkRole(request, ['admin'])
+  if (authError) return authError
+
+  const { companyId } = await request.json()
+  if (!companyId) return NextResponse.json({ error: 'companyId required' }, { status: 400 })
+
+  // Cascading delete: companies table has ON DELETE CASCADE on all related tables
+  const { error } = await supabaseAdmin.from('companies').delete().eq('id', companyId)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  return NextResponse.json({ ok: true })
+}
+

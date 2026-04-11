@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState, useEffect } from "react";
 import { useCompanyConfig } from "@/lib/use-config";
 
 export function FacetLogo({ size = 28 }: { size?: number }) {
@@ -89,7 +89,6 @@ export function NavBar({ role, active }: { role: "newcomer" | "manager" | "hr" |
     { href: "/newcomer/buckets", label: "My Journey", key: "buckets" },
     { href: "/newcomer/org", label: "Org Chart", key: "org" },
     { href: "/newcomer/people", label: "My People", key: "people" },
-    { href: "/newcomer/evaluation", label: "Check-in", key: "evaluation" },
   ];
 
   const links = {
@@ -153,10 +152,39 @@ export function NavBar({ role, active }: { role: "newcomer" | "manager" | "hr" |
   );
 }
 
+export function PreArrivalBanner() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    // Only check on newcomer pages
+    if (!window.location.pathname.startsWith("/newcomer")) return;
+    // Don't show on pre-arrival page itself
+    if (window.location.pathname.includes("/pre-arrival")) return;
+    fetch("/api/newcomer/tasks")
+      .then(r => r.ok ? r.json() : [])
+      .then(data => {
+        if (!Array.isArray(data)) return;
+        const interview = data.find((t: any) => t.activity?.toLowerCase().includes("pre-arrival interview") && !t.done);
+        if (interview) setShow(true);
+      });
+  }, []);
+
+  if (!show) return null;
+  return (
+    <div style={{ background: "#EEEEF5", borderBottom: "1px solid #1A1A2E33", padding: "8px 32px", display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
+      <span style={{ fontSize: 13, color: "#1A1A2E", fontWeight: 600 }}>Your pre-arrival interview is waiting</span>
+      <a href="/newcomer/pre-arrival" style={{
+        fontSize: 12, fontWeight: 700, padding: "4px 14px", borderRadius: 6,
+        background: "#1A1A2E", color: "#FFF", textDecoration: "none",
+      }}>Start now</a>
+    </div>
+  );
+}
+
 export function PageShell({ children, nav }: { children: ReactNode; nav: ReactNode }) {
   return (
     <div style={{ minHeight: "100vh", background: "#F5F4F0" }}>
       {nav}
+      <PreArrivalBanner />
       <main className="page-main" style={{ maxWidth: 1100, margin: "0 auto", padding: "28px 32px", display: "flex", flexDirection: "column", gap: 16 }}>
         {children}
       </main>
