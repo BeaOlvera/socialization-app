@@ -107,13 +107,14 @@ export function NavBar({ role, active }: { role: "newcomer" | "manager" | "hr" |
 
   const roleLabel = { admin: "Admin", newcomer: "Newcomer", manager: "Manager", hr: "HR Admin" };
   const roleColors = { admin: "#0A0A0A", newcomer: "#1A1A2E", manager: "#2D6A4F", hr: "#9B2335" };
+  const homeHref = { admin: "/", newcomer: "/newcomer", manager: "/manager", hr: "/hr" }[role];
 
   return (
     <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "#FFFFFF", borderBottom: "1px solid #E2E0DA" }}>
       <div className="nav-inner" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         {/* Logo + back */}
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <Link href="/" style={{
+          <Link href={homeHref} style={{
             display: "flex", alignItems: "center", gap: 6, textDecoration: "none",
             padding: "5px 10px 5px 8px", borderRadius: 8, border: "1px solid #E2E0DA",
             background: "#F5F4F0", color: "#6B6B6B", fontSize: 12, fontWeight: 500,

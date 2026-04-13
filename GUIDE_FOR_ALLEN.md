@@ -30,6 +30,8 @@ The platform has four user roles, each with a different view and set of capabili
 | **Manager** | Newcomer's direct manager | Sees their newcomers' progress, completes manager check-ins |
 | **Newcomer** | The new employee | Completes activities, does check-ins, tracks their own journey |
 
+**Navigation note:** Each role has its own home. The "← Home" button in the top-left nav takes newcomers to `/newcomer`, managers to `/manager`, and HR to `/hr` — users stay inside their own role. Only the Admin sees the cross-role landing page at `/`, which lists all roles and is clearly marked with a black-bordered **Admin · All roles** badge to distinguish it from user-facing screens.
+
 ---
 
 ## 3. Login Credentials (Demo Data)

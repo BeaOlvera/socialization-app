@@ -84,9 +84,13 @@ export default function Home() {
         </div>
 
         {/* Role accordion */}
-        <div style={{ background: "#FFFFFF", border: "1px solid #E2E0DA", borderRadius: 20, padding: "20px 20px 16px", marginBottom: 12 }}>
-          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", color: "#AEABA3", textTransform: "uppercase", marginBottom: 14 }}>
-            Demo — select a role
+        <div style={{ background: "#FFFFFF", border: "2px solid #0A0A0A", borderRadius: 20, padding: "20px 20px 16px", marginBottom: 12, position: "relative" }}>
+          <div style={{ position: "absolute", top: -11, left: 20, display: "flex", alignItems: "center", gap: 6, background: "#0A0A0A", color: "#FFF", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", padding: "4px 10px", borderRadius: 6, textTransform: "uppercase" }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#FFD700", display: "inline-block" }} />
+            Admin · All roles
+          </div>
+          <p style={{ fontSize: 11, color: "#6B6B6B", marginBottom: 14, marginTop: 4 }}>
+            Admin-only view. Each role below links to that user's own home.
           </p>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
